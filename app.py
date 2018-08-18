@@ -1,10 +1,19 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, disconnect
 
+COLS = 9
 names = []
+stations = {}
+pre_fill = False
+
 with open('names.txt', 'r') as f:
+    i = 0
     for line in f.readlines():
-        names.append(line.strip())
+        name = line.strip()
+        names.append(name)
+        if pre_fill:
+            stations[i] = name
+            i += 1
 
 async_mode = None
 app = Flask(__name__)
@@ -14,16 +23,24 @@ socketio = SocketIO(app, async_mode=async_mode)
 
 @app.route('/')
 def index():
-    return render_template('index.html', names=names)
+    return render_template('student.html', names=names)
+
 
 @app.route('/teacher')
 def teacher():
-    return render_template('teacher.html')
+    return render_template('teacher.html', stations=stations)
 
 
 @socketio.on('seat')
-def test_message(message):
-    emit('seated', {'ip': request.remote_addr, 'message': message}, broadcast=True)
+def seat(message):
+    seat_index = (int(message['row']) - 1) * COLS + int(message['column']) - 1
+    name = message['name']
+    stations[seat_index] = name
+    emit('seated', {
+        'ip': request.remote_addr,
+        'name': name,
+        'seatIndex': seat_index},
+        broadcast=True)
 
 
 @socketio.on('disconnect_request')

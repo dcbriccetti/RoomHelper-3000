@@ -20,7 +20,13 @@
         <input id='front-view' type="checkbox" checked>
         <label for="front-view">View from Front
         </label>
+        <button id="choose">Choose</button>
     </div>
 </div>
+<script>
+{% for index, name in stations.items() %}
+    names[{{index}}] = "{{name}}";
+{% endfor %}
+</script>
 </body>
 </html>

@@ -6,17 +6,21 @@ const seats = [
     'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
     'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', '', 
 ];
+const names = new Array(rows * cols);
 const missingSeatIndexes = new Set([8, 35]);
 const aisleAfterColumn = 3;
+let selectedSeatIndex = null;
 
 $(document).ready(() => {
     const socket = io.connect();
 
     socket.on('seated', msg => {
-        const row0 = Number(msg.message.row) - 1;
-        const col0 = Number(msg.message.column) - 1;
-        const name = msg.message.name;
-        console.log(`Received ${msg.ip}, ${name}, ${row0}, ${msg.message.column}`);
-        seats[row0 * cols + col0] = name;
+        names[msg.seatIndex] = msg.name;
+    });
+
+    $('#choose').click(event => {
+        const s = [];
+        names.forEach((name, index) => {if (name) s.push(index);});
+        selectedSeatIndex = s.length === 0 ? null : s[Math.floor(Math.random() * s.length)];
     });
 });

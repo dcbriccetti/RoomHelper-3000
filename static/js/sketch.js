@@ -14,9 +14,12 @@ function draw() {
         textSize(14);
         strokeWeight(1);
         noStroke();
-        fill(136, 159, 178);
+        if (seatIndex === selectedSeatIndex)
+            fill(200, 159, 178);
+        else
+            fill(136, 159, 178);
         rect(startX, startY, w - 3, h - 3);
-        const name = seats[seatIndex];
+        const name = names[seatIndex] || seats[seatIndex];
         noStroke();
         fill(0);
         text(name, startX + 4, startY + 5, w, h);
