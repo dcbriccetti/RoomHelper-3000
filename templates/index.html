@@ -13,7 +13,12 @@
     <h1>Room Helper 3000😀</h1>
     <h2>Seat</h2>
     <form id="seat" method="POST" action='#'>
-        Name: <input type="text" id="name">
+        <select id="name">
+            <option value=' '>Choose Name</option>
+            {% for name in names %}
+            <option value='{{ name }}'>{{ name }}</option>
+            {% endfor %}
+        </select>
         <select id="row">
             <option value=' '>Choose Row</option>
             <option value='1'>A</option>
