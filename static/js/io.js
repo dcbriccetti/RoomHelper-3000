@@ -12,14 +12,6 @@ const aisleAfterColumn = 3;
 $(document).ready(() => {
     const socket = io.connect();
 
-    socket.on('connect', () => {
-        socket.emit('my_event', {data: 'I\'m connected!'});
-    });
-
-    socket.on('my_response', msg => {
-        console.log('Received ' + msg.data);
-    });
-
     socket.on('seated', msg => {
         const row0 = Number(msg.message.row) - 1;
         const col0 = Number(msg.message.column) - 1;

@@ -28,18 +28,7 @@ def test_message(message):
 
 @socketio.on('disconnect_request')
 def disconnect_request():
-    emit('my_response', {'data': 'Disconnected!'})
     disconnect()
-
-
-@socketio.on('connect')
-def test_connect():
-    emit('my_response', {'data': 'Connected'})
-
-
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected', request.sid)
 
 
 if __name__ == '__main__':
