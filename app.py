@@ -16,9 +16,9 @@ socketio = SocketIO(app, async_mode=async_mode)
 def index():
     return render_template('index.html', names=names)
 
-@app.route('/admin')
-def admin():
-    return render_template('admin.html', names=names)
+@app.route('/teacher')
+def teacher():
+    return render_template('teacher.html')
 
 
 @socketio.on('seat')

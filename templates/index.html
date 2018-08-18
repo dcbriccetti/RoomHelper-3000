@@ -6,12 +6,13 @@
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-    <script type="text/javascript" charset="utf-8" src="static/js/io.js"></script>
+    <script type="text/javascript" charset="utf-8" src="static/js/studentio.js"></script>
 </head>
 <body>
 <div class="container" id="container">
     <h1>Room Helper 3000😀</h1>
-    <h2>Seat</h2>
+    <br/>
+    <h2>Who’s Sitting Where?</h2>
     <form id="seat" method="POST" action='#'>
         <select id="name">
             <option value=' '>Choose Name</option>
@@ -40,6 +41,11 @@
         </select>
         <input type="submit" value="Set Location">
     </form>
+    <br/>
+    <h2>What’s Your Status?</h2>
+    <div>
+        <input id='need-help' type="checkbox"><label for="need-help">Need Help</label>
+    </div>
 </div>
 </body>
 </html>

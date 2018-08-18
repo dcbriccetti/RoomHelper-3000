@@ -19,9 +19,4 @@ $(document).ready(() => {
         console.log(`Received ${msg.ip}, ${name}, ${row0}, ${msg.message.column}`);
         seats[row0 * cols + col0] = name;
     });
-
-    $('form#seat').submit(event => {
-        socket.emit('seat', {name: $('#name').val(), row: $('#row').val(), column: $('#column').val()});
-        return false;
-    });
 });
