@@ -7,6 +7,13 @@ $(document).ready(() => {
     function column() {return $('#column').val();}
     function getSeatIndex() {return (Number(row()) - 1) * COLS + Number(column()) - 1;}
 
+    socket.on('set_names', msg => {
+        $('#name option:gt(0)').remove();
+        const sel = $('#name');
+        msg.names.split('\n').forEach(name =>
+            sel.append(`<option value="${name}">${name}</option>`));
+    });
+
     $('form#seat').submit(event => {
         if (name().length > 0 && row().length > 0 && column().length > 0) {
             socket.emit('seat', {name: name(), seatIndex: getSeatIndex()});

@@ -22,6 +22,7 @@ def teacher():
 
 @socketio.on('set_names')
 def set_names(message):
+    emit('set_names', message, broadcast=True)
     global names
     names = []
     assign_seats = message['assignSeats']
