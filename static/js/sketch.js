@@ -1,5 +1,5 @@
 function setup() {
-    createCanvas(800, 400).parent('container');
+    createCanvas(800, 400).parent('canvas');
     frameRate(2);
 }
 

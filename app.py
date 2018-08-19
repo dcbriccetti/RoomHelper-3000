@@ -4,14 +4,6 @@ from flask_socketio import SocketIO, emit, disconnect
 COLS = 9
 names = []
 stations = {}
-pre_fill = False
-
-with open('names.txt', 'r') as f:
-    for i, line in enumerate(f.readlines()):
-        name = line.strip()
-        names.append(name)
-        if pre_fill:
-            stations[i] = {'name': name}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -34,17 +26,31 @@ def seat_index(message):
     return (int(row_string) - 1) * COLS + int(column_string) - 1 \
         if row_string.strip() and column_string.strip() else None
 
+
+@socketio.on('set_names')
+def set_names(message):
+    global names
+    names = []
+    assign_seats = message['assignSeats']
+    for si, line in enumerate(message['names'].split('\n')):
+        name = line.strip()
+        names.append(name)
+        if assign_seats:
+            stations[si] = {'name': name}
+            broadcast_seated(name, si)
+
+
 @socketio.on('seat')
 def seat(message):
     si = seat_index(message)
-    if si:
+    if si is not None:
         name = message['name']
         stations[si] = {'name': name}
-        emit('seated', {
-            'ip': request.remote_addr,
-            'name': name,
-            'seatIndex': si},
-            broadcast=True)
+        broadcast_seated(name, si)
+
+
+def broadcast_seated(name, seat_index):
+    emit('seated', {'name': name, 'seatIndex': seat_index}, broadcast=True)
 
 
 @socketio.on('set_status')

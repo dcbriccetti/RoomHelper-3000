@@ -25,6 +25,10 @@ $(document).ready(() => {
         needHelps[msg.seatIndex] = msg.station.needHelp;
     });
 
+    $('#set-names').click(event => {
+        socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
+    });
+
     $('#choose').click(event => {
         const s = [];
         names.forEach((name, index) => {if (name) s.push(index);});
