@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Room Helper 3000😀</title>
+    <title>Room Helper 3000 😀</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -9,13 +9,13 @@
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
             crossorigin="anonymous"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-    <script type="text/javascript" charset="utf-8" src="static/js/teacherio.js"></script>
+    <script type="text/javascript" charset="utf-8" src="static/js/teacher.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="static/js/sketch.js"></script>
 </head>
 <body>
 <div class="container" id="container">
-    <h1>Room Helper 3000😀</h1>
+    <h1>Room Helper 3000 😀</h1>
     <div>
         <input id='front-view' type="checkbox" checked>
         <label for="front-view">View from Front
@@ -24,8 +24,8 @@
     </div>
 </div>
 <script>
-{% for index, name in stations.items() %}
-    names[{{index}}] = "{{name}}";
+{% for index, station in stations.items() %}
+    names[{{index}}] = "{{station['name']}}";
 {% endfor %}
 </script>
 </body>

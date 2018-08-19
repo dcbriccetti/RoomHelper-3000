@@ -7,13 +7,11 @@ stations = {}
 pre_fill = False
 
 with open('names.txt', 'r') as f:
-    i = 0
-    for line in f.readlines():
+    for i, line in enumerate(f.readlines()):
         name = line.strip()
         names.append(name)
         if pre_fill:
-            stations[i] = name
-            i += 1
+            stations[i] = {'name': name}
 
 async_mode = None
 app = Flask(__name__)
@@ -33,14 +31,17 @@ def teacher():
 
 @socketio.on('seat')
 def seat(message):
-    seat_index = (int(message['row']) - 1) * COLS + int(message['column']) - 1
-    name = message['name']
-    stations[seat_index] = name
-    emit('seated', {
-        'ip': request.remote_addr,
-        'name': name,
-        'seatIndex': seat_index},
-        broadcast=True)
+    row_string = message['row']
+    column_string = message['column']
+    if row_string.strip() and column_string.strip():
+        seat_index = (int(row_string) - 1) * COLS + int(column_string) - 1
+        name = message['name']
+        stations[seat_index] = {'name': name}
+        emit('seated', {
+            'ip': request.remote_addr,
+            'name': name,
+            'seatIndex': seat_index},
+            broadcast=True)
 
 
 @socketio.on('disconnect_request')

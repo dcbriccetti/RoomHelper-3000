@@ -9,7 +9,7 @@ function draw() {
     const h = height / rows;
     const frontView = $('#front-view').is(':checked');
 
-    function drawGroup(startX, startY, seatIndex) {
+    function drawStation(startX, startY, seatIndex) {
         textFont('Helvetica');
         textSize(14);
         strokeWeight(1);
@@ -22,7 +22,8 @@ function draw() {
         const name = names[seatIndex] || seats[seatIndex];
         noStroke();
         fill(0);
-        text(name, startX + 4, startY + 5, w, h);
+        const xMargin = 4;
+        text(name, startX + xMargin, startY + 5, w - 2 * xMargin, h);
     }
 
     background(255);
@@ -36,7 +37,7 @@ function draw() {
                 const aisleAdj = frontView ?
                     ac > cols - 1 - 1 - aisleAfterColumn ? aisle : 0 :
                     ac > aisleAfterColumn ? aisle : 0;
-                drawGroup(ac * w + aisleAdj, ar * h, seatIndex);
+                drawStation(ac * w + aisleAdj, ar * h, seatIndex);
             }
         }
     }
