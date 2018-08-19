@@ -26,6 +26,8 @@
 <script>
 {% for index, station in stations.items() %}
     names[{{index}}] = "{{station['name']}}";
+    dones[{{index}}] = "{{station['done']}}" === 'True';
+    needHelps[{{index}}] = "{{station['needHelp']}}" === 'True';
 {% endfor %}
 </script>
 </body>

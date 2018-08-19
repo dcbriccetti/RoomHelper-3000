@@ -8,6 +8,10 @@ function draw() {
     const w = (width - aisle) / cols;
     const h = height / rows;
     const frontView = $('#front-view').is(':checked');
+    const normalColor = [168, 196, 219];
+    const selectedColor = [200, 159, 178];
+    const doneColor = [99, 255, 139];
+    const needHelpColor = [255, 146, 69];
 
     function drawStation(startX, startY, seatIndex) {
         textFont('Helvetica');
@@ -15,9 +19,13 @@ function draw() {
         strokeWeight(1);
         noStroke();
         if (seatIndex === selectedSeatIndex)
-            fill(200, 159, 178);
+            fill(...selectedColor);
+        else if (needHelps[seatIndex])
+            fill(...needHelpColor);
+        else if (dones[seatIndex])
+            fill(...doneColor);
         else
-            fill(136, 159, 178);
+            fill(...normalColor);
         rect(startX, startY, w - 3, h - 3);
         const name = names[seatIndex] || seats[seatIndex];
         noStroke();

@@ -15,20 +15,20 @@
     <h2>Name and Location</h2>
     <form id="seat" method="POST" action='#'>
         <select id="name">
-            <option value=' '>Choose Name</option>
+            <option value=''>Choose Name</option>
             {% for name in names %}
             <option value='{{ name }}'>{{ name }}</option>
             {% endfor %}
         </select>
         <select id="row">
-            <option value=' '>Choose Row</option>
+            <option value=''>Choose Row</option>
             <option value='1'>A</option>
             <option value='2'>B</option>
             <option value='3'>C</option>
             <option value='4'>D</option>
         </select>
         <select id="column">
-            <option value=' '>Choose Column</option>
+            <option value=''>Choose Column</option>
             <option value='1'>1</option>
             <option value='2'>2</option>
             <option value='3'>3</option>
@@ -42,6 +42,11 @@
         <input type="submit" value="Set">
     </form>
     <br/>
+     <div id="status" style="display: none">
+         <h2>Your Progress</h2>
+         <input id='need-help' type="checkbox"><label for="need-help">Need Help</label>
+         <input id='done' type="checkbox" style="margin-left: 1em"><label for="done">Done with current assignment</label>
+     </div>
 </div>
 </body>
 </html>

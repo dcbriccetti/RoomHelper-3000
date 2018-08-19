@@ -13,10 +13,9 @@ with open('names.txt', 'r') as f:
         if pre_fill:
             stations[i] = {'name': name}
 
-async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode=async_mode)
+socketio = SocketIO(app)
 
 
 @app.route('/')
@@ -29,19 +28,36 @@ def teacher():
     return render_template('teacher.html', stations=stations)
 
 
-@socketio.on('seat')
-def seat(message):
+def seat_index(message):
     row_string = message['row']
     column_string = message['column']
-    if row_string.strip() and column_string.strip():
-        seat_index = (int(row_string) - 1) * COLS + int(column_string) - 1
+    return (int(row_string) - 1) * COLS + int(column_string) - 1 \
+        if row_string.strip() and column_string.strip() else None
+
+@socketio.on('seat')
+def seat(message):
+    si = seat_index(message)
+    if si:
         name = message['name']
-        stations[seat_index] = {'name': name}
+        stations[si] = {'name': name}
         emit('seated', {
             'ip': request.remote_addr,
             'name': name,
-            'seatIndex': seat_index},
+            'seatIndex': si},
             broadcast=True)
+
+
+@socketio.on('set_status')
+def set_status(message):
+    si = seat_index(message)
+    if si is not None:
+        station = stations.get(si)
+        if station:
+            station['done'] = message['done']
+            station['needHelp'] = message['needHelp']
+            message['seatIndex'] = si
+            ss_msg = {'seatIndex': si, 'station': station}
+            emit('status_set', ss_msg, broadcast=True)
 
 
 @socketio.on('disconnect_request')

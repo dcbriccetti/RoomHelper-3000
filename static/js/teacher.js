@@ -7,6 +7,8 @@ const seats = [
     'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', '', 
 ];
 const names = new Array(rows * cols);
+const dones = new Array(rows * cols);
+const needHelps = new Array(rows * cols);
 const missingSeatIndexes = new Set([8, 35]);
 const aisleAfterColumn = 3;
 let selectedSeatIndex = null;
@@ -16,6 +18,11 @@ $(document).ready(() => {
 
     socket.on('seated', msg => {
         names[msg.seatIndex] = msg.name;
+    });
+
+    socket.on('status_set', msg => {
+        dones[msg.seatIndex] = msg.station.done;
+        needHelps[msg.seatIndex] = msg.station.needHelp;
     });
 
     $('#choose').click(event => {
