@@ -15,7 +15,6 @@ function draw() {
 
     function drawStation(startX, startY, seatIndex) {
         textFont('Helvetica');
-        textSize(14);
         noStroke();
         if (seatIndex === selectedSeatIndex)
             fill(...selectedColor);
@@ -25,11 +24,24 @@ function draw() {
             fill(...doneColor);
         else
             fill(...normalColor);
+
         rect(startX, startY, w - 3, h - 3);
-        const name = names[seatIndex] || seats[seatIndex];
+
         fill(0);
-        const xMargin = 4;
-        text(name, startX + xMargin, startY + 5, w - 2 * xMargin, h);
+        const xMargin = 2;
+        textSize(10);
+        textAlign(LEFT, TOP);
+        text(seats[seatIndex], startX + xMargin, startY + 3, w - 2 * xMargin, h);
+        const name = names[seatIndex];
+        if (name) {
+            const parts = name.split(', ');
+            textSize(20);
+            textAlign(CENTER, CENTER);
+            if (textWidth(parts[1]) > w) textSize(14);
+            text(parts[1], startX + w / 2, startY + h / 3);
+            textSize(12);
+            text(parts[0], startX + w / 2, startY + h / 3 + 20);
+        }
     }
 
     background(255);
