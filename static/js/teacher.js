@@ -16,7 +16,16 @@ let selectedSeatIndex = null;
 $(document).ready(() => {
     const socket = io.connect();
 
+    function clearNameElsewhere(newSeatIndex, clearName) {
+        names.forEach((name, i) => {
+            if (i !== newSeatIndex && name === clearName) {
+                names[i] = dones[i] = needHelps[i] = null;
+            }
+        });
+    }
+
     socket.on('seated', msg => {
+        clearNameElsewhere(msg.seatIndex, msg.name);
         names[msg.seatIndex] = msg.name;
     });
 

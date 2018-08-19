@@ -20,13 +20,6 @@ def teacher():
     return render_template('teacher.html', stations=stations)
 
 
-def seat_index(message):
-    row_string = message['row']
-    column_string = message['column']
-    return (int(row_string) - 1) * COLS + int(column_string) - 1 \
-        if row_string.strip() and column_string.strip() else None
-
-
 @socketio.on('set_names')
 def set_names(message):
     global names
@@ -42,11 +35,13 @@ def set_names(message):
 
 @socketio.on('seat')
 def seat(message):
-    si = seat_index(message)
-    if si is not None:
-        name = message['name']
-        stations[si] = {'name': name}
-        broadcast_seated(name, si)
+    name = message['name']
+    si = message['seatIndex']
+    existing_different_index = [i for i, station in stations.items() if station['name'] == name and i != si]
+    if existing_different_index:
+        del stations[existing_different_index[0]]
+    stations[si] = {'name': name}
+    broadcast_seated(name, si)
 
 
 def broadcast_seated(name, seat_index):
@@ -55,15 +50,14 @@ def broadcast_seated(name, seat_index):
 
 @socketio.on('set_status')
 def set_status(message):
-    si = seat_index(message)
-    if si is not None:
-        station = stations.get(si)
-        if station:
-            station['done'] = message['done']
-            station['needHelp'] = message['needHelp']
-            message['seatIndex'] = si
-            ss_msg = {'seatIndex': si, 'station': station}
-            emit('status_set', ss_msg, broadcast=True)
+    si = message['seatIndex']
+    station = stations.get(si)
+    if station:
+        station['done'] = message['done']
+        station['needHelp'] = message['needHelp']
+        message['seatIndex'] = si
+        ss_msg = {'seatIndex': si, 'station': station}
+        emit('status_set', ss_msg, broadcast=True)
 
 
 @socketio.on('disconnect_request')
