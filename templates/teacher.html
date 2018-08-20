@@ -34,14 +34,7 @@
 function loadStations() {
     let stationsFromServer = {{stationJson | safe}};
     for (const index in stationsFromServer) {
-        const v = stationsFromServer[index];
-        const station = stations[index] || new Station();
-        station.ip = v.ip;
-        station.nickname = v.nickname;
-        station.name = v.name;
-        station.done = v.done;
-        station.needHelp = v.needHelp;
-        stations[index] = station;
+        stations[index] = stationsFromServer[index];
     }
 }
 loadStations();

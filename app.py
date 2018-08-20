@@ -55,8 +55,9 @@ def set_names(message):
         name = line.strip()
         names.append(name)
         if assign_seats:
-            stations[si] = {'ip': ip, 'nickname': '', 'name': name}
-            broadcast_seated(ip, '', name, si)
+            station = {'ip': ip, 'nickname': '', 'name': name}
+            stations[si] = station
+            broadcast_seated(station, si)
 
 
 @socketio.on('seat')
@@ -69,12 +70,13 @@ def seat(message):
     existing_different_index = [i for i, station in stations.items() if station['name'] == name and i != si]
     if existing_different_index:
         del stations[existing_different_index[0]]
-    stations[si] = {'ip': ip, 'nickname': nickname, 'name': name}
-    broadcast_seated(ip, nickname, name, si)
+    station = {'ip': ip, 'nickname': nickname, 'name': name}
+    stations[si] = station
+    broadcast_seated(station, si)
 
 
-def broadcast_seated(ip, nickname, name, seat_index):
-    emit('seated', {'ip': ip, 'nickname': nickname, 'name': name, 'seatIndex': seat_index}, broadcast=True)
+def broadcast_seated(station, seat_index):
+    emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True)
 
 
 @socketio.on('set_status')
