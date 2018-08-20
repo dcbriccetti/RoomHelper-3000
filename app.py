@@ -1,11 +1,16 @@
 from random import choice
+from time import time
+
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit, disconnect
 import logging
 
-logging.basicConfig(filename='log.txt', level=logging.DEBUG,
-    format='%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s')
-logger = logging.getLogger(__name__)
+logFormatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s")
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+for handler in (logging.FileHandler('log.txt'), logging.StreamHandler()):
+    handler.setFormatter(logFormatter)
+    logger.addHandler(handler)
 
 settings = {
     'columns': 9,
@@ -41,11 +46,15 @@ def connect():
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
-@socketio.on('disconnect_request')
+@socketio.on('disconnect')
 def disconnect_request():
     r = request
-    logger.info('Disconnecting %s, %s', r.remote_addr, r.sid)
-    disconnect()
+    logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
+    matches = [item for item in stations.items() if r.sid == item[1].get('sid')]
+    if matches:
+        station_index, station = matches[0]
+        clearStation(station)
+        emit('clear_station', station_index, broadcast=True)
 
 
 @socketio.on('set_names')
@@ -58,12 +67,12 @@ def set_names(message):
     names = []
     assign_seats = message['assignSeats']
 
-    def nextSi(start):
+    def skip_missing(start):
         while start in settings['missingSeatIndexes']:
             start += 1
         return start
 
-    si = nextSi(0)
+    si = skip_missing(0)
     for line in message['names'].split('\n'):
         name = line.strip()
         names.append(name)
@@ -71,7 +80,7 @@ def set_names(message):
             station = {'ip': ip, 'nickname': '', 'name': name}
             stations[si] = station
             broadcast_seated(station, si)
-            si = nextSi(si + 1)
+            si = skip_missing(si + 1)
 
 
 @socketio.on('seat')
@@ -81,10 +90,10 @@ def seat(message):
     si = message['seatIndex']
     ip = request.remote_addr
     logger.info('%s seat %s %s to %d', ip, name, nickname, si)
-    existing_different_index = [i for i, station in stations.items() if station['name'] == name and i != si]
+    existing_different_index = [i for i, station in stations.items() if station.get('name') == name and i != si]
     if existing_different_index:
         del stations[existing_different_index[0]]
-    station = {'ip': ip, 'nickname': nickname, 'name': name}
+    station = {'ip': ip, 'sid': request.sid, 'nickname': nickname, 'name': name}
     stations[si] = station
     broadcast_seated(station, si)
 
@@ -120,10 +129,17 @@ def set_status(message):
         done = message['done']
         need_help = message['needHelp']
         logging.info('set_status %s: done: %s, need help: %s', message['name'], done, need_help)
-        station['done'] = done
-        station['needHelp'] = need_help
+        now = time()
+        station['done'] = now if done else None
+        station['needHelp'] = now if need_help else None
         ss_msg = {'seatIndex': si, 'station': station}
         emit('status_set', ss_msg, broadcast=True)
+
+
+def clearStation(station):
+    for key in ('nickname', 'name', 'needHelp', 'done'):
+        if key in station:
+            del station[key]
 
 
 if __name__ == '__main__':

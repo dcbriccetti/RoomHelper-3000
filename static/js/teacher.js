@@ -17,6 +17,8 @@ $(document).ready(() => {
         stations[msg.seatIndex] = msg.station;
     });
 
+    socket.on('clear_station', seatIndex => {stations[seatIndex] = null;});
+
     socket.on('status_set', msg => {
         stations[msg.seatIndex].done = msg.station.done;
         stations[msg.seatIndex].needHelp = msg.station.needHelp;

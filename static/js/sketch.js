@@ -60,7 +60,7 @@ function draw() {
 
     for (let r = 0; r < settings.rows; ++r) {
         for (let c = 0; c < settings.columns; ++c) {
-            const seatIndex = r * 9 + c;
+            const seatIndex = r * settings.columns + c;
             if (!missingSeatIndexes.has(seatIndex)) {
                 const ar = frontView ? settings.rows - 1 - r : r;
                 const ac = frontView ? settings.columns - 1 - c : c;
