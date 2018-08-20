@@ -4,14 +4,20 @@ function setup() {
 }
 
 function draw() {
-    const aisle = 7;
-    const w = (width - aisle) / cols;
-    const h = height / rows;
+    const aisleWidth = 7;
+    const w = (width - aisleWidth) / settings.columns;
+    const h = height / settings.rows;
     const frontView = $('#front-view').is(':checked');
     const normalColor =     [168, 196, 219];
     const selectedColor =   [200, 159, 178];
     const doneColor =       [99,  255, 139];
     const needHelpColor =   [255, 146,  69];
+
+    function stationName(index) {
+        const rowFrom0 = Math.floor(index / settings.columns);
+        const colFrom0 = index % settings.columns;
+        return String.fromCharCode('A'.charCodeAt(0) + rowFrom0) + (colFrom0 + 1);
+    }
 
     function drawStation(startX, startY, seatIndex) {
         textFont('Helvetica');
@@ -32,7 +38,7 @@ function draw() {
         const xMargin = 2;
         textSize(10);
         textAlign(LEFT, TOP);
-        text(seats[seatIndex], startX + xMargin, startY + 3);
+        text(stationName(seatIndex), startX + xMargin, startY + 3);
 
         if (station && station.name) {
             textAlign(RIGHT);
@@ -50,15 +56,17 @@ function draw() {
 
     background(255);
 
-    for (let r = 0; r < rows; ++r) {
-        for (let c = 0; c < cols; ++c) {
+    const missingSeatIndexes = new Set(settings.missingSeatIndexes);
+
+    for (let r = 0; r < settings.rows; ++r) {
+        for (let c = 0; c < settings.columns; ++c) {
             const seatIndex = r * 9 + c;
             if (!missingSeatIndexes.has(seatIndex)) {
-                const ar = frontView ? rows - 1 - r : r;
-                const ac = frontView ? cols - 1 - c : c;
+                const ar = frontView ? settings.rows - 1 - r : r;
+                const ac = frontView ? settings.columns - 1 - c : c;
                 const aisleAdj = frontView ?
-                    ac > cols - 1 - 1 - aisleAfterColumn ? aisle : 0 :
-                    ac > aisleAfterColumn ? aisle : 0;
+                    ac > settings.columns - 1 - 1 - settings.aisleAfterColumn ? aisleWidth : 0 :
+                    ac > settings.aisleAfterColumn ? aisleWidth : 0;
                 drawStation(ac * w + aisleAdj, ar * h, seatIndex);
             }
         }

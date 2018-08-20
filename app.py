@@ -6,7 +6,12 @@ logging.basicConfig(filename='log.txt', level=logging.DEBUG,
     format='%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s')
 logger = logging.getLogger(__name__)
 
-COLS = 9
+settings = {
+    'columns': 9,
+    'rows': 4,
+    'missingSeatIndexes': [8, 35],
+    'aisleAfterColumn': 3
+}
 names = []
 stations = {}
 
@@ -19,14 +24,14 @@ socketio = SocketIO(app)
 def index():
     r = request
     logger.info('Student page requested from %s, %s', r.remote_addr, r.user_agent)
-    return render_template('student.html', names=names)
+    return render_template('student.html', settings=json.dumps(settings), names=names)
 
 
 @app.route('/teacher')
 def teacher():
     r = request
     logger.info('Teacher page requested from %s, %s', r.remote_addr, r.user_agent)
-    return render_template('teacher.html', stationJson=json.dumps(stations))
+    return render_template('teacher.html', settings=json.dumps(settings), stationJson=json.dumps(stations))
 
 
 @socketio.on('connect')

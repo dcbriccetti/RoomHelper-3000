@@ -1,29 +1,18 @@
-const rows = 4;
-const cols = 9;
-const seats = [
-    'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', '',
-    'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9',
-    'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
-    'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', '',
-];
-
-const stations = new Array(rows * cols);
-const missingSeatIndexes = new Set([8, 35]);
-const aisleAfterColumn = 3;
+const stations = new Array(settings.rows * settings.columns);
 let selectedSeatIndex = null;
 
 $(document).ready(() => {
     const socket = io.connect();
 
-    function clearNameElsewhere(newSeatIndex, clearName) {
-        stations.forEach((station, i) => {
-            if (i !== newSeatIndex && station.name === clearName) {
-                station.ip = station.nickname = station.name = station.done = station.needHelp = null;
-            }
-        });
-    }
-
     socket.on('seated', msg => {
+        function clearNameElsewhere(newSeatIndex, clearName) {
+            stations.forEach((station, i) => {
+                if (i !== newSeatIndex && station.name === clearName) {
+                    station.ip = station.nickname = station.name = station.done = station.needHelp = null;
+                }
+            });
+        }
+
         clearNameElsewhere(msg.seatIndex, msg.station.name);
         stations[msg.seatIndex] = msg.station;
     });

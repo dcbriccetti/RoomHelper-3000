@@ -1,12 +1,11 @@
 $(document).ready(() => {
-    const COLS = 9;
     const socket = io.connect();
 
     function nickname() {return $('#nickname').val();}
     function name() {return $('#name').val();}
     function row() {return $('#row').val();}
     function column() {return $('#column').val();}
-    function getSeatIndex() {return (Number(row()) - 1) * COLS + Number(column()) - 1;}
+    function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     socket.on('set_names', msg => {
         $('#name option:gt(0)').remove();
