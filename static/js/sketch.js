@@ -16,11 +16,12 @@ function draw() {
     function drawStation(startX, startY, seatIndex) {
         textFont('Helvetica');
         noStroke();
+        const station = stations[seatIndex];
         if (seatIndex === selectedSeatIndex)
             fill(...selectedColor);
-        else if (needHelps[seatIndex])
+        else if (station && station.needHelp)
             fill(...needHelpColor);
-        else if (dones[seatIndex])
+        else if (station && station.done)
             fill(...doneColor);
         else
             fill(...normalColor);
@@ -31,10 +32,12 @@ function draw() {
         const xMargin = 2;
         textSize(10);
         textAlign(LEFT, TOP);
-        text(seats[seatIndex], startX + xMargin, startY + 3, w - 2 * xMargin, h);
-        const name = names[seatIndex];
-        if (name) {
-            const parts = name.split(', ');
+        text(seats[seatIndex], startX + xMargin, startY + 3);
+
+        if (station && station.name) {
+            textAlign(RIGHT);
+            text(station.ip, startX + w - xMargin - 2 /* todo why this 2 */, startY + 3);
+            const parts = station.name.split(', ');
             textSize(20);
             textAlign(CENTER, CENTER);
             if (textWidth(parts[1]) > w) textSize(14);

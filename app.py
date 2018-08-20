@@ -1,5 +1,10 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, disconnect
+import logging
+
+logging.basicConfig(filename='log.txt', level=logging.DEBUG,
+    format='%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s')
+logger = logging.getLogger(__name__)
 
 COLS = 9
 names = []
@@ -12,16 +17,36 @@ socketio = SocketIO(app)
 
 @app.route('/')
 def index():
+    r = request
+    logger.info('Student page requested from %s, %s', r.remote_addr, r.user_agent)
     return render_template('student.html', names=names)
 
 
 @app.route('/teacher')
 def teacher():
-    return render_template('teacher.html', stations=stations)
+    r = request
+    logger.info('Teacher page requested from %s, %s', r.remote_addr, r.user_agent)
+    return render_template('teacher.html', stationDict=stations)
+
+
+@socketio.on('connect')
+def connect():
+    r = request
+    logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
+
+
+@socketio.on('disconnect_request')
+def disconnect_request():
+    r = request
+    logger.info('Disconnecting %s, %s', r.remote_addr, r.sid)
+    disconnect()
 
 
 @socketio.on('set_names')
 def set_names(message):
+    r = request
+    ip = r.remote_addr
+    logger.info('set_names from %s, %s', ip, r.sid)
     emit('set_names', message, broadcast=True)
     global names
     names = []
@@ -30,23 +55,25 @@ def set_names(message):
         name = line.strip()
         names.append(name)
         if assign_seats:
-            stations[si] = {'name': name}
-            broadcast_seated(name, si)
+            stations[si] = {'ip': ip, 'name': name}
+            broadcast_seated(ip, name, si)
 
 
 @socketio.on('seat')
 def seat(message):
     name = message['name']
     si = message['seatIndex']
+    ip = request.remote_addr
+    logger.info('%s seat %s to %d', ip, name, si)
     existing_different_index = [i for i, station in stations.items() if station['name'] == name and i != si]
     if existing_different_index:
         del stations[existing_different_index[0]]
-    stations[si] = {'name': name}
-    broadcast_seated(name, si)
+    stations[si] = {'ip': ip, 'name': name}
+    broadcast_seated(ip, name, si)
 
 
-def broadcast_seated(name, seat_index):
-    emit('seated', {'name': name, 'seatIndex': seat_index}, broadcast=True)
+def broadcast_seated(ip, name, seat_index):
+    emit('seated', {'ip': ip, 'name': name, 'seatIndex': seat_index}, broadcast=True)
 
 
 @socketio.on('set_status')
@@ -54,16 +81,13 @@ def set_status(message):
     si = message['seatIndex']
     station = stations.get(si)
     if station:
-        station['done'] = message['done']
-        station['needHelp'] = message['needHelp']
-        message['seatIndex'] = si
+        done = message['done']
+        need_help = message['needHelp']
+        logging.info('set_status %s: done: %s, need help: %s', message['name'], done, need_help)
+        station['done'] = done
+        station['needHelp'] = need_help
         ss_msg = {'seatIndex': si, 'station': station}
         emit('status_set', ss_msg, broadcast=True)
-
-
-@socketio.on('disconnect_request')
-def disconnect_request():
-    disconnect()
 
 
 if __name__ == '__main__':

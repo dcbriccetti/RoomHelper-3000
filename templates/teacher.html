@@ -31,11 +31,18 @@
 </div>
 </div>
 <script>
-{% for index, station in stations.items() %}
-    names[{{index}}] = "{{station['name']}}";
-    dones[{{index}}] = "{{station['done']}}" === 'True';
-    needHelps[{{index}}] = "{{station['needHelp']}}" === 'True';
-{% endfor %}
+function loadStations() {
+    let station;
+    {% for index, stationElem in stationDict.items() %}
+    station = stations[{{index}}] || new Station();
+    station.ip = "{{stationElem['ip']}}";
+    station.name = "{{stationElem['name']}}";
+    station.done = "{{stationElem['done']}}" === 'True';
+    station.needHelp = "{{stationElem['needHelp']}}" === 'True';
+    stations[{{index}}] = station;
+    {% endfor %}
+}
+loadStations();
 </script>
 </body>
 </html>

@@ -6,9 +6,18 @@ const seats = [
     'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
     'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', '', 
 ];
-const names = new Array(rows * cols);
-const dones = new Array(rows * cols);
-const needHelps = new Array(rows * cols);
+
+class Station {
+    constructor() {
+        this.reset();
+    }
+
+    reset() {
+        this.ip = this.name = this.done = this.needHelp = null;
+    }
+}
+
+const stations = new Array(rows * cols).map(() => new Station());
 const missingSeatIndexes = new Set([8, 35]);
 const aisleAfterColumn = 3;
 let selectedSeatIndex = null;
@@ -17,21 +26,24 @@ $(document).ready(() => {
     const socket = io.connect();
 
     function clearNameElsewhere(newSeatIndex, clearName) {
-        names.forEach((name, i) => {
-            if (i !== newSeatIndex && name === clearName) {
-                names[i] = dones[i] = needHelps[i] = null;
+        stations.forEach((station, i) => {
+            if (i !== newSeatIndex && station.name === clearName) {
+                station.reset();
             }
         });
     }
 
     socket.on('seated', msg => {
         clearNameElsewhere(msg.seatIndex, msg.name);
-        names[msg.seatIndex] = msg.name;
+        const s = new Station();
+        s.ip = msg.ip;
+        s.name = msg.name;
+        stations[msg.seatIndex] = s;
     });
 
     socket.on('status_set', msg => {
-        dones[msg.seatIndex] = msg.station.done;
-        needHelps[msg.seatIndex] = msg.station.needHelp;
+        stations[msg.seatIndex].done = msg.station.done;
+        stations[msg.seatIndex].needHelp = msg.station.needHelp;
     });
 
     $('#set-names').click(event => {
@@ -40,7 +52,7 @@ $(document).ready(() => {
 
     $('#choose').click(event => {
         const s = [];
-        names.forEach((name, index) => {if (name) s.push(index);});
+        stations.forEach((station, index) => {if (station.name) s.push(index);});
         selectedSeatIndex = s.length === 0 ? null : s[Math.floor(Math.random() * s.length)];
     });
 });
