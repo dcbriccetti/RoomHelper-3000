@@ -13,7 +13,7 @@ class Station {
     }
 
     reset() {
-        this.ip = this.name = this.done = this.needHelp = null;
+        this.ip = this.nickname = this.name = this.done = this.needHelp = null;
     }
 }
 
@@ -37,6 +37,7 @@ $(document).ready(() => {
         clearNameElsewhere(msg.seatIndex, msg.name);
         const s = new Station();
         s.ip = msg.ip;
+        s.nickname = msg.nickname;
         s.name = msg.name;
         stations[msg.seatIndex] = s;
     });

@@ -2,6 +2,7 @@ $(document).ready(() => {
     const COLS = 9;
     const socket = io.connect();
 
+    function nickname() {return $('#nickname').val();}
     function name() {return $('#name').val();}
     function row() {return $('#row').val();}
     function column() {return $('#column').val();}
@@ -16,7 +17,7 @@ $(document).ready(() => {
 
     $('form#seat').submit(event => {
         if (name().length > 0 && row().length > 0 && column().length > 0) {
-            socket.emit('seat', {name: name(), seatIndex: getSeatIndex()});
+            socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
             $('#status').show();
         }
         return false;

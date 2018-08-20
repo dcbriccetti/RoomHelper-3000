@@ -32,15 +32,17 @@
 </div>
 <script>
 function loadStations() {
-    let station;
-    {% for index, stationElem in stationDict.items() %}
-    station = stations[{{index}}] || new Station();
-    station.ip = "{{stationElem['ip']}}";
-    station.name = "{{stationElem['name']}}";
-    station.done = "{{stationElem['done']}}" === 'True';
-    station.needHelp = "{{stationElem['needHelp']}}" === 'True';
-    stations[{{index}}] = station;
-    {% endfor %}
+    let stationsFromServer = {{stationJson | safe}};
+    for (const index in stationsFromServer) {
+        const v = stationsFromServer[index];
+        const station = stations[index] || new Station();
+        station.ip = v.ip;
+        station.nickname = v.nickname;
+        station.name = v.name;
+        station.done = v.done;
+        station.needHelp = v.needHelp;
+        stations[index] = station;
+    }
 }
 loadStations();
 </script>

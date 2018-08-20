@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit, disconnect
 import logging
 
@@ -26,7 +26,7 @@ def index():
 def teacher():
     r = request
     logger.info('Teacher page requested from %s, %s', r.remote_addr, r.user_agent)
-    return render_template('teacher.html', stationDict=stations)
+    return render_template('teacher.html', stationJson=json.dumps(stations))
 
 
 @socketio.on('connect')
@@ -55,25 +55,26 @@ def set_names(message):
         name = line.strip()
         names.append(name)
         if assign_seats:
-            stations[si] = {'ip': ip, 'name': name}
-            broadcast_seated(ip, name, si)
+            stations[si] = {'ip': ip, 'nickname': '', 'name': name}
+            broadcast_seated(ip, '', name, si)
 
 
 @socketio.on('seat')
 def seat(message):
+    nickname = message['nickname']
     name = message['name']
     si = message['seatIndex']
     ip = request.remote_addr
-    logger.info('%s seat %s to %d', ip, name, si)
+    logger.info('%s seat %s %s to %d', ip, name, nickname, si)
     existing_different_index = [i for i, station in stations.items() if station['name'] == name and i != si]
     if existing_different_index:
         del stations[existing_different_index[0]]
-    stations[si] = {'ip': ip, 'name': name}
-    broadcast_seated(ip, name, si)
+    stations[si] = {'ip': ip, 'nickname': nickname, 'name': name}
+    broadcast_seated(ip, nickname, name, si)
 
 
-def broadcast_seated(ip, name, seat_index):
-    emit('seated', {'ip': ip, 'name': name, 'seatIndex': seat_index}, broadcast=True)
+def broadcast_seated(ip, nickname, name, seat_index):
+    emit('seated', {'ip': ip, 'nickname': nickname, 'name': name, 'seatIndex': seat_index}, broadcast=True)
 
 
 @socketio.on('set_status')

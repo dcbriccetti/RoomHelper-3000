@@ -40,8 +40,9 @@ function draw() {
             const parts = station.name.split(', ');
             textSize(20);
             textAlign(CENTER, CENTER);
-            if (textWidth(parts[1]) > w) textSize(14);
-            text(parts[1], startX + w / 2, startY + h / 3);
+            const name = station.nickname || parts[1];
+            if (textWidth(name) > w) textSize(14);
+            text(name, startX + w / 2, startY + h / 3);
             textSize(12);
             text(parts[0], startX + w / 2, startY + h / 3 + 20);
         }
