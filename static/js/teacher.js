@@ -26,9 +26,11 @@ $(document).ready(() => {
         socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
     });
 
+    $('#random-set').click(event => {
+        socket.emit('random_set', Number($('#random-set-number').val()));
+    });
+
     $('#choose').click(event => {
-        const s = [];
-        stations.forEach((station, index) => {if (station.name) s.push(index);});
-        selectedSeatIndex = s.length === 0 ? null : s[Math.floor(Math.random() * s.length)];
+        socket.emit('random_call', null, (i) => selectedSeatIndex = i === -1 ? null : i);
     });
 });

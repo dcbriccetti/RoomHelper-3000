@@ -1,3 +1,4 @@
+from random import choice
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit, disconnect
 import logging
@@ -56,13 +57,21 @@ def set_names(message):
     global names
     names = []
     assign_seats = message['assignSeats']
-    for si, line in enumerate(message['names'].split('\n')):
+
+    def nextSi(start):
+        while start in settings['missingSeatIndexes']:
+            start += 1
+        return start
+
+    si = nextSi(0)
+    for line in message['names'].split('\n'):
         name = line.strip()
         names.append(name)
         if assign_seats:
             station = {'ip': ip, 'nickname': '', 'name': name}
             stations[si] = station
             broadcast_seated(station, si)
+            si = nextSi(si + 1)
 
 
 @socketio.on('seat')
@@ -78,6 +87,25 @@ def seat(message):
     station = {'ip': ip, 'nickname': nickname, 'name': name}
     stations[si] = station
     broadcast_seated(station, si)
+
+
+@socketio.on('random_set')
+def random_set(random_calls_limit):
+    logger.info('Random calls limit set to %d', random_calls_limit)
+    for station in stations.values():
+        if station.get('name'):
+            station['callsLeft'] = random_calls_limit
+
+
+@socketio.on('random_call')
+def random_call(ignore):
+    eligible = [(k, v) for k, v in stations.items() if v.get('callsLeft', 0) > 0]
+    if not eligible:
+        return -1
+    chosen = choice(eligible)
+    chosen[1]['callsLeft'] -= 1
+    logger.info('%s %s called randomly', chosen[1].get('nickname', ''), chosen[1]['name'])
+    return chosen[0]
 
 
 def broadcast_seated(station, seat_index):
