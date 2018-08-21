@@ -20,8 +20,15 @@ $(() => {
     socket.on('clear_station', seatIndex => {stations[seatIndex] = null;});
 
     socket.on('status_set', msg => {
-        stations[msg.seatIndex].done = msg.station.done;
-        stations[msg.seatIndex].needHelp = msg.station.needHelp;
+        const station = stations[msg.seatIndex];
+        station.done = msg.station.done;
+        const haveAnswerChange = station.haveAnswer !== msg.station.haveAnswer;
+        station.haveAnswer = msg.station.haveAnswer;
+        station.needHelp = msg.station.needHelp;
+        if (haveAnswerChange) {
+            const numHave = stations.filter(s => s.haveAnswer).length;
+            $('#choose-with-answer').text(`${numHave} with Answer`)
+        }
     });
 
     $('#set-names').click(event => {
@@ -32,7 +39,11 @@ $(() => {
         socket.emit('random_set', Number($('#random-set-number').val()));
     });
 
-    $('#choose').click(event => {
-        socket.emit('random_call', null, (i) => selectedSeatIndex = i === -1 ? null : i);
-    });
+    function requestRandomCall(any) {
+        socket.emit('random_call', any, (i) => selectedSeatIndex = i === -1 ? null : i);
+    }
+
+    $('#choose')            .click(event => {requestRandomCall(true);});
+    $('#choose-with-answer').click(event => {requestRandomCall(false);});
+    $('#choose-reset')      .click(event => {selectedSeatIndex = null;});
 });

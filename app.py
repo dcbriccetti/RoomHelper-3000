@@ -117,8 +117,9 @@ def random_set(random_calls_limit):
 
 
 @socketio.on('random_call', namespace=TEACHER_NS)
-def random_call(ignore):
-    eligible = [(k, v) for k, v in stations.items() if v.get('callsLeft', 0) > 0]
+def random_call(any):
+    eligible = [(k, v) for k, v in stations.items() if v.get('callsLeft', 0) > 0
+                and (True if any else v.get('haveAnswer', False))]
     if not eligible:
         return -1
     chosen = choice(eligible)
@@ -137,17 +138,20 @@ def set_status(message):
     station = stations.get(si)
     if station:
         done = message['done']
+        have_answer = message['haveAnswer']
         need_help = message['needHelp']
-        logging.info('set_status %s: done: %s, need help: %s', message['name'], done, need_help)
+        logging.info('set_status %s: done: %s, have answer: %s, need help: %s',
+            message['name'], done, have_answer, need_help)
         now = time()
         station['done'] = now if done else None
+        station['haveAnswer'] = now if have_answer else None
         station['needHelp'] = now if need_help else None
         ss_msg = {'seatIndex': si, 'station': station}
         emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
 
 
 def clear_station(station):
-    for key in ('nickname', 'name', 'needHelp', 'done'):
+    for key in ('nickname', 'name', 'needHelp', 'done', 'haveAnswer'):
         if key in station:
             del station[key]
 

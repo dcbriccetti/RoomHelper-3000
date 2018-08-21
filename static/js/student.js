@@ -22,12 +22,14 @@ $(() => {
         return false;
     });
 
+    const statusKeys = ['needHelp', 'haveAnswer', 'done'];
+
     function updateStatus() {
-        socket.emit('set_status', {name: name(), seatIndex: getSeatIndex(),
-            needHelp: $('#need-help').is(':checked'),
-            done: $('#done').is(':checked')});
+        const args = {name: name(), seatIndex: getSeatIndex()};
+        statusKeys.forEach((key) => args[key] = $('#' + key).is(':checked'));
+        socket.emit('set_status', args);
         return true;
     }
 
-    ['need-help', 'done'].forEach(id => {$(`#${id}`).click(updateStatus);});
+    statusKeys.forEach(id => {$(`#${id}`).click(updateStatus);});
 });
