@@ -1,10 +1,10 @@
-$(document).ready(() => {
-    const socket = io.connect();
+$(() => {
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
-    function nickname() {return $('#nickname').val();}
-    function name() {return $('#name').val();}
-    function row() {return $('#row').val();}
-    function column() {return $('#column').val();}
+    function nickname()     {return $('#nickname').val();}
+    function name()         {return $('#name').val();}
+    function row()          {return $('#row').val();}
+    function column()       {return $('#column').val();}
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     socket.on('set_names', msg => {

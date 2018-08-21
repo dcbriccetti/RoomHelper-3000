@@ -1,9 +1,12 @@
+import logging
 from random import choice
 from time import time
 
 from flask import Flask, render_template, request, json
-from flask_socketio import SocketIO, emit, disconnect
-import logging
+from flask_socketio import SocketIO, emit
+
+STUDENT_NS = '/student'
+TEACHER_NS = '/teacher'
 
 logFormatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s")
 logger = logging.getLogger()
@@ -40,29 +43,36 @@ def teacher():
     return render_template('teacher.html', settings=json.dumps(settings), stationJson=json.dumps(stations))
 
 
-@socketio.on('connect')
+def on_all_namespaces(event, handler):
+    for ns in (TEACHER_NS, STUDENT_NS):
+        socketio.on_event(event, handler, namespace=ns)
+
+
 def connect():
     r = request
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
-@socketio.on('disconnect')
+on_all_namespaces('connect', connect)
+
+
+@socketio.on('disconnect', namespace=STUDENT_NS)
 def disconnect_request():
     r = request
     logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
     matches = [item for item in stations.items() if r.sid == item[1].get('sid')]
     if matches:
         station_index, station = matches[0]
-        clearStation(station)
-        emit('clear_station', station_index, broadcast=True)
+        clear_station(station)
+        emit('clear_station', station_index, broadcast=True, namespace=TEACHER_NS)
 
 
-@socketio.on('set_names')
+@socketio.on('set_names', namespace=TEACHER_NS)
 def set_names(message):
     r = request
     ip = r.remote_addr
     logger.info('set_names from %s, %s', ip, r.sid)
-    emit('set_names', message, broadcast=True)
+    emit('set_names', message, broadcast=True, namespace=STUDENT_NS)
     global names
     names = []
     assign_seats = message['assignSeats']
@@ -83,7 +93,7 @@ def set_names(message):
             si = skip_missing(si + 1)
 
 
-@socketio.on('seat')
+@socketio.on('seat', namespace=STUDENT_NS)
 def seat(message):
     nickname = message['nickname']
     name = message['name']
@@ -98,7 +108,7 @@ def seat(message):
     broadcast_seated(station, si)
 
 
-@socketio.on('random_set')
+@socketio.on('random_set', namespace=TEACHER_NS)
 def random_set(random_calls_limit):
     logger.info('Random calls limit set to %d', random_calls_limit)
     for station in stations.values():
@@ -106,7 +116,7 @@ def random_set(random_calls_limit):
             station['callsLeft'] = random_calls_limit
 
 
-@socketio.on('random_call')
+@socketio.on('random_call', namespace=TEACHER_NS)
 def random_call(ignore):
     eligible = [(k, v) for k, v in stations.items() if v.get('callsLeft', 0) > 0]
     if not eligible:
@@ -118,10 +128,10 @@ def random_call(ignore):
 
 
 def broadcast_seated(station, seat_index):
-    emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True)
+    emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
 
 
-@socketio.on('set_status')
+@socketio.on('set_status', namespace=STUDENT_NS)
 def set_status(message):
     si = message['seatIndex']
     station = stations.get(si)
@@ -133,10 +143,10 @@ def set_status(message):
         station['done'] = now if done else None
         station['needHelp'] = now if need_help else None
         ss_msg = {'seatIndex': si, 'station': station}
-        emit('status_set', ss_msg, broadcast=True)
+        emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
 
 
-def clearStation(station):
+def clear_station(station):
     for key in ('nickname', 'name', 'needHelp', 'done'):
         if key in station:
             del station[key]
