@@ -22,6 +22,8 @@
     <div style="margin-bottom: .3em">
         <input id='front-view' type="checkbox" checked>
         <label for="front-view">Front View</label>
+        <input id='enable-chat' type="checkbox" style="margin-left: 1em;">
+        <label for="enable-chat">Chat</label>
         <span style="margin-left: 2em">Random calling:</span>
         <button class="btn btn-primary" id="random-set">Set</button>
         <input type="number" value='2' style="width: 2em" id="random-set-number">
@@ -35,6 +37,7 @@
         <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
     </label>
     <button id="set-names" type="button" class="btn btn-primary">Set</button>
+    {% include 'chat.html' %}
     <p/><p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
 </div>
 <script>

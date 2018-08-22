@@ -6,6 +6,10 @@ $(() => {
     function name()         {return $('#name').val();}
     function row()          {return $('#row').val();}
     function column()       {return $('#column').val();}
+    function firstLast()    {
+        const parts = name().split(', ');
+        return (nickname() || parts[1]) + ' ' + parts[0];
+    }
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     socket.on('set_names', msg => {
@@ -13,6 +17,21 @@ $(() => {
         const sel = $('#name');
         msg.names.split('\n').forEach(name =>
             sel.append(`<option value="${name}">${name}</option>`));
+    });
+
+    if (settings.chatEnabled) $('#chat').show();
+    socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
+    socket.on('enable_chat', enabled => {
+        const c = $('#chat');
+        if (enabled) c.show(); else c.hide();
+    });
+
+    const cm = $('#chat-msg');
+    cm.keypress(e => {
+        if (e.which === 13) {
+            socket.emit('chat_msg', firstLast() + ': ' + cm.val() + '\n');
+            cm.val('');
+        }
     });
 
     $('form#seat').submit(() => {

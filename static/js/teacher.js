@@ -7,6 +7,16 @@ $(() => {
     status.recalculateStatusOrders();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
 
+    socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
+
+    const cm = $('#chat-msg');
+    cm.keypress(e => {
+        if (e.which === 13) {
+            socket.emit('chat_msg', 'Teacher: ' + cm.val() + '\n');
+            cm.val('');
+        }
+    });
+
     socket.on('seated', msg => {
         function clearNameElsewhere(newSeatIndex, clearName) {
             stations.forEach((station, i) => {
@@ -38,9 +48,17 @@ $(() => {
         socket.emit('random_set', Number($('#random-set-number').val()));
     });
 
+    const ec = $('#enable-chat');
+    ec.prop('checked', settings.chatEnabled);
+    ec.click(() => {
+        socket.emit('enable_chat', ec.is(':checked'));
+    });
+
     function requestRandomCall(any) {
         socket.emit('random_call', any, (i) => selectedSeatIndex = i === -1 ? null : i);
     }
+
+    $('#chat').show();
 
     setNumHaveButton(status.numWithAnswer());
     $('#choose')            .click(event => {requestRandomCall(true);});

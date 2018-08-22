@@ -7,6 +7,7 @@ from flask_socketio import SocketIO, emit
 
 STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
+ALL_NS = (TEACHER_NS, STUDENT_NS)
 
 logFormatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s")
 logger = logging.getLogger()
@@ -19,7 +20,8 @@ settings = {
     'columns': 9,
     'rows': 4,
     'missingSeatIndexes': [8, 35],
-    'aisleAfterColumn': 3
+    'aisleAfterColumn': 3,
+    'chatEnabled': False
 }
 names = []
 stations = {}
@@ -44,7 +46,7 @@ def teacher():
 
 
 def on_all_namespaces(event, handler):
-    for ns in (TEACHER_NS, STUDENT_NS):
+    for ns in ALL_NS:
         socketio.on_event(event, handler, namespace=ns)
 
 
@@ -53,7 +55,15 @@ def connect():
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
+def relay_chat(msg):
+    r = request
+    logger.info('Chat message from %s: %s', r.remote_addr, msg)
+    for ns in ALL_NS:
+        emit('chat_msg', msg, namespace=ns, broadcast=True)
+
+
 on_all_namespaces('connect', connect)
+on_all_namespaces('chat_msg', relay_chat)
 
 
 @socketio.on('disconnect', namespace=STUDENT_NS)
@@ -65,6 +75,12 @@ def disconnect_request():
         station_index, station = matches[0]
         clear_station(station)
         emit('clear_station', station_index, broadcast=True, namespace=TEACHER_NS)
+
+
+@socketio.on('enable_chat', namespace=TEACHER_NS)
+def enable_chat(enable):
+    settings['chatEnabled'] = enable
+    emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('set_names', namespace=TEACHER_NS)
