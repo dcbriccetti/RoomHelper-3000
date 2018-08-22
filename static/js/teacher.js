@@ -1,12 +1,12 @@
 'use strict';
 
-const stations = new Array(settings.rows * settings.columns);
-const status = new Status(stations);
+let stations;
+const status = new Status();
 
 let selectedSeatIndex = null;
 
 $(() => {
-    status.recalculateStatusOrders();
+    status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
 
     socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
@@ -40,7 +40,7 @@ $(() => {
 
     status.onHaveAnswerChange(numHave => setNumHaveButton(numHave));
 
-    socket.on('status_set', msg => {status.set(msg);});
+    socket.on('status_set', msg => {status.set(stations, msg);});
 
     $('#set-names').click(() => {
         socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
@@ -61,8 +61,9 @@ $(() => {
     }
 
     $('#chat').show();
+    $('#names').focus();
 
-    setNumHaveButton(status.numWithAnswer());
+    setNumHaveButton(status.numWithAnswer(stations));
     $('#choose')            .click(event => {requestRandomCall(true);});
     $('#choose-with-answer').click(event => {requestRandomCall(false);});
     $('#choose-reset')      .click(event => {selectedSeatIndex = null;});

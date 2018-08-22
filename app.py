@@ -24,7 +24,7 @@ settings = {
     'chatEnabled': False
 }
 names = []
-stations = {}
+stations = [{} for i in range(settings['columns'] * settings['rows'])]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -70,7 +70,7 @@ on_all_namespaces('chat_msg', relay_chat)
 def disconnect_request():
     r = request
     logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
-    matches = [item for item in stations.items() if r.sid == item[1].get('sid')]
+    matches = [item for item in enumerate(stations) if r.sid == item[1].get('sid')]
     if matches:
         station_index, station = matches[0]
         clear_station(station)
@@ -116,9 +116,9 @@ def seat(message):
     si = message['seatIndex']
     ip = request.remote_addr
     logger.info('%s seat %s %s to %d', ip, name, nickname, si)
-    existing_different_index = [i for i, station in stations.items() if station.get('name') == name and i != si]
+    existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
     if existing_different_index:
-        del stations[existing_different_index[0]]
+        stations[existing_different_index[0]] = {}
     station = {'ip': ip, 'sid': request.sid, 'nickname': nickname, 'name': name}
     stations[si] = station
     broadcast_seated(station, si)
@@ -127,14 +127,14 @@ def seat(message):
 @socketio.on('random_set', namespace=TEACHER_NS)
 def random_set(random_calls_limit):
     logger.info('Random calls limit set to %d', random_calls_limit)
-    for station in stations.values():
+    for station in stations:
         if station.get('name'):
             station['callsLeft'] = random_calls_limit
 
 
 @socketio.on('random_call', namespace=TEACHER_NS)
 def random_call(any):
-    eligible = [(k, v) for k, v in stations.items() if v.get('callsLeft', 0) > 0
+    eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
                 and (True if any else v.get('haveAnswer', False))]
     if not eligible:
         return -1
@@ -151,7 +151,7 @@ def broadcast_seated(station, seat_index):
 @socketio.on('set_status', namespace=STUDENT_NS)
 def set_status(message):
     si = message['seatIndex']
-    station = stations.get(si)
+    station = stations[si]
     if station:
         done = message['done']
         have_answer = message['haveAnswer']

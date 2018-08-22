@@ -1,7 +1,7 @@
 'use strict';
 
 $(() => {
-    const status = new Status(null);
+    const status = new Status();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
     function nickname()     {return $('#nickname').val();}

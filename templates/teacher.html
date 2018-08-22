@@ -41,13 +41,7 @@
     <p/><p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
 </div>
 <script>
-function loadStations() {
-    let stationsFromServer = {{stationJson | safe}};
-    for (const index in stationsFromServer) {
-        stations[index] = stationsFromServer[index];
-    }
-}
-loadStations();
+stations = {{stationJson | safe}};
 </script>
 </body>
 </html>
