@@ -1,4 +1,5 @@
 $(() => {
+    const status = new Status(null);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
     function nickname()     {return $('#nickname').val();}
@@ -14,7 +15,7 @@ $(() => {
             sel.append(`<option value="${name}">${name}</option>`));
     });
 
-    $('form#seat').submit(event => {
+    $('form#seat').submit(() => {
         if (name().length > 0 && row().length > 0 && column().length > 0) {
             socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
             $('#status').show();
@@ -22,14 +23,12 @@ $(() => {
         return false;
     });
 
-    const statusKeys = ['needHelp', 'haveAnswer', 'done'];
-
     function updateStatus() {
         const args = {name: name(), seatIndex: getSeatIndex()};
-        statusKeys.forEach((key) => args[key] = $('#' + key).is(':checked'));
+        status.keys.forEach((key) => args[key] = $('#' + key).is(':checked'));
         socket.emit('set_status', args);
         return true;
     }
 
-    statusKeys.forEach(id => {$(`#${id}`).click(updateStatus);});
+    status.keys.forEach(id => {$(`#${id}`).click(updateStatus);});
 });

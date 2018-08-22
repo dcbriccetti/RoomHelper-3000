@@ -1,4 +1,6 @@
 const stations = new Array(settings.rows * settings.columns);
+const status = new Status(stations);
+
 let selectedSeatIndex = null;
 
 $(() => {
@@ -19,19 +21,13 @@ $(() => {
 
     socket.on('clear_station', seatIndex => {stations[seatIndex] = null;});
 
+    status.onHaveAnswerChange(numHave => $('#choose-with-answer').text(`${numHave} with Answer`));
+
     socket.on('status_set', msg => {
-        const station = stations[msg.seatIndex];
-        station.done = msg.station.done;
-        const haveAnswerChange = station.haveAnswer !== msg.station.haveAnswer;
-        station.haveAnswer = msg.station.haveAnswer;
-        station.needHelp = msg.station.needHelp;
-        if (haveAnswerChange) {
-            const numHave = stations.filter(s => s.haveAnswer).length;
-            $('#choose-with-answer').text(`${numHave} with Answer`)
-        }
+        status.set(msg);
     });
 
-    $('#set-names').click(event => {
+    $('#set-names').click(() => {
         socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
     });
 
