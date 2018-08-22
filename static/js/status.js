@@ -1,3 +1,5 @@
+'use strict';
+
 class Status {
     constructor(stations) {
         this.stations = stations;

@@ -1,3 +1,5 @@
+'use strict';
+
 $(() => {
     const status = new Status(null);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');

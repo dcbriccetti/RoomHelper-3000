@@ -1,3 +1,5 @@
+'use strict';
+
 const stations = new Array(settings.rows * settings.columns);
 const status = new Status(stations);
 
