@@ -4,6 +4,7 @@ const status = new Status(stations);
 let selectedSeatIndex = null;
 
 $(() => {
+    status.recalculateStatusOrders();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
 
     socket.on('seated', msg => {
@@ -21,11 +22,13 @@ $(() => {
 
     socket.on('clear_station', seatIndex => {stations[seatIndex] = null;});
 
-    status.onHaveAnswerChange(numHave => $('#choose-with-answer').text(`${numHave} with Answer`));
+    function setNumHaveButton(numHave) {
+        $('#choose-with-answer').text(`${numHave} with Answer`);
+    }
 
-    socket.on('status_set', msg => {
-        status.set(msg);
-    });
+    status.onHaveAnswerChange(numHave => setNumHaveButton(numHave));
+
+    socket.on('status_set', msg => {status.set(msg);});
 
     $('#set-names').click(() => {
         socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
@@ -39,6 +42,7 @@ $(() => {
         socket.emit('random_call', any, (i) => selectedSeatIndex = i === -1 ? null : i);
     }
 
+    setNumHaveButton(status.numWithAnswer());
     $('#choose')            .click(event => {requestRandomCall(true);});
     $('#choose-with-answer').click(event => {requestRandomCall(false);});
     $('#choose-reset')      .click(event => {selectedSeatIndex = null;});

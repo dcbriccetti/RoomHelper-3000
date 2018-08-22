@@ -52,6 +52,22 @@ new p5(p => {
                 p.text(name, startX + w / 2, startY + h / 3);
                 p.textSize(12);
                 p.text(parts[0], startX + w / 2, startY + h / 3 + 20);
+
+                p.textSize(14);
+                p.textAlign(p.LEFT, p.BOTTOM);
+                const xPerKey = (w - 2 * xMargin) / status.keys.length;
+
+                status.keys.forEach((key, i) => {
+                    const code = status.shortCodes[i];
+                    const x = startX + xMargin + xPerKey * i;
+                    const keyOrder = status.orders[key];
+                    if (keyOrder) {
+                        const studentOrder = keyOrder[station.name];
+                        if (studentOrder) {
+                            p.text(code + studentOrder.order, x, startY + h - 4);
+                        }
+                    }
+                });
             }
         }
 
