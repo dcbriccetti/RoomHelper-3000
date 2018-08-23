@@ -59,7 +59,8 @@ def relay_chat(msg):
     r = request
     logger.info('Chat message from %s: %s', r.remote_addr, msg)
     for ns in ALL_NS:
-        emit('chat_msg', msg, namespace=ns, broadcast=True)
+        if settings['chatEnabled'] or ns == TEACHER_NS:
+            emit('chat_msg', msg, namespace=ns, broadcast=True)
 
 
 on_all_namespaces('connect', connect)
