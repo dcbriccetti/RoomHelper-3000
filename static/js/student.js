@@ -43,17 +43,25 @@ $(() => {
             submittedName = name();
             submittedNickname = nickname();
             socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
-            $('#status').show();
+            $('#comm').show();
         }
         return false;
     });
 
     function updateStatus() {
-        const args = {seatIndex: getSeatIndex()};
+        const args = {name: firstLast(), seatIndex: getSeatIndex()};
         status.keys.forEach((key) => args[key] = $('#' + key).is(':checked'));
         socket.emit('set_status', args);
         return true;
     }
 
     status.keys.forEach(id => {$(`#${id}`).click(updateStatus);});
+
+    for (let r = 0; r < settings.rows; ++r) {
+        const letter = String.fromCharCode('A'.charCodeAt(0) + r);
+        $('#row').append(`<option value='${r + 1}'>${letter}</option>`);
+    }
+
+    for (let c = 1; c <= settings.columns; ++c)
+        $('#column').append(`<option value='${c}'>${c}</option>`);
 });

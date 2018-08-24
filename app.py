@@ -17,6 +17,7 @@ for handler in (logging.FileHandler('log.txt'), logging.StreamHandler()):
     logger.addHandler(handler)
 
 settings = {
+    'teacherName': 'Dave Briccetti',  # Change this
     'columns': 9,
     'rows': 4,
     'missingSeatIndexes': [8, 35],
@@ -174,7 +175,7 @@ def set_status(message):
             have_answer = message['haveAnswer']
             need_help = message['needHelp']
             logging.info('set_status %s: done: %s, have answer: %s, need help: %s',
-                station['name'], done, have_answer, need_help)
+                message['name'], done, have_answer, need_help)
             now = time()
             station['done'] = now if done else None
             station['haveAnswer'] = now if have_answer else None

@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>RoomHelper 3000—Student</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
@@ -12,54 +14,47 @@
 </head>
 <body>
 <div class="container" id="container">
-    <h1>RoomHelper 3000</h1>
-    <br/>
-    <h2>Name and Location</h2>
-    <form id="seat">
-        <div class="form-group row">
-            <select class="form-control col-4" id="name">
-                <option value=''>Name</option>
-                {% for name in names %}
-                <option value='{{ name }}'>{{ name }}</option>
-                {% endfor %}
-            </select>
-            <input class="form-control col-3" id="nickname" placeholder="Optional Nickname">
+    <h3>RoomHelper 3000</h3>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Name and Location</h4>
+            <form id="seat">
+                <div class="form-group row">
+                    <select class="form-control col-4" id="name">
+                        <option value=''>Name</option>
+                        {% for name in names %}
+                        <option value='{{ name }}'>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input class="form-control col-3" id="nickname" placeholder="Optional Nickname">
+                </div>
+                <div class="form-group row">
+                    <select class="form-control col-2" id="row">
+                        <option value=''>Row</option>
+                    </select>
+                    <select class="form-control col-2" id="column">
+                        <option value=''>Column</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <button id="set-names" type="submit" class="btn btn-primary form-control col-2">Set</button>
+                </div>
+            </form>
         </div>
-        <div class="form-group row">
-            <select class="form-control col-2" id="row">
-                <option value=''>Row</option>
-                <option value='1'>A</option>
-                <option value='2'>B</option>
-                <option value='3'>C</option>
-                <option value='4'>D</option>
-            </select>
-            <select class="form-control col-2" id="column">
-                <option value=''>Column</option>
-                <option value='1'>1</option>
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
-                <option value='5'>5</option>
-                <option value='6'>6</option>
-                <option value='7'>7</option>
-                <option value='8'>8</option>
-                <option value='9'>9</option>
-            </select>
-        </div>
-        <div class="form-group row">
-            <button id="set-names" type="submit" class="btn btn-primary form-control col-2">Set</button>
-        </div>
-    </form>
-    <br/>
+    </div>
 
-    <div id="status" style="display: none">
-        <h2>Communicate</h2>
-        <input id='needHelp' type="checkbox"><label for="needHelp">Need Help</label>
-        <input id='haveAnswer' type="checkbox" style="margin-left: 1em"><label for="haveAnswer">Have Answer</label>
-        <input id='done' type="checkbox" style="margin-left: 1em"><label for="done">Done with current assignment</label>
-        {% include 'chat.html' %}
+    <div class="card" id="comm" style="display: none">
+        <div class="card-body">
+            <h4 class="card-title">Communication</h4>
+            <input id='needHelp' type="checkbox"><label for="needHelp">Need Help</label>
+            <input id='haveAnswer' type="checkbox" style="margin-left: 1em"><label for="haveAnswer">Have Answer</label>
+            <input id='done' type="checkbox" style="margin-left: 1em"><label for="done">Done with current
+            assignment</label>
+            {% include 'chat.html' %}
+        </div>
     </div>
     <p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
 </div>
+{% include 'bootstrap.html' %}
 </body>
 </html>
