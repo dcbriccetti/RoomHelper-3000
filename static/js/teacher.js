@@ -20,6 +20,13 @@ $(() => {
         }
     });
 
+    const tm = $('#teacher-msg');
+    tm.keypress(e => {
+        if (e.which === 13) {
+            socket.emit('teacher_msg', `${tm.val()}\n`);
+        }
+    });
+
     socket.on('seated', msg => {
         function clearNameElsewhere(newSeatIndex, clearName) {
             stations.forEach((station, i) => {
@@ -33,7 +40,7 @@ $(() => {
         stations[msg.seatIndex] = msg.station;
     });
 
-    socket.on('clear_station', seatIndex => {stations[seatIndex] = null;});
+    socket.on('clear_station', seatIndex => {stations[seatIndex] = {};});
 
     function setNumHaveButton(numHave) {
         $('#choose-with-answer').text(`${numHave} with Answer`);

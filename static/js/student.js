@@ -38,6 +38,14 @@ $(() => {
         }
     });
 
+    socket.on('teacher_msg', msg => {
+        if (msg.trim().length)
+            $('#teacher-msg').show();
+        else
+            $('#teacher-msg').hide();
+        $('#teacher-msg-text').text(msg);
+    });
+
     $('form#seat').submit(() => {
         if (name().length > 0 && row().length > 0 && column().length > 0) {
             submittedName = name();

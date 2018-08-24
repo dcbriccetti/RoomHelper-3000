@@ -66,8 +66,16 @@ def relay_chat(msg):
             emit('chat_msg', msg, namespace=ns, broadcast=True)
 
 
+def relay_teacher_msg(msg):
+    r = request
+    logger.info('Teacher message from %s: %s', r.remote_addr, msg)
+    for ns in ALL_NS:
+        emit('teacher_msg', msg, namespace=ns, broadcast=True)
+
+
 on_all_namespaces('connect', connect)
 on_all_namespaces('chat_msg', relay_chat)
+on_all_namespaces('teacher_msg', relay_teacher_msg)
 
 
 @socketio.on('auth', namespace=TEACHER_NS)
