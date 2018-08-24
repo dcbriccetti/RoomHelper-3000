@@ -4,13 +4,14 @@ $(() => {
     const status = new Status();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
+    let submittedName, submittedNickname;
     function nickname()     {return $('#nickname').val();}
     function name()         {return $('#name').val();}
     function row()          {return $('#row').val();}
     function column()       {return $('#column').val();}
     function firstLast()    {
-        const parts = name().split(', ');
-        return (nickname() || parts[1]) + ' ' + parts[0];
+        const parts = submittedName.split(', ');
+        return (submittedNickname || parts[1]) + ' ' + parts[0];
     }
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
@@ -28,6 +29,7 @@ $(() => {
         if (enabled) c.show(); else c.hide();
     });
 
+
     const cm = $('#chat-msg');
     cm.keypress(e => {
         if (e.which === 13) {
@@ -38,6 +40,8 @@ $(() => {
 
     $('form#seat').submit(() => {
         if (name().length > 0 && row().length > 0 && column().length > 0) {
+            submittedName = name();
+            submittedNickname = nickname();
             socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
             $('#status').show();
         }
@@ -45,7 +49,7 @@ $(() => {
     });
 
     function updateStatus() {
-        const args = {name: name(), seatIndex: getSeatIndex()};
+        const args = {seatIndex: getSeatIndex()};
         status.keys.forEach((key) => args[key] = $('#' + key).is(':checked'));
         socket.emit('set_status', args);
         return true;

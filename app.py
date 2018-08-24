@@ -158,7 +158,7 @@ def set_status(message):
         have_answer = message['haveAnswer']
         need_help = message['needHelp']
         logging.info('set_status %s: done: %s, have answer: %s, need help: %s',
-            message['name'], done, have_answer, need_help)
+            station['name'], done, have_answer, need_help)
         now = time()
         station['done'] = now if done else None
         station['haveAnswer'] = now if have_answer else None
