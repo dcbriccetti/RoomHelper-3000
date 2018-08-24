@@ -18,26 +18,31 @@
 <body>
 <div class="container" id="container">
     <h1>RoomHelper 3000</h1>
-    <div id="canvas"></div>
-    <div style="margin-bottom: .3em">
-        <input id='front-view' type="checkbox" checked>
-        <label for="front-view">Front View</label>
-        <input id='enable-chat' type="checkbox" style="margin-left: 1em;">
-        <label for="enable-chat">Chat</label>
-        <span style="margin-left: 2em">Random calling:</span>
-        <button class="btn btn-primary" id="random-set">Set</button>
-        <input type="number" value='2' style="width: 2em" id="random-set-number">
-        Call:
-        <button class="btn btn-primary" id="choose">Any</button>
-        <button class="btn btn-primary" id="choose-with-answer">With Answer</button>
-        <button class="btn btn-secondary" id="choose-reset">Reset</button>
+    <div id="login">
+        <input id="password" type="password">
     </div>
-    <textarea id="names" rows="2" placeholder="Names"></textarea><br/>
-    <label>
-        <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
-    </label>
-    <button id="set-names" type="button" class="btn btn-primary">Set</button>
-    {% include 'chat.html' %}
+    <div id="main" style="display: none">
+        <div id="canvas"></div>
+        <div style="margin-bottom: .3em">
+            <input id='front-view' type="checkbox" checked>
+            <label for="front-view">Front View</label>
+            <input id='enable-chat' type="checkbox" style="margin-left: 1em;">
+            <label for="enable-chat">Chat</label>
+            <span style="margin-left: 2em">Random calling:</span>
+            <button class="btn btn-primary" id="random-set">Set</button>
+            <input type="number" value='2' style="width: 2em" id="random-set-number">
+            Call:
+            <button class="btn btn-primary" id="choose">Any</button>
+            <button class="btn btn-primary" id="choose-with-answer">With Answer</button>
+            <button class="btn btn-secondary" id="choose-reset">Reset</button>
+        </div>
+        <textarea id="names" rows="2" placeholder="Names"></textarea><br/>
+        <label>
+            <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
+        </label>
+        <button id="set-names" type="button" class="btn btn-primary">Set</button>
+        {% include 'chat.html' %}
+    </div>
     <p/><p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
 </div>
 <script>

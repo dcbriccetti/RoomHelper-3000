@@ -6,6 +6,7 @@ const status = new Status();
 let selectedSeatIndex = null;
 
 $(() => {
+    let authd = false;
     status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
 
@@ -61,10 +62,24 @@ $(() => {
     }
 
     $('#chat').show();
-    $('#names').focus();
+    if (!authd) $('#password').focus();
 
     setNumHaveButton(status.numWithAnswer(stations));
     $('#choose')            .click(event => {requestRandomCall(true);});
     $('#choose-with-answer').click(event => {requestRandomCall(false);});
     $('#choose-reset')      .click(event => {selectedSeatIndex = null;});
+
+    const pw = $('#password');
+    pw.keypress(e => {
+        if (e.which === 13) {
+            socket.emit('auth', pw.val(), (valid => {
+                if (valid) {
+                    $('#main').show();
+                    $('#login').hide();
+                    $('#names').focus();
+                    authd = true;
+                }
+            }))
+        }
+    })
 });

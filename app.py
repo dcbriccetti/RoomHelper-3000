@@ -25,6 +25,8 @@ settings = {
 }
 names = []
 stations = [{} for i in range(settings['columns'] * settings['rows'])]
+teacher_password = 'teach'  # Change this
+authenticated = False
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -67,6 +69,14 @@ on_all_namespaces('connect', connect)
 on_all_namespaces('chat_msg', relay_chat)
 
 
+@socketio.on('auth', namespace=TEACHER_NS)
+def auth(password):
+    global authenticated
+    if password == teacher_password:
+        authenticated = True
+    return authenticated
+
+
 @socketio.on('disconnect', namespace=STUDENT_NS)
 def disconnect_request():
     r = request
@@ -80,69 +90,74 @@ def disconnect_request():
 
 @socketio.on('enable_chat', namespace=TEACHER_NS)
 def enable_chat(enable):
-    settings['chatEnabled'] = enable
-    emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
+    if authenticated:
+        settings['chatEnabled'] = enable
+        emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('set_names', namespace=TEACHER_NS)
 def set_names(message):
-    r = request
-    ip = r.remote_addr
-    logger.info('set_names from %s, %s', ip, r.sid)
-    emit('set_names', message, broadcast=True, namespace=STUDENT_NS)
-    global names
-    names = []
-    assign_seats = message['assignSeats']
+    if authenticated:
+        r = request
+        ip = r.remote_addr
+        logger.info('set_names from %s, %s', ip, r.sid)
+        emit('set_names', message, broadcast=True, namespace=STUDENT_NS)
+        global names
+        names = []
+        assign_seats = message['assignSeats']
 
-    def skip_missing(start):
-        while start in settings['missingSeatIndexes']:
-            start += 1
-        return start
+        def skip_missing(start):
+            while start in settings['missingSeatIndexes']:
+                start += 1
+            return start
 
-    si = skip_missing(0)
-    for line in message['names'].split('\n'):
-        name = line.strip()
-        names.append(name)
-        if assign_seats:
-            station = {'ip': ip, 'nickname': '', 'name': name}
-            stations[si] = station
-            broadcast_seated(station, si)
-            si = skip_missing(si + 1)
+        si = skip_missing(0)
+        for line in message['names'].split('\n'):
+            name = line.strip()
+            names.append(name)
+            if assign_seats:
+                station = {'ip': ip, 'nickname': '', 'name': name}
+                stations[si] = station
+                broadcast_seated(station, si)
+                si = skip_missing(si + 1)
 
 
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message):
-    nickname = message['nickname']
-    name = message['name']
-    si = message['seatIndex']
-    ip = request.remote_addr
-    logger.info('%s seat %s %s to %d', ip, name, nickname, si)
-    existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
-    if existing_different_index:
-        stations[existing_different_index[0]] = {}
-    station = {'ip': ip, 'sid': request.sid, 'nickname': nickname, 'name': name}
-    stations[si] = station
-    broadcast_seated(station, si)
+    if authenticated:
+        nickname = message['nickname']
+        name = message['name']
+        si = message['seatIndex']
+        ip = request.remote_addr
+        logger.info('%s seat %s %s to %d', ip, name, nickname, si)
+        existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
+        if existing_different_index:
+            stations[existing_different_index[0]] = {}
+        station = {'ip': ip, 'sid': request.sid, 'nickname': nickname, 'name': name}
+        stations[si] = station
+        broadcast_seated(station, si)
 
 
 @socketio.on('random_set', namespace=TEACHER_NS)
 def random_set(random_calls_limit):
-    logger.info('Random calls limit set to %d', random_calls_limit)
-    for station in stations:
-        if station.get('name'):
-            station['callsLeft'] = random_calls_limit
+    if authenticated:
+        logger.info('Random calls limit set to %d', random_calls_limit)
+        for station in stations:
+            if station.get('name'):
+                station['callsLeft'] = random_calls_limit
 
 
 @socketio.on('random_call', namespace=TEACHER_NS)
 def random_call(any):
-    eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
-                and (True if any else v.get('haveAnswer', False))]
-    if not eligible:
-        return -1
-    chosen = choice(eligible)
-    chosen[1]['callsLeft'] -= 1
-    logger.info('%s %s called randomly', chosen[1].get('nickname', ''), chosen[1]['name'])
-    return chosen[0]
+    if authenticated:
+        eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
+                    and (True if any else v.get('haveAnswer', False))]
+        if not eligible:
+            return -1
+        chosen = choice(eligible)
+        chosen[1]['callsLeft'] -= 1
+        logger.info('%s %s called randomly', chosen[1].get('nickname', ''), chosen[1]['name'])
+        return chosen[0]
 
 
 def broadcast_seated(station, seat_index):
@@ -151,20 +166,21 @@ def broadcast_seated(station, seat_index):
 
 @socketio.on('set_status', namespace=STUDENT_NS)
 def set_status(message):
-    si = message['seatIndex']
-    station = stations[si]
-    if station:
-        done = message['done']
-        have_answer = message['haveAnswer']
-        need_help = message['needHelp']
-        logging.info('set_status %s: done: %s, have answer: %s, need help: %s',
-            station['name'], done, have_answer, need_help)
-        now = time()
-        station['done'] = now if done else None
-        station['haveAnswer'] = now if have_answer else None
-        station['needHelp'] = now if need_help else None
-        ss_msg = {'seatIndex': si, 'station': station}
-        emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
+    if authenticated:
+        si = message['seatIndex']
+        station = stations[si]
+        if station:
+            done = message['done']
+            have_answer = message['haveAnswer']
+            need_help = message['needHelp']
+            logging.info('set_status %s: done: %s, have answer: %s, need help: %s',
+                station['name'], done, have_answer, need_help)
+            now = time()
+            station['done'] = now if done else None
+            station['haveAnswer'] = now if have_answer else None
+            station['needHelp'] = now if need_help else None
+            ss_msg = {'seatIndex': si, 'station': station}
+            emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
 
 
 def clear_station(station):
