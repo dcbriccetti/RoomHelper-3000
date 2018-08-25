@@ -72,4 +72,11 @@ $(() => {
 
     for (let c = 1; c <= settings.columns; ++c)
         $('#column').append(`<option value='${c}'>${c}</option>`);
+
+    if (lastSeatIndex >= 0) {
+        const r = Math.floor((lastSeatIndex / settings.columns)) + 1;
+        const c = (lastSeatIndex % settings.columns) + 1;
+        $(`#row option:eq(${r})`).attr('selected', true);
+        $(`#column option:eq(${c})`).attr('selected', true);
+    }
 });

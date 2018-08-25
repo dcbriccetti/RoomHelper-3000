@@ -4,6 +4,7 @@ from time import time
 
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
+from persister import Persister
 
 STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
@@ -29,6 +30,8 @@ stations = [{} for i in range(settings['columns'] * settings['rows'])]
 teacher_password = 'teach'  # Change this
 authenticated = False
 
+persister = Persister()
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
@@ -37,8 +40,10 @@ socketio = SocketIO(app)
 @app.route('/')
 def index():
     r = request
-    logger.info('Student page requested from %s, %s', r.remote_addr, r.user_agent)
-    return render_template('student.html', settings=json.dumps(settings), names=names)
+    seat_index = persister.seat_indexes_by_ip.get(r.remote_addr, -1)
+    logger.info('Student page requested from %s (last seat index: %d), %s',
+        r.remote_addr, seat_index, r.user_agent)
+    return render_template('student.html', settings=json.dumps(settings), names=names, lastSeatIndex=seat_index)
 
 
 @app.route('/teacher')
@@ -138,6 +143,8 @@ def seat(message):
         name = message['name']
         si = message['seatIndex']
         ip = request.remote_addr
+        persister.seat_indexes_by_ip[ip] = si
+        persister.save()
         logger.info('%s seat %s %s to %d', ip, name, nickname, si)
         existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
         if existing_different_index:
