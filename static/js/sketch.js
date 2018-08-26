@@ -3,7 +3,6 @@
 new p5(p => {
     p.setup = function() {
         p.createCanvas(800, 400).parent('canvas');
-        p.frameRate(3);
     };
 
     p.draw = function() {
@@ -90,5 +89,7 @@ new p5(p => {
                 }
             }
         }
-    }
+
+        p.noLoop();
+    };
 });
