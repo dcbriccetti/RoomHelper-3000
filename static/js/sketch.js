@@ -1,6 +1,6 @@
 'use strict';
 
-new p5(p => {
+const sketch = new p5(p => {
     p.setup = function() {
         p.createCanvas(800, 400).parent('canvas');
     };
