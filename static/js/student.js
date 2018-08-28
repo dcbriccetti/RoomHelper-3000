@@ -33,7 +33,7 @@ $(() => {
     const cm = $('#chat-msg');
     cm.keypress(e => {
         if (e.which === 13) {
-            socket.emit('chat_msg', firstLast() + ': ' + cm.val() + '\n');
+            socket.emit('chat_msg', firstLast(), cm.val());
             cm.val('');
         }
     });
@@ -43,7 +43,7 @@ $(() => {
             $('#teacher-msg').show();
         else
             $('#teacher-msg').hide();
-        $('#teacher-msg-text').text(msg);
+        $('#teacher-msg-text').html(msg);
     });
 
     $('form#seat').submit(() => {

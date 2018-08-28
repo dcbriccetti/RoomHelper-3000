@@ -15,7 +15,7 @@ $(() => {
     const cm = $('#chat-msg');
     cm.keypress(e => {
         if (e.which === 13) {
-            socket.emit('chat_msg', `${settings.teacherName}: ${cm.val()}\n`);
+            socket.emit('chat_msg', settings.teacherName, cm.val());
             cm.val('');
         }
     });

@@ -4,6 +4,7 @@ from time import time
 
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
+from markdown import markdown
 from persister import Persister
 
 STUDENT_NS = '/student'
@@ -63,19 +64,21 @@ def connect():
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
-def relay_chat(msg):
+def relay_chat(sender, msg):
     r = request
-    logger.info('Chat message from %s: %s', r.remote_addr, msg)
+    logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
+    html = markdown(sender + ': ' + msg)
     for ns in ALL_NS:
         if settings['chatEnabled'] or ns == TEACHER_NS:
-            emit('chat_msg', msg, namespace=ns, broadcast=True)
+            emit('chat_msg', html, namespace=ns, broadcast=True)
 
 
 def relay_teacher_msg(msg):
     r = request
     logger.info('Teacher message from %s: %s', r.remote_addr, msg)
+    html = markdown(msg)
     for ns in ALL_NS:
-        emit('teacher_msg', msg, namespace=ns, broadcast=True)
+        emit('teacher_msg', html, namespace=ns, broadcast=True)
 
 
 on_all_namespaces('connect', connect)
