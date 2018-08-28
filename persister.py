@@ -20,7 +20,7 @@ class Persister:
         if self.seat_indexes_by_ip:
             with open('stationloc.txt', 'w') as file:
                 for ip, index in self.seat_indexes_by_ip.items():
-                    file.write('%s\t%d' % (ip, index))
+                    file.write('%s\t%d\n' % (ip, index))
 
             self.log_operation('saved')
 

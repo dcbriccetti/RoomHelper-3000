@@ -8,4 +8,19 @@ A webapp to manage a class of students in a computer lab.
 - shows the students the current task, or other message from the teacher
 - allows the students to chat with each other (when the teacher permits it)
 
+Feature ideas:
+
+- A button for the teacher to ring a bell on all clients,
+to regain student attention
+- Chat protections:
+    - Delete all messages from a person
+    - Disable chat for a person
+- Nickname abuse protection
+    - Disable changes in various ways
+- Let teacher reset checkboxes
+- Let teacher disable checkboxes and disable them
+- Make it easier to help students in order of them checking the box. Maybe a special marking for whoever is next.
+- Remove confusion where students think they have to
+push Set when they change checkbox settings
+
 ![Screen shot](screen1-large.png)
