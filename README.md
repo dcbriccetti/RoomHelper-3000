@@ -18,7 +18,7 @@ to regain student attention
 - Nickname abuse protection
     - Disable changes in various ways
 - Let teacher reset checkboxes
-- Let teacher disable checkboxes and disable them
+- Let teacher disable checkboxes
 - Make it easier to help students in order of them checking the box. Maybe a special marking for whoever is next.
 - Remove confusion where students think they have to
 push Set when they change checkbox settings
