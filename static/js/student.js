@@ -22,6 +22,19 @@ $(() => {
             sel.append(`<option value="${name}">${name}</option>`));
     });
 
+    socket.on('clear_checks', () => {
+        status.keys.forEach(key => {
+            const elem = $('#' + key);
+            console.log(elem);
+            elem.attr('checked', false)
+        });
+    });
+
+    socket.on('enable_checks', enabled => {
+        const c = $('#status-checks');
+        if (enabled) c.show(); else c.hide();
+    });
+
     if (settings.nickEnabled) $('#nickname').show();
 
     if (settings.chatEnabled) $('#chat').show();

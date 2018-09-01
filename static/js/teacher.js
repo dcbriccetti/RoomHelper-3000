@@ -61,6 +61,12 @@ $(() => {
         socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
     });
 
+    $('#clear-checks').click(() => {
+        socket.emit('clear_checks');
+        status.clearAll(stations);
+        sketch.loop();
+    });
+
     $('#random-set').click(event => {
         socket.emit('random_set', Number($('#random-set-number').val()));
     });
@@ -69,6 +75,12 @@ $(() => {
     ec.prop('checked', settings.chatEnabled);
     ec.click(() => {
         socket.emit('enable_chat', ec.is(':checked'));
+    });
+
+    const eck = $('#enable-checks');
+    eck.prop('checked', settings.checksEnabled);
+    eck.click(() => {
+        socket.emit('enable_checks', eck.is(':checked'));
     });
 
     function requestRandomCall(any) {

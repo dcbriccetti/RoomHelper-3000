@@ -25,8 +25,11 @@ settings = {
     'missingSeatIndexes': [8, 35],
     'aisleAfterColumn': 3,
     'chatEnabled': False,
+    'checksEnabled': False,
     'nickEnabled': False
 }
+
+status_toggles = ('haveAnswer', 'needHelp', 'done')
 names = []
 stations = [{} for i in range(settings['columns'] * settings['rows'])]
 teacher_password = 'teach'  # Change this
@@ -113,6 +116,23 @@ def enable_chat(enable):
         emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
 
+@socketio.on('enable_checks', namespace=TEACHER_NS)
+def enable_checks(enable):
+    if authenticated:
+        settings['checksEnabled'] = enable
+        emit('enable_checks', enable, broadcast=True, namespace=STUDENT_NS)
+
+
+@socketio.on('clear_checks', namespace=TEACHER_NS)
+def clear_checks():
+    if authenticated:
+        for station in stations:
+            for st in status_toggles:
+                station[st] = None
+
+    emit('clear_checks', broadcast=True, namespace=STUDENT_NS)
+
+
 @socketio.on('set_names', namespace=TEACHER_NS)
 def set_names(message):
     if authenticated:
@@ -190,15 +210,10 @@ def set_status(message):
         si = message['seatIndex']
         station = stations[si]
         if station:
-            done = message['done']
-            have_answer = message['haveAnswer']
-            need_help = message['needHelp']
-            logging.info('set_status %s: done: %s, have answer: %s, need help: %s',
-                message['name'], done, have_answer, need_help)
+            logging.info('set_status: %s', message)
             now = time()
-            station['done'] = now if done else None
-            station['haveAnswer'] = now if have_answer else None
-            station['needHelp'] = now if need_help else None
+            for st in status_toggles:
+                station[st] = now if message.get(st, False) else None
             ss_msg = {'seatIndex': si, 'station': station}
             emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
 

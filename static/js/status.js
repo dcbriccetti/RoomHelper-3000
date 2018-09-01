@@ -26,7 +26,7 @@ class Status {
     recalculateStatusOrders(stations) {
         this.keys.forEach(key => {
             const namesTimes = stations.filter(station =>
-                station[key]).map(station => [station.name, station[key]])
+                station[key]).map(station => [station.name, station[key]]);
             namesTimes.sort((a, b) => a[1] - b[1]);
             const timesInOrder = {};
             namesTimes.forEach((nt, i) => {
@@ -34,5 +34,12 @@ class Status {
             });
             this.orders[key] = timesInOrder;
         });
+    }
+
+    clearAll(stations) {
+        stations.forEach(station => {
+            this.keys.forEach(key => station[key] = null);
+        });
+        this.recalculateStatusOrders(stations);
     }
 }
