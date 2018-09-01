@@ -22,6 +22,8 @@ $(() => {
             sel.append(`<option value="${name}">${name}</option>`));
     });
 
+    if (settings.nickEnabled) $('#nickname').show();
+
     if (settings.chatEnabled) $('#chat').show();
     socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
     socket.on('enable_chat', enabled => {

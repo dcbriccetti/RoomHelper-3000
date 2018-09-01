@@ -24,7 +24,8 @@ settings = {
     'rows': 4,
     'missingSeatIndexes': [8, 35],
     'aisleAfterColumn': 3,
-    'chatEnabled': False
+    'chatEnabled': False,
+    'nickEnabled': False
 }
 names = []
 stations = [{} for i in range(settings['columns'] * settings['rows'])]
@@ -142,7 +143,7 @@ def set_names(message):
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message):
     if authenticated:
-        nickname = message['nickname']
+        nickname = message['nickname'] if settings['nickEnabled'] else ''
         name = message['name']
         si = message['seatIndex']
         ip = request.remote_addr
