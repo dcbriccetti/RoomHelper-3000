@@ -116,6 +116,13 @@ def enable_chat(enable):
         emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
 
+@socketio.on('clear_chat', namespace=TEACHER_NS)
+def clear_chat():
+    if authenticated:
+        for ns in ALL_NS:
+            emit('clear_chat', broadcast=True, namespace=ns)
+
+
 @socketio.on('enable_checks', namespace=TEACHER_NS)
 def enable_checks(enable):
     if authenticated:
@@ -152,12 +159,13 @@ def set_names(message):
         si = skip_missing(0)
         for line in message['names'].split('\n'):
             name = line.strip()
-            names.append(name)
-            if assign_seats:
-                station = {'ip': ip, 'nickname': '', 'name': name}
-                stations[si] = station
-                broadcast_seated(station, si)
-                si = skip_missing(si + 1)
+            if name:
+                names.append(name)
+                if assign_seats:
+                    station = {'ip': ip, 'nickname': '', 'name': name}
+                    stations[si] = station
+                    broadcast_seated(station, si)
+                    si = skip_missing(si + 1)
 
 
 @socketio.on('seat', namespace=STUDENT_NS)

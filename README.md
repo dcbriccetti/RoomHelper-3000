@@ -12,11 +12,9 @@ Feature ideas:
 
 - A button for the teacher to ring a bell on all clients,
 to regain student attention
-- Chat protections:
+- Chat:
     - Delete all messages from a person
     - Disable chat for a person
-- Let teacher reset checkboxes
-- Let teacher disable checkboxes
 - Make it easier to help students in order of them checking the box. Maybe a special marking for whoever is next.
 - Remove confusion where students think they have to
 push Set when they change checkbox settings

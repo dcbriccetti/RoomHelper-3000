@@ -11,6 +11,7 @@ $(() => {
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
 
     socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
+    socket.on('clear_chat', () => $('#chat-log').empty());
 
     const cm = $('#chat-msg');
     cm.keypress(e => {
@@ -67,21 +68,17 @@ $(() => {
         sketch.loop();
     });
 
-    $('#random-set').click(event => {
-        socket.emit('random_set', Number($('#random-set-number').val()));
-    });
+    $('#clear-chat').click(() => socket.emit('clear_chat'));
+
+    $('#random-set').click(() => socket.emit('random_set', Number($('#random-set-number').val())));
 
     const ec = $('#enable-chat');
     ec.prop('checked', settings.chatEnabled);
-    ec.click(() => {
-        socket.emit('enable_chat', ec.is(':checked'));
-    });
+    ec.click(() => socket.emit('enable_chat', ec.is(':checked')));
 
     const eck = $('#enable-checks');
     eck.prop('checked', settings.checksEnabled);
-    eck.click(() => {
-        socket.emit('enable_checks', eck.is(':checked'));
-    });
+    eck.click(() => socket.emit('enable_checks', eck.is(':checked')));
 
     function requestRandomCall(any) {
         socket.emit('random_call', any, (i) => {
@@ -95,9 +92,9 @@ $(() => {
 
     setNumHaveButton(status.numWithAnswer(stations));
     $('#front-view')        .click(() => sketch.loop());
-    $('#choose')            .click(event => {requestRandomCall(true);});
-    $('#choose-with-answer').click(event => {requestRandomCall(false);});
-    $('#choose-reset')      .click(event => {
+    $('#choose')            .click(() => {requestRandomCall(true);});
+    $('#choose-with-answer').click(() => {requestRandomCall(false);});
+    $('#choose-reset')      .click(() => {
         selectedSeatIndex = null;
         sketch.loop();
     });

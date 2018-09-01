@@ -39,6 +39,7 @@ $(() => {
 
     if (settings.chatEnabled) $('#chat').show();
     socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
+    socket.on('clear_chat', () => $('#chat-log').empty());
     socket.on('enable_chat', enabled => {
         const c = $('#chat');
         if (enabled) c.show(); else c.hide();
