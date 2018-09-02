@@ -10,8 +10,6 @@ A webapp to manage a class of students in a computer lab.
 
 Feature ideas:
 
-- A button for the teacher to ring a bell on all clients,
-to regain student attention
 - Chat:
     - Delete all messages from a person
     - Disable chat for a person

@@ -1,6 +1,8 @@
 'use strict';
 
 $(() => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const soundFiles = new SoundFiles(audioContext, ['/static/audio/triangle.wav']);
     const status = new Status();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
@@ -15,6 +17,7 @@ $(() => {
     }
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
+    socket.on('ring_bell', () => soundFiles.play(0));
     socket.on('set_names', msg => {
         $('#name option:gt(0)').remove();
         const sel = $('#name');
@@ -68,6 +71,7 @@ $(() => {
             submittedNickname = nickname();
             socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
             $('#comm').show();
+            audioContext.resume();
         }
         return false;
     });

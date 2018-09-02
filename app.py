@@ -109,6 +109,12 @@ def disconnect_request():
         emit('clear_station', station_index, broadcast=True, namespace=TEACHER_NS)
 
 
+@socketio.on('ring_bell', namespace=TEACHER_NS)
+def ring_bell():
+    if authenticated:
+        emit('ring_bell', broadcast=True, namespace=STUDENT_NS)
+
+
 @socketio.on('enable_chat', namespace=TEACHER_NS)
 def enable_chat(enable):
     if authenticated:

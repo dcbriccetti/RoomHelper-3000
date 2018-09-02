@@ -6,6 +6,8 @@ const status = new Status();
 let selectedSeatIndex = null;
 
 $(() => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const soundFiles = new SoundFiles(audioContext, ['/static/audio/triangle.wav']);
     let authd = false;
     status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
@@ -66,6 +68,11 @@ $(() => {
         socket.emit('clear_checks');
         status.clearAll(stations);
         sketch.loop();
+    });
+
+    $('#ring-bell').click(() => {
+        soundFiles.play(0);
+        socket.emit('ring_bell')
     });
 
     $('#clear-chat').click(() => socket.emit('clear_chat'));
