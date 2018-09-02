@@ -115,6 +115,12 @@ def ring_bell():
         emit('ring_bell', broadcast=True, namespace=STUDENT_NS)
 
 
+@socketio.on('enable-yes-no', namespace=TEACHER_NS)
+def enable_yes_no(enable, question):
+    if authenticated:
+        emit('enable-yes-no', {'enable': enable, 'question': question}, broadcast=True, namespace=STUDENT_NS)
+
+
 @socketio.on('enable_chat', namespace=TEACHER_NS)
 def enable_chat(enable):
     if authenticated:
@@ -190,6 +196,12 @@ def seat(message):
         station = {'ip': ip, 'sid': request.sid, 'nickname': nickname, 'name': name}
         stations[si] = station
         broadcast_seated(station, si)
+
+
+@socketio.on('yes-no-answer', namespace=STUDENT_NS)
+def yes_no_answer(answer):
+    if authenticated:
+        emit('yes-no-answer', answer, broadcast=True, namespace=TEACHER_NS)
 
 
 @socketio.on('random_set', namespace=TEACHER_NS)

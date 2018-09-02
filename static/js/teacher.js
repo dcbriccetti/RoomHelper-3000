@@ -6,6 +6,23 @@ const status = new Status();
 let selectedSeatIndex = null;
 
 $(() => {
+    function setUpPolls() {
+        const eyn = $('#enable-yes-no');
+        eyn.click(() => {
+            const checked = eyn.is(':checked');
+            if (! checked) {
+                stations.forEach(station => delete station.answer);
+                sketch.loop();
+            }
+            socket.emit('enable-yes-no', checked, $('#yes-no-question').val())
+        });
+
+        socket.on('yes-no-answer', msg => {
+            stations[msg.seatIndex].answer = msg.answer;
+            sketch.loop();
+        })
+    }
+
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const soundFiles = new SoundFiles(audioContext, ['/static/audio/triangle.wav']);
     let authd = false;
@@ -118,5 +135,7 @@ $(() => {
                 }
             }))
         }
-    })
+    });
+
+    setUpPolls();
 });

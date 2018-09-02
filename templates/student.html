@@ -57,10 +57,17 @@
             </div>
             <div id="status-checks" style="display: none">
                 <h5>Your Status</h5>
-                <input id='needHelp' type="checkbox"><label for="needHelp">Need Help</label>
-                <input id='haveAnswer' type="checkbox" style="margin-left: 1em"><label for="haveAnswer">Have Answer</label>
-                <input id='done' type="checkbox" style="margin-left: 1em"><label for="done">Done with current
+                <input id='needHelp' type="checkbox"> <label for="needHelp">Need Help</label>
+                <input id='haveAnswer' type="checkbox" style="margin-left: 1em"> <label for="haveAnswer">Have Answer</label>
+                <input id='done' type="checkbox" style="margin-left: 1em"> <label for="done">Done with current
                 assignment</label>
+            </div>
+            <div id="yes-no-poll" style="display: none">
+                <h5>Yes/No Poll</h5>
+                <p id="yes-no-question"></p>
+                <input name='yes-no-answer' id='no-answer' type="radio" checked> <label for="no-answer">No Answer</label>
+                <input name='yes-no-answer' id='yes' type="radio"> <label for="yes">Yes</label>
+                <input name='yes-no-answer' id='no' type="radio"> <label for="no">No</label>
             </div>
             {% include 'chat.html' %}
         </div>

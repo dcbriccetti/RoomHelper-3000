@@ -17,6 +17,19 @@ $(() => {
     }
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
+    function setUpPoll() {
+        socket.on('enable-yes-no', msg => {
+            $('#yes-no-question').text(msg.question);
+            const e = $('#yes-no-poll');
+            if (msg.enable) e.show(); else e.hide();
+        });
+
+        const answersById = {'no-answer': '', 'yes': 'Yes', 'no': 'No'};
+        $('input[name="yes-no-answer"]').click(event =>
+            socket.emit('yes-no-answer', {seatIndex: getSeatIndex(), answer: answersById[event.target.id]})
+        );
+    }
+
     socket.on('ring_bell', () => soundFiles.play(0));
     socket.on('set_names', msg => {
         $('#name option:gt(0)').remove();
@@ -99,4 +112,6 @@ $(() => {
         $(`#row option:eq(${r})`).attr('selected', true);
         $(`#column option:eq(${c})`).attr('selected', true);
     }
+
+    setUpPoll();
 });

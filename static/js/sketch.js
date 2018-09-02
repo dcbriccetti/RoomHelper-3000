@@ -58,17 +58,23 @@ const sketch = new p5(p => {
                 p.textAlign(p.LEFT, p.BOTTOM);
                 const xPerKey = (w - 2 * xMargin) / status.keys.length;
 
-                status.keys.forEach((key, i) => {
-                    const code = status.shortCodes[i];
-                    const x = startX + xMargin + xPerKey * i;
-                    const keyOrder = status.orders[key];
-                    if (keyOrder) {
-                        const studentOrder = keyOrder[station.name];
-                        if (studentOrder) {
-                            p.text(code + studentOrder.order, x, startY + h - 4);
+                const y = startY + h - 4;
+                const answer = station.answer;
+                if (answer) {
+                    p.text(answer, startX + xMargin, y);
+                } else {
+                    status.keys.forEach((key, i) => {
+                        const code = status.shortCodes[i];
+                        const x = startX + xMargin + xPerKey * i;
+                        const keyOrder = status.orders[key];
+                        if (keyOrder) {
+                            const studentOrder = keyOrder[station.name];
+                            if (studentOrder) {
+                                p.text(code + studentOrder.order, x, y);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
 
