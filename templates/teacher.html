@@ -25,34 +25,52 @@
     </div>
     <div id="main" style="display: none">
         <div id="canvas"></div>
-        <div style="margin-bottom: .3em">
-            <input id='front-view' type="checkbox" checked>
-            <label for="front-view">Front View</label>
-            <button id="ring-bell" type="button" class="btn btn-primary">Bell</button>
-            <input id='enable-chat' type="checkbox" style="margin-left: .6em;">
-            <label for="enable-chat">Chat</label>
-            <button id="clear-chat" type="button" class="btn btn-primary">Clear</button>
-            <input id='enable-checks' type="checkbox" style="margin-left: .6em;">
-            <label for="enable-checks">Checks</label>
-            <button id="clear-checks" type="button" class="btn btn-primary">Clear</button>
-            <br/>
-            <div style="margin-top: .2em">
-                <span>Random calling:</span>
-                <button class="btn btn-primary" id="random-set">Set</button>
-                <input type="number" value='2' style="width: 2em" id="random-set-number">
-                Call:
-                <button class="btn btn-primary" id="choose">Any</button>
-                <button class="btn btn-primary" id="choose-with-answer">With Answer</button>
-                <button class="btn btn-secondary" id="choose-reset">Reset</button>
-            </div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="seating-tab" data-toggle="tab" href="#seating" role="tab" aria-controls="seating" aria-selected="true">Seating</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="calling-tab" data-toggle="tab" href="#calling" role="tab" aria-controls="calling" aria-selected="false">Calling</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="control-tab" data-toggle="tab" href="#control" role="tab" aria-controls="control" aria-selected="false">Control</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="seating" role="tabpanel" aria-labelledby="seating-tab">
+              <input id='front-view' type="checkbox" checked>
+              <label for="front-view">Front View</label>
+              <textarea id="names" rows="2" placeholder="Names"></textarea>
+              <label>
+                  <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
+              </label>
+              <button id="set-names" type="button" class="btn btn-primary">Set</button>
+          </div>
+          <div class="tab-pane fade" id="calling" role="tabpanel" aria-labelledby="calling-tab">
+              <button class="btn btn-primary" id="random-set">Set</button>
+              <input type="number" value='2' style="width: 2em" id="random-set-number">
+              Call:
+              <button class="btn btn-primary" id="choose">Any</button>
+              <button class="btn btn-primary" id="choose-with-answer">With Answer</button>
+              <button class="btn btn-secondary" id="choose-reset">Reset</button>
+          </div>
+          <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+              <button id="ring-bell" type="button" class="btn btn-primary">Bell</button>
+              <textarea id="teacher-msg" style='margin-left: 1em' rows="2" cols="40" placeholder="Message from Teacher"></textarea>
+          </div>
+          <div class="tab-pane fade" id="control" role="tabpanel" aria-labelledby="control-tab">
+              <input id='enable-chat' type="checkbox" style="margin-left: .6em;">
+              <label for="enable-chat">Chat</label>
+              <button id="clear-chat" type="button" class="btn btn-primary">Clear</button>
+              <input id='enable-checks' type="checkbox" style="margin-left: .6em;">
+              <label for="enable-checks">Checks</label>
+              <button id="clear-checks" type="button" class="btn btn-primary">Clear</button>
+          </div>
         </div>
-        <textarea id="names" rows="2" placeholder="Names"></textarea>
-        <textarea id="teacher-msg" style='margin-left: 1em' rows="2" cols="40" placeholder="Message from Teacher"></textarea>
         <br/>
-        <label>
-            <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
-        </label>
-        <button id="set-names" type="button" class="btn btn-primary">Set</button>
         {% include 'chat.html' %}
     </div>
     <p/><p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
