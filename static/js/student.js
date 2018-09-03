@@ -23,31 +23,42 @@ $(() => {
             $('#question-text').text(msg.question);
             $('#poll').show();
 
+            const pollElem = $(`#poll-${msg.type}`);
+
+            function answerWith(answer) {socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answer})}
+
             switch(msg.type) {
                 case 'multi':
-                    const pollElem = $('#poll-multi');
                     pollElem.empty();
                     msg.answers.forEach((answer, i) => {
                         const radioId = `ans-${i}`;
                         const newRadio = $(`<input name='multi-answer' id='${radioId}' type="radio">`);
-                        newRadio.click(() => socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answer}));
+                        newRadio.click(() => answerWith(answer));
                         newRadio.appendTo(pollElem);
                         $(`<span> </span><label for="${radioId}">${answer}</label><br/>`).appendTo(pollElem);
                     });
-                    pollElem.show();
                     break;
 
                 case 'scale':
                     scaleSlider.val(0);
                     $('#scale-text').text('0');
-                    $('#poll-scale').show();
+
+                    scaleSlider.change(() => {
+                        $('#scale-text').text(scaleSlider.val());
+                        socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: scaleSlider.val()});
+                    });
                     break;
+
+                case 'text':
+                    const elem = $('#text-answer');
+                    elem.keypress(e => {
+                        if (e.which === 13) {
+                            answerWith(elem.val());
+                        }
+                    });
             }
 
-            scaleSlider.change(() => {
-                $('#scale-text').text(scaleSlider.val());
-                socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: scaleSlider.val()});
-            });
+            pollElem.show();
         });
 
         socket.on('stop_poll', () => {
