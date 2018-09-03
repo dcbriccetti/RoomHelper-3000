@@ -7,16 +7,12 @@ let selectedSeatIndex = null;
 
 $(() => {
     function setUpPolls() {
-        const questionTypesByTabIds = {
-            'multi-tab': 'multi',
-            'scale-tab': 'scale'
-        };
-        const eyn = $('#start_poll');
-        eyn.click(() => {
-            const checked = eyn.is(':checked');
-            if (checked) {
-                const activePollTab = $('#poll li a.active').attr('id');
-                socket.emit('start_poll', questionTypesByTabIds[activePollTab], $('#question-text').val(),
+        const pollTabPrefix = 'poll-tab-';  // In tab IDs in teacher.html
+        const enablePoll = $('#enable-poll');
+        enablePoll.click(() => {
+            if (enablePoll.is(':checked')) {
+                const activePollTabId = $('#poll li a.active').attr('id');
+                socket.emit('start_poll', activePollTabId.substring(pollTabPrefix.length), $('#question-text').val(),
                     $('#multi-answers').val().split('\n').filter(line => line.trim().length > 0));
             } else {
                 socket.emit('stop_poll');

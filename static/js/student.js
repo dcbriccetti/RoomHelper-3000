@@ -25,23 +25,22 @@ $(() => {
 
             switch(msg.type) {
                 case 'multi':
-                    const multiPoll = $('#multi-poll');
-                    multiPoll.empty();
+                    const pollElem = $('#poll-multi');
+                    pollElem.empty();
                     msg.answers.forEach((answer, i) => {
                         const radioId = `ans-${i}`;
                         const newRadio = $(`<input name='multi-answer' id='${radioId}' type="radio">`);
                         newRadio.click(() => socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answer}));
-                        newRadio.appendTo(multiPoll);
-                        $(`<span> </span><label for="${radioId}">${answer}</label><br/>`).appendTo(multiPoll);
+                        newRadio.appendTo(pollElem);
+                        $(`<span> </span><label for="${radioId}">${answer}</label><br/>`).appendTo(pollElem);
                     });
-                    $('#multi-no-answer').attr('checked', true);
-                    $('#multi-poll').show();
+                    pollElem.show();
                     break;
 
                 case 'scale':
                     scaleSlider.val(0);
                     $('#scale-text').text('0');
-                    $('#scale-poll').show();
+                    $('#poll-scale').show();
                     break;
             }
 
