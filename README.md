@@ -6,7 +6,11 @@ A webapp to manage a class of students in a computer lab.
 - lets the students indicate they need help, are done with the current task, or have an answer to the question being asked
 - randomly chooses students from the entire class, or from just those who have indicated they have an answer
 - shows the students the current task, or other message from the teacher
+- gives realtime polls
+    - multiple choice
+    - from 0 to 10
 - allows the students to chat with each other (when the teacher permits it)
+- provides a bell that rings on all the computers
 
 Feature ideas:
 
@@ -16,7 +20,5 @@ Feature ideas:
 - Make it easier to help students in order of them checking the box. Maybe a special marking for whoever is next.
 - Remove confusion where students think they have to
 push Set when they change checkbox settings
-- Quick polls (yes/no, multiple choice, real number range)
-- April Fools skylarking
 
 ![Screen shot](screen1-large.png)

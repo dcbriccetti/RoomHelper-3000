@@ -8,7 +8,7 @@ let selectedSeatIndex = null;
 $(() => {
     function setUpPolls() {
         const questionTypesByTabIds = {
-            'yes-no-tab': 'yes/no',
+            'multi-tab': 'multi',
             'scale-tab': 'scale'
         };
         const eyn = $('#start_poll');
@@ -16,7 +16,8 @@ $(() => {
             const checked = eyn.is(':checked');
             if (checked) {
                 const activePollTab = $('#poll li a.active').attr('id');
-                socket.emit('start_poll', questionTypesByTabIds[activePollTab], $('#question-text').val());
+                socket.emit('start_poll', questionTypesByTabIds[activePollTab], $('#question-text').val(),
+                    $('#multi-answers').val().split('\n').filter(line => line.trim().length > 0));
             } else {
                 socket.emit('stop_poll');
                 stations.forEach(station => delete station.answer);

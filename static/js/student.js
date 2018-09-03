@@ -24,9 +24,18 @@ $(() => {
             $('#poll').show();
 
             switch(msg.type) {
-                case 'yes/no':
-                    $('#yes_no_no_answer').attr('checked', true);
-                    $('#yes-no-poll').show();
+                case 'multi':
+                    const multiPoll = $('#multi-poll');
+                    multiPoll.empty();
+                    msg.answers.forEach((answer, i) => {
+                        const radioId = `ans-${i}`;
+                        const newRadio = $(`<input name='multi-answer' id='${radioId}' type="radio">`);
+                        newRadio.click(() => socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answer}));
+                        newRadio.appendTo(multiPoll);
+                        $(`<span> </span><label for="${radioId}">${answer}</label><br/>`).appendTo(multiPoll);
+                    });
+                    $('#multi-no-answer').attr('checked', true);
+                    $('#multi-poll').show();
                     break;
 
                 case 'scale':
@@ -47,11 +56,6 @@ $(() => {
             $('.pollType').hide();
             $('#poll').hide();
         });
-
-        const answersById = {'yes_no_no_answer': '', 'yes': 'Yes', 'no': 'No'};
-        $('input[name="yes-no-answer"]').click(event =>
-            socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answersById[event.target.id]})
-        );
     }
 
     socket.on('ring_bell', () => soundFiles.play(0));

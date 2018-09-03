@@ -116,9 +116,9 @@ def ring_bell():
 
 
 @socketio.on('start_poll', namespace=TEACHER_NS)
-def start_poll(type, question):
+def start_poll(type, question, answers):
     if authenticated:
-        emit('start_poll', {'type': type, 'question': question}, broadcast=True, namespace=STUDENT_NS)
+        emit('start_poll', {'type': type, 'question': question, 'answers': answers}, broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('stop_poll', namespace=TEACHER_NS)
