@@ -18,15 +18,39 @@ $(() => {
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     function setUpPoll() {
-        socket.on('enable-yes-no', msg => {
-            $('#yes-no-question').text(msg.question);
-            const e = $('#yes-no-poll');
-            if (msg.enable) e.show(); else e.hide();
+        socket.on('start_poll', msg => {
+            const scaleSlider = $('#scale');
+            $('#question-text').text(msg.question);
+            $('#poll').show();
+
+            switch(msg.type) {
+                case 'yes/no':
+                    $('#yes_no_no_answer').attr('checked', true);
+                    $('#yes-no-poll').show();
+                    break;
+
+                case 'scale':
+                    scaleSlider.val(0);
+                    $('#scale-text').text('0');
+                    $('#scale-poll').show();
+                    break;
+            }
+
+            scaleSlider.change(() => {
+                $('#scale-text').text(scaleSlider.val());
+                socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: scaleSlider.val()});
+            });
         });
 
-        const answersById = {'no-answer': '', 'yes': 'Yes', 'no': 'No'};
+        socket.on('stop_poll', () => {
+            $('#question-text').text('');
+            $('.pollType').hide();
+            $('#poll').hide();
+        });
+
+        const answersById = {'yes_no_no_answer': '', 'yes': 'Yes', 'no': 'No'};
         $('input[name="yes-no-answer"]').click(event =>
-            socket.emit('yes-no-answer', {seatIndex: getSeatIndex(), answer: answersById[event.target.id]})
+            socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answersById[event.target.id]})
         );
     }
 

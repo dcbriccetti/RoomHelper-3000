@@ -32,7 +32,7 @@ settings = {
 status_toggles = ('haveAnswer', 'needHelp', 'done')
 names = []
 stations = [{} for i in range(settings['columns'] * settings['rows'])]
-teacher_password = 'teach'  # Change this
+teacher_password = ''  # Change this
 authenticated = False
 
 persister = Persister()
@@ -115,10 +115,16 @@ def ring_bell():
         emit('ring_bell', broadcast=True, namespace=STUDENT_NS)
 
 
-@socketio.on('enable-yes-no', namespace=TEACHER_NS)
-def enable_yes_no(enable, question):
+@socketio.on('start_poll', namespace=TEACHER_NS)
+def start_poll(type, question):
     if authenticated:
-        emit('enable-yes-no', {'enable': enable, 'question': question}, broadcast=True, namespace=STUDENT_NS)
+        emit('start_poll', {'type': type, 'question': question}, broadcast=True, namespace=STUDENT_NS)
+
+
+@socketio.on('stop_poll', namespace=TEACHER_NS)
+def stop_poll():
+    if authenticated:
+        emit('stop_poll', broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('enable_chat', namespace=TEACHER_NS)
@@ -198,10 +204,10 @@ def seat(message):
         broadcast_seated(station, si)
 
 
-@socketio.on('yes-no-answer', namespace=STUDENT_NS)
+@socketio.on('answer-poll', namespace=STUDENT_NS)
 def yes_no_answer(answer):
     if authenticated:
-        emit('yes-no-answer', answer, broadcast=True, namespace=TEACHER_NS)
+        emit('answer-poll', answer, broadcast=True, namespace=TEACHER_NS)
 
 
 @socketio.on('random_set', namespace=TEACHER_NS)

@@ -27,21 +27,26 @@
         <div id="canvas"></div>
 
         <ul class="nav nav-tabs" role="tablist">
-          <li class="nav-item">
-            <a class="nav-link active" id="seating-tab" data-toggle="tab" href="#seating" role="tab" aria-controls="seating" aria-selected="true">Seating</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="calling-tab" data-toggle="tab" href="#calling" role="tab" aria-controls="calling" aria-selected="false">Calling</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="control-tab" data-toggle="tab" href="#control" role="tab" aria-controls="control" aria-selected="false">Control</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="poll-tab" data-toggle="tab" href="#poll" role="tab" aria-polls="poll" aria-selected="false">Poll</a>
-          </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="seating-tab" data-toggle="tab" href="#seating" role="tab"
+                   aria-controls="seating" aria-selected="true">Seating</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="calling-tab" data-toggle="tab" href="#calling" role="tab"
+                   aria-controls="calling" aria-selected="false">Calling</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab"
+                   aria-controls="contact" aria-selected="false">Contact</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="control-tab" data-toggle="tab" href="#control" role="tab"
+                   aria-controls="control" aria-selected="false">Control</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="poll-tab" data-toggle="tab" href="#poll" role="tab" aria-controls="poll"
+                   aria-selected="false">Poll</a>
+            </li>
         </ul>
 
         <div class="tab-content">
@@ -76,23 +81,35 @@
                 <button id="clear-checks" type="button" class="btn btn-primary">Clear</button>
             </div>
             <div class="tab-pane fade" id="poll" role="tabpanel" aria-labelledby="poll-tab">
+                <div class="form-group row">
+                    <textarea class="form-control" id="question-text" rows="2"
+                              placeholder="Question"></textarea>
+                </div>
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="yes-no-tab" data-toggle="tab" href="#yes-no" role="tab"
                            aria-controls="yes-no" aria-selected="true">Yes/No</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="scale-tab" data-toggle="tab" href="#scale" role="tab"
+                           aria-controls="scale" aria-selected="true">Scale</a>
+                    </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="yes-no" role="tabpanel" aria-labelledby="yes-no-tab">
                         <div class="form-group row">
-                            <textarea class="form-control" id="yes-no-question" rows="2"
-                                      placeholder="Question"></textarea>
-                            <span class="form-control">
-                                <input id='enable-yes-no' type="checkbox">
-                                <label for="enable-yes-no">Enable</label>
-                            </span>
                         </div>
                     </div>
+                    <div class="tab-pane fade" id="scale" role="tabpanel" aria-labelledby="scale-tab">
+                        <div class="form-group row">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <span class="form-control">
+                        <input id='start_poll' type="checkbox">
+                        <label for="start_poll">Enable</label>
+                    </span>
                 </div>
             </div>
         </div>

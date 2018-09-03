@@ -7,20 +7,27 @@ let selectedSeatIndex = null;
 
 $(() => {
     function setUpPolls() {
-        const eyn = $('#enable-yes-no');
+        const questionTypesByTabIds = {
+            'yes-no-tab': 'yes/no',
+            'scale-tab': 'scale'
+        };
+        const eyn = $('#start_poll');
         eyn.click(() => {
             const checked = eyn.is(':checked');
-            if (! checked) {
+            if (checked) {
+                const activePollTab = $('#poll li a.active').attr('id');
+                socket.emit('start_poll', questionTypesByTabIds[activePollTab], $('#question-text').val());
+            } else {
+                socket.emit('stop_poll');
                 stations.forEach(station => delete station.answer);
                 sketch.loop();
             }
-            socket.emit('enable-yes-no', checked, $('#yes-no-question').val())
         });
 
-        socket.on('yes-no-answer', msg => {
+        socket.on('answer-poll', msg => {
             stations[msg.seatIndex].answer = msg.answer;
             sketch.loop();
-        })
+        });
     }
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
