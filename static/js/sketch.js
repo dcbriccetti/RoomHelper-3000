@@ -60,7 +60,7 @@ const sketch = new p5(p => {
 
                 const y = startY + h - 4;
                 const answer = station.answer;
-                if (answer) {
+                if (showAnswersInStations && answer) {
                     p.text(answer, startX + xMargin, y);
                 } else {
                     status.keys.forEach((key, i) => {

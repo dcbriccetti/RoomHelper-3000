@@ -4,6 +4,7 @@ let stations;
 const status = new Status();
 
 let selectedSeatIndex = null;
+let showAnswersInStations = false;
 
 $(() => {
     function setUpPolls() {
@@ -19,6 +20,13 @@ $(() => {
                 stations.forEach(station => delete station.answer);
                 sketch.loop();
             }
+        });
+        function show(what, show) {show ? $(what).show() : $(what).hide();}
+
+        $('#show-here').change(() => show('#answers', $('#show-here').is(':checked')));
+        $('#show-in-chart').change(() => {
+            showAnswersInStations = $('#show-in-chart').is(':checked');
+            sketch.loop();
         });
 
         socket.on('answer-poll', msg => {
