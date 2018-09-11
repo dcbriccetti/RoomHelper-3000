@@ -11,9 +11,7 @@ const sketch = new p5(p => {
         const h = p.height / settings.rows;
         const frontView = $('#front-view').is(':checked');
         const normalColor   = [168, 196, 219];
-        const selectedColor = [200, 159, 178];
-        const doneColor     = [99,  255, 139];
-        const needHelpColor = [255, 146,  69];
+        const selectedColor = [230, 230, 230];
 
         function stationName(index) {
             const rowFrom0 = Math.floor(index / settings.columns);
@@ -25,15 +23,7 @@ const sketch = new p5(p => {
             p.textFont('Helvetica');
             p.noStroke();
             const station = stations[seatIndex];
-            if (seatIndex === selectedSeatIndex)
-                p.fill(selectedColor);
-            else if (station && station.needHelp)
-                p.fill(needHelpColor);
-            else if (station && station.done)
-                p.fill(doneColor);
-            else
-                p.fill(normalColor);
-
+            p.fill(seatIndex === selectedSeatIndex ? selectedColor : normalColor);
             p.rect(startX, startY, w - 3, h - 3);
 
             p.fill(0);
@@ -57,6 +47,7 @@ const sketch = new p5(p => {
                 p.textSize(14);
                 p.textAlign(p.LEFT, p.BOTTOM);
                 const xPerKey = (w - 2 * xMargin) / status.keys.length;
+                const tagHeight = 1 / 3 * h;
 
                 const y = startY + h - 4;
                 const answer = station.answer;
@@ -70,6 +61,9 @@ const sketch = new p5(p => {
                         if (keyOrder) {
                             const studentOrder = keyOrder[station.name];
                             if (studentOrder) {
+                                p.fill(status.tagColors[i]);
+                                p.rect(x - 2, startY + h - tagHeight - 3, xPerKey, tagHeight);
+                                p.fill(0);
                                 p.text(code + studentOrder.order, x, y);
                             }
                         }
