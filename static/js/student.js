@@ -68,6 +68,13 @@ $(() => {
         });
     }
 
+    function showOrHideNowAndFromMessage(selector, show, message) {
+        function sho(obj, show) {if (show) obj.show(); else obj.hide();}
+        const jqObj = $(selector);
+        sho(jqObj, show);
+        socket.on(message, enabled => sho(jqObj, enabled));
+    }
+
     socket.on('ring_bell', () => soundFiles.play(0));
     socket.on('set_names', msg => {
         $('#name option:gt(0)').remove();
@@ -84,21 +91,13 @@ $(() => {
         });
     });
 
-    socket.on('enable_checks', enabled => {
-        const c = $('#status-checks');
-        if (enabled) c.show(); else c.hide();
-    });
+    showOrHideNowAndFromMessage('#status-checks', settings.checksEnabled, 'enable_checks');
+    showOrHideNowAndFromMessage('#chat',          settings.chatEnabled,   'enable_chat');
 
     if (settings.nickEnabled) $('#nickname').show();
 
-    if (settings.chatEnabled) $('#chat').show();
     socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
     socket.on('clear_chat', () => $('#chat-log').empty());
-    socket.on('enable_chat', enabled => {
-        const c = $('#chat');
-        if (enabled) c.show(); else c.hide();
-    });
-
 
     const cm = $('#chat-msg');
     cm.keypress(e => {
