@@ -82,7 +82,8 @@ const sketch = new p5(p => {
                 if (!missingSeatIndexes.has(seatIndex)) {
                     const ar = frontView ? settings.rows - 1 - r : r;
                     const ac = frontView ? settings.columns - 1 - c : c;
-                    const aisleAdj = frontView ?
+                    const aisleAdj = !settings.aisleAfterColumn ? 0 :
+                        frontView ?
                         ac > settings.columns - 1 - 1 - settings.aisleAfterColumn ? aisleWidth : 0 :
                         ac > settings.aisleAfterColumn ? aisleWidth : 0;
                     drawStation(ac * w + aisleAdj, ar * h, seatIndex);

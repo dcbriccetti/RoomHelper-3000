@@ -1,4 +1,3 @@
-import logging
 from random import choice
 from time import time
 
@@ -6,28 +5,12 @@ from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
 from markdown import markdown
 from persister import Persister
+from settings import settings
+from applog import logger
 
 STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
 ALL_NS = (TEACHER_NS, STUDENT_NS)
-
-logFormatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(module)s\t%(message)s")
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-for handler in (logging.FileHandler('log.txt'), logging.StreamHandler()):
-    handler.setFormatter(logFormatter)
-    logger.addHandler(handler)
-
-settings = {
-    'teacherName': 'Dave Briccetti',  # Change this
-    'columns': 9,
-    'rows': 4,
-    'missingSeatIndexes': [8, 35],
-    'aisleAfterColumn': 3,
-    'chatEnabled': False,
-    'checksEnabled': False,
-    'nickEnabled': False
-}
 
 status_toggles = ('haveAnswer', 'needHelp', 'done')
 names = []
