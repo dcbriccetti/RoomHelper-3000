@@ -101,7 +101,7 @@ $(() => {
 
     const cm = $('#chat-msg');
     cm.keypress(e => {
-        if (e.which === 13) {
+        if (e.which === 13 && cm.val().length > 0) {
             socket.emit('chat_msg', firstLast(), cm.val());
             cm.val('');
         }
