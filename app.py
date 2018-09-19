@@ -225,7 +225,7 @@ def set_status(message):
         si = message['seatIndex']
         station = stations[si]
         if station:
-            logging.info('set_status: %s', message)
+            logger.info('set_status: %s', message)
             now = time()
             for st in status_toggles:
                 station[st] = now if message.get(st, False) else None
