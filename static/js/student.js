@@ -100,10 +100,12 @@ $(() => {
     socket.on('clear_chat', () => $('#chat-log').empty());
 
     const cm = $('#chat-msg');
+    let chatAfterTime = 0;
     cm.keypress(e => {
-        if (e.which === 13 && cm.val().length > 0) {
+        if (e.which === 13 && cm.val().length > 0 && new Date().getTime() > chatAfterTime) {
             socket.emit('chat_msg', firstLast(), cm.val());
             cm.val('');
+            chatAfterTime = new Date().getTime() + settings.chatDelayMs;
         }
     });
 

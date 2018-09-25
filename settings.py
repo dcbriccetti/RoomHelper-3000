@@ -3,7 +3,8 @@ settingsTemplate = {
     'missingSeatIndexes': [],
     'chatEnabled': False,
     'checksEnabled': False,
-    'nickEnabled': False
+    'nickEnabled': False,
+    'chatDelayMs': 5000
 }
 
 room1 = {
