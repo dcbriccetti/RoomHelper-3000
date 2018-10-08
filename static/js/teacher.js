@@ -67,18 +67,8 @@ $(() => {
     let authd = false;
     status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
-    const polls = new Polls();
-
-    socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
-    socket.on('clear_chat', () => $('#chat-log').empty());
-
-    const cm = $('#chat-msg');
-    cm.keypress(e => {
-        if (e.which === 13) {
-            socket.emit('chat_msg', settings.teacherName, cm.val());
-            cm.val('');
-        }
-    });
+    new TeacherChat(socket, () => settings.teacherName);
+    new Polls();
 
     const tm = $('#teacher-msg');
     tm.keypress(e => {
