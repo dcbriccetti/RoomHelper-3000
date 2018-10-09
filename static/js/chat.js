@@ -1,7 +1,11 @@
 class Messenger {
-    constructor(socket, nameFn, messageMessage, clearMessage, entrySelector, controlFlood) {
-        socket.on(messageMessage, this.addMessage);
-        socket.on(clearMessage, this.clear);
+    constructor(socket, nameFn, prefix, controlFlood) {
+        const messageMessage = prefix + '_msg';
+        const clearMessage = 'clear_' + prefix;
+        const entrySelector = `#${prefix}-msg`;
+        const contentsSelector = `#${prefix}-log`;
+        socket.on(messageMessage, (msg) => $(contentsSelector).prepend(msg));
+        socket.on(clearMessage, () => $(contentsSelector).empty());
 
         const entryField = $(entrySelector);
         let chatAfterTime = 0;
@@ -18,15 +22,7 @@ class Messenger {
 
 class Chat extends Messenger {
     constructor(socket, nameFn, controlFlood) {
-        super(socket, nameFn, 'chat_msg', 'clear_chat', '#chat-msg', controlFlood);
-    }
-
-    addMessage(msg) {
-        $('#chat-log').prepend(msg);
-    }
-
-    clear() {
-        return $('#chat-log').empty();
+        super(socket, nameFn, 'chat', controlFlood);
     }
 }
 
@@ -38,14 +34,6 @@ class TeacherChat extends Chat {
 
 class Shares extends Messenger {
     constructor(socket, nameFn, controlFlood) {
-        super(socket, nameFn, 'shares_msg', 'clear_shares', '#shares-msg', controlFlood);
-    }
-
-    addMessage(msg) {
-        $('#shares-log').prepend(msg);
-    }
-
-    clear() {
-        return $('#shares-log').empty();
+        super(socket, nameFn, 'shares', controlFlood);
     }
 }
