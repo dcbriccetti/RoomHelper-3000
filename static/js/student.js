@@ -94,6 +94,7 @@ $(() => {
 
     showOrHideNowAndFromMessage('#status-checks', settings.checksEnabled, 'enable_checks');
     showOrHideNowAndFromMessage('#chat',          settings.chatEnabled,   'enable_chat');
+    showOrHideNowAndFromMessage('#shares',        settings.sharesEnabled, 'enable_shares');
 
     if (settings.nickEnabled) $('#nickname').show();
 

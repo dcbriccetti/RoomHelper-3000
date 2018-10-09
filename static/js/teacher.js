@@ -130,6 +130,10 @@ $(() => {
     ec.prop('checked', settings.chatEnabled);
     ec.click(() => socket.emit('enable_chat', ec.is(':checked')));
 
+    const es = $('#enable-shares');
+    es.prop('checked', settings.sharesEnabled);
+    es.click(() => socket.emit('enable_shares', es.is(':checked')));
+
     const eck = $('#enable-checks');
     eck.prop('checked', settings.checksEnabled);
     eck.click(() => socket.emit('enable_checks', eck.is(':checked')));

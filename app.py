@@ -116,6 +116,12 @@ def enable_chat(enable):
         settings['chatEnabled'] = enable
         emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
+@socketio.on('enable_shares', namespace=TEACHER_NS)
+def enable_shares(enable):
+    if authenticated:
+        settings['sharesEnabled'] = enable
+        emit('enable_shares', enable, broadcast=True, namespace=STUDENT_NS)
+
 
 @socketio.on('clear_chat', namespace=TEACHER_NS)
 def clear_chat():
