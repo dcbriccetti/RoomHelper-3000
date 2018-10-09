@@ -1,5 +1,6 @@
 from random import choice
 from time import time
+from urllib.parse import urlparse
 
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
@@ -60,6 +61,17 @@ def relay_chat(sender, msg):
             emit('chat_msg', html, namespace=ns, broadcast=True)
 
 
+def relay_shares(sender, possibleUrl):
+    r = request
+    logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possibleUrl)
+    parts = urlparse(possibleUrl)
+    if parts.hostname in settings['allowedSharesDomains']:
+        html = '<p>%s: <a href="%s" target="_blank">%s</a></p>' % (sender, possibleUrl, possibleUrl)
+        for ns in ALL_NS:
+            if settings['sharesEnabled'] or ns == TEACHER_NS:
+                emit('shares_msg', html, namespace=ns, broadcast=True)
+
+
 def relay_teacher_msg(msg):
     r = request
     logger.info('Teacher message from %s: %s', r.remote_addr, msg)
@@ -70,6 +82,7 @@ def relay_teacher_msg(msg):
 
 on_all_namespaces('connect', connect)
 on_all_namespaces('chat_msg', relay_chat)
+on_all_namespaces('shares_msg', relay_shares)
 on_all_namespaces('teacher_msg', relay_teacher_msg)
 
 
@@ -116,12 +129,25 @@ def enable_chat(enable):
         settings['chatEnabled'] = enable
         emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
+@socketio.on('enable_shares', namespace=TEACHER_NS)
+def enable_shares(enable):
+    if authenticated:
+        settings['sharesEnabled'] = enable
+        emit('enable_shares', enable, broadcast=True, namespace=STUDENT_NS)
+
 
 @socketio.on('clear_chat', namespace=TEACHER_NS)
 def clear_chat():
     if authenticated:
         for ns in ALL_NS:
             emit('clear_chat', broadcast=True, namespace=ns)
+
+
+@socketio.on('clear_shares', namespace=TEACHER_NS)
+def clear_shares():
+    if authenticated:
+        for ns in ALL_NS:
+            emit('clear_shares', broadcast=True, namespace=ns)
 
 
 @socketio.on('enable_checks', namespace=TEACHER_NS)

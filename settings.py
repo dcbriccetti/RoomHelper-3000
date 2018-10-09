@@ -2,9 +2,11 @@ settingsTemplate = {
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
     'chatEnabled': False,
+    'sharesEnabled': False,
     'checksEnabled': False,
     'nickEnabled': False,
-    'chatDelayMs': 5000
+    'chatDelayMs': 5000,
+    'allowedSharesDomains': ('repl.it', 'editor.p5js.org')
 }
 
 room1 = {

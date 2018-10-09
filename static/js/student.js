@@ -15,6 +15,7 @@ $(() => {
         const parts = submittedName.split(', ');
         return (submittedNickname || parts[1]) + ' ' + parts[0];
     }
+    [Chat, Shares].forEach(fn => new fn(socket, firstLast, true));
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     function setUpPoll() {
@@ -93,21 +94,9 @@ $(() => {
 
     showOrHideNowAndFromMessage('#status-checks', settings.checksEnabled, 'enable_checks');
     showOrHideNowAndFromMessage('#chat',          settings.chatEnabled,   'enable_chat');
+    showOrHideNowAndFromMessage('#shares',        settings.sharesEnabled, 'enable_shares');
 
     if (settings.nickEnabled) $('#nickname').show();
-
-    socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
-    socket.on('clear_chat', () => $('#chat-log').empty());
-
-    const cm = $('#chat-msg');
-    let chatAfterTime = 0;
-    cm.keypress(e => {
-        if (e.which === 13 && cm.val().length > 0 && new Date().getTime() > chatAfterTime) {
-            socket.emit('chat_msg', firstLast(), cm.val());
-            cm.val('');
-            chatAfterTime = new Date().getTime() + settings.chatDelayMs;
-        }
-    });
 
     socket.on('teacher_msg', msg => {
         if (msg.trim().length)

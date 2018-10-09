@@ -67,18 +67,8 @@ $(() => {
     let authd = false;
     status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
-    const polls = new Polls();
-
-    socket.on('chat_msg', msg => {$('#chat-log').prepend(msg);});
-    socket.on('clear_chat', () => $('#chat-log').empty());
-
-    const cm = $('#chat-msg');
-    cm.keypress(e => {
-        if (e.which === 13) {
-            socket.emit('chat_msg', settings.teacherName, cm.val());
-            cm.val('');
-        }
-    });
+    [TeacherChat, Shares].forEach(fn => new fn(socket, () => settings.teacherName, false));
+    new Polls();
 
     const tm = $('#teacher-msg');
     tm.keypress(e => {
@@ -132,17 +122,20 @@ $(() => {
         socket.emit('ring_bell')
     });
 
-    $('#clear-chat').click(() => socket.emit('clear_chat'));
+    $('#clear-chat'  ).click(() => socket.emit('clear_chat'));
+    $('#clear-shares').click(() => socket.emit('clear_shares'));
 
     $('#random-set').click(() => socket.emit('random_set', Number($('#random-set-number').val())));
 
-    const ec = $('#enable-chat');
-    ec.prop('checked', settings.chatEnabled);
-    ec.click(() => socket.emit('enable_chat', ec.is(':checked')));
-
-    const eck = $('#enable-checks');
-    eck.prop('checked', settings.checksEnabled);
-    eck.click(() => socket.emit('enable_checks', eck.is(':checked')));
+    function chk(sel, msg, setting) {
+        const ec = $(sel);
+        ec.prop('checked', setting);
+        ec.click(() => socket.emit(msg, ec.is(':checked')));
+    }
+    [['#enable-chat',   'enable_chat',   settings.chatEnabled],
+     ['#enable-shares', 'enable_shares', settings.sharesEnabled],
+     ['#enable-checks', 'enable_checks', settings.checksEnabled],
+    ].forEach(a => chk(a[0], a[1], a[2]));
 
     function requestRandomCall(any) {
         socket.emit('random_call', any, (i) => {
@@ -151,6 +144,7 @@ $(() => {
         });
     }
 
+    $('#shares').show();
     $('#chat').show();
     if (!authd) $('#password').focus();
 
