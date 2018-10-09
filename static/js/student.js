@@ -15,7 +15,7 @@ $(() => {
         const parts = submittedName.split(', ');
         return (submittedNickname || parts[1]) + ' ' + parts[0];
     }
-    new Chat(socket, firstLast);
+    [Chat, Shares].forEach(fn => new fn(socket, firstLast, true));
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     function setUpPoll() {

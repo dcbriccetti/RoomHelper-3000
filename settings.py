@@ -5,7 +5,8 @@ settingsTemplate = {
     'sharesEnabled': False,
     'checksEnabled': False,
     'nickEnabled': False,
-    'chatDelayMs': 5000
+    'chatDelayMs': 5000,
+    'allowedSharesDomains': ('repl.it', 'editor.p5js.org')
 }
 
 room1 = {
