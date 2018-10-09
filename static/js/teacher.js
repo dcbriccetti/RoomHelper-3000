@@ -141,6 +141,7 @@ $(() => {
         });
     }
 
+    $('#shares').show();
     $('#chat').show();
     if (!authd) $('#password').focus();
 

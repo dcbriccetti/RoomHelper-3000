@@ -2,6 +2,7 @@ settingsTemplate = {
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
     'chatEnabled': False,
+    'sharesEnabled': False,
     'checksEnabled': False,
     'nickEnabled': False,
     'chatDelayMs': 5000

@@ -77,6 +77,9 @@
                 <input id='enable-chat' type="checkbox" style="margin-left: .6em;">
                 <label for="enable-chat">Chat</label>
                 <button id="clear-chat" type="button" class="btn btn-primary">Clear</button>
+                <input id='enable-shares' type="checkbox" style="margin-left: .6em;">
+                <label for="enable-shares">Shares</label>
+                <button id="clear-shares" type="button" class="btn btn-primary">Clear</button>
                 <input id='enable-checks' type="checkbox" style="margin-left: .6em;">
                 <label for="enable-checks">Checks</label>
                 <button id="clear-checks" type="button" class="btn btn-primary">Clear</button>
@@ -150,6 +153,7 @@ Don’t Know</textarea>
             </div>
         </div>
         <br/>
+        {% include 'shares.html' %}
         {% include 'chat.html' %}
     </div>
     <p/><p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
