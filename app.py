@@ -1,5 +1,5 @@
 from random import choice
-from time import time
+from time import time, strftime
 from urllib.parse import urlparse
 
 from flask import Flask, render_template, request, json
@@ -55,7 +55,7 @@ def connect():
 def relay_chat(sender, msg):
     r = request
     logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
-    html = markdown(sender + ': ' + msg)
+    html = markdown(strftime('%H:%M:%S') + ' ' + sender + ': ' + msg)
     for ns in ALL_NS:
         if settings['chatEnabled'] or ns == TEACHER_NS:
             emit('chat_msg', html, namespace=ns, broadcast=True)
@@ -66,7 +66,8 @@ def relay_shares(sender, possibleUrl):
     logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possibleUrl)
     parts = urlparse(possibleUrl)
     if parts.hostname in settings['allowedSharesDomains']:
-        html = '<p>%s: <a href="%s" target="_blank">%s</a></p>' % (sender, possibleUrl, possibleUrl)
+        html = '<p>%s %s: <a href="%s" target="_blank">%s</a></p>' % (
+            strftime('%H:%M:%S'), sender, possibleUrl, possibleUrl)
         for ns in ALL_NS:
             if settings['sharesEnabled'] or ns == TEACHER_NS:
                 emit('shares_msg', html, namespace=ns, broadcast=True)
@@ -128,6 +129,7 @@ def enable_chat(enable):
     if authenticated:
         settings['chatEnabled'] = enable
         emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
+
 
 @socketio.on('enable_shares', namespace=TEACHER_NS)
 def enable_shares(enable):
