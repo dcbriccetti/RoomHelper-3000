@@ -60,18 +60,6 @@ def relay_chat(sender, msg):
             emit('chat_msg', html, namespace=ns, broadcast=True)
 
 
-def relay_shares(sender, possibleUrl):
-    r = request
-    logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possibleUrl)
-    parts = urlparse(possibleUrl)
-    if parts.hostname in settings['allowedSharesDomains']:
-        html = '<p>%s %s: <a href="%s" target="_blank">%s</a></p>' % (
-            strftime('%H:%M:%S'), sender, possibleUrl, possibleUrl)
-        for ns in ALL_NS:
-            if settings['sharesEnabled'] or ns == TEACHER_NS:
-                emit('shares_msg', html, namespace=ns, broadcast=True)
-
-
 def relay_teacher_msg(msg):
     r = request
     logger.info('Teacher message from %s: %s', r.remote_addr, msg)
@@ -82,8 +70,29 @@ def relay_teacher_msg(msg):
 
 on_all_namespaces('connect', connect)
 on_all_namespaces('chat_msg', relay_chat)
-on_all_namespaces('shares_msg', relay_shares)
 on_all_namespaces('teacher_msg', relay_teacher_msg)
+
+
+def relay_shares(sender, possible_url, allow_any=False):
+    r = request
+    logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possible_url)
+    parts = urlparse(possible_url)
+    if allow_any or parts.hostname in settings['allowedSharesDomains']:
+        html = '<p>%s %s: <a href="%s" target="_blank">%s</a></p>' % (
+            strftime('%H:%M:%S'), sender, possible_url, possible_url)
+        for ns in ALL_NS:
+            if settings['sharesEnabled'] or ns == TEACHER_NS:
+                emit('shares_msg', html, namespace=ns, broadcast=True)
+
+
+@socketio.on('shares_msg', namespace=STUDENT_NS)
+def relay_student_share(sender, possible_url):
+    relay_shares(sender, possible_url)
+
+
+@socketio.on('shares_msg', namespace=TEACHER_NS)
+def relay_student_share(sender, possible_url):
+    relay_shares(sender, possible_url, allow_any=True)
 
 
 @socketio.on('auth', namespace=TEACHER_NS)
