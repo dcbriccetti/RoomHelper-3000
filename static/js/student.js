@@ -6,14 +6,13 @@ $(() => {
     const status = new Status();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
-    let submittedName, submittedNickname;
-    function nickname()     {return $('#nickname').val();}
+    let submittedName;
     function name()         {return $('#name').val();}
     function row()          {return $('#row').val();}
     function column()       {return $('#column').val();}
     function firstLast()    {
         const parts = submittedName.split(', ');
-        return (submittedNickname || parts[1]) + ' ' + parts[0];
+        return parts[1] + ' ' + parts[0];
     }
     [Chat, Shares].forEach(fn => new fn(socket, firstLast, true));
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
@@ -96,8 +95,6 @@ $(() => {
     showOrHideNowAndFromMessage('#chat',          settings.chatEnabled,   'enable_chat');
     showOrHideNowAndFromMessage('#shares',        settings.sharesEnabled, 'enable_shares');
 
-    if (settings.nickEnabled) $('#nickname').show();
-
     socket.on('teacher_msg', msg => {
         if (msg.trim().length)
             $('#teacher-msg').show();
@@ -110,8 +107,7 @@ $(() => {
         if (name().length > 0 && row().length > 0 && column().length > 0 &&
                 ! settings.missingSeatIndexes.includes(getSeatIndex())) {
             submittedName = name();
-            submittedNickname = nickname();
-            socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
+            socket.emit('seat', {name: name(), seatIndex: getSeatIndex()});
             $('#comm').show();
             audioContext.resume();
         } else $('#comm').hide();

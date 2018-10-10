@@ -26,7 +26,7 @@ $(() => {
         function clearNameElsewhere(newSeatIndex, clearName) {
             stations.forEach((station, i) => {
                 if (i !== newSeatIndex && station && station.name === clearName) {
-                    station.ip = station.nickname = station.name = station.done = station.needHelp = null;
+                    station.ip = station.name = station.done = station.needHelp = null;
                 }
             });
         }

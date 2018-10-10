@@ -191,7 +191,7 @@ def set_names(message):
             if name:
                 names.append(name)
                 if assign_seats:
-                    station = {'ip': ip, 'nickname': '', 'name': name}
+                    station = {'ip': ip, 'name': name}
                     stations[si] = station
                     broadcast_seated(station, si)
                     si = skip_missing(si + 1)
@@ -200,17 +200,16 @@ def set_names(message):
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message):
     if authenticated:
-        nickname = message['nickname'] if settings['nickEnabled'] else ''
         name = message['name']
         si = message['seatIndex']
         ip = request.remote_addr
         persister.seat_indexes_by_ip[ip] = si
         persister.save()
-        logger.info('%s seat %s %s to %d', ip, name, nickname, si)
+        logger.info('%s seat %s to %d', ip, name, si)
         existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
         if existing_different_index:
             stations[existing_different_index[0]] = {}
-        station = {'ip': ip, 'sid': request.sid, 'nickname': nickname, 'name': name}
+        station = {'ip': ip, 'sid': request.sid, 'name': name}
         stations[si] = station
         broadcast_seated(station, si)
 
@@ -239,7 +238,7 @@ def random_call(any):
             return -1
         chosen = choice(eligible)
         chosen[1]['callsLeft'] -= 1
-        logger.info('%s %s called randomly', chosen[1].get('nickname', ''), chosen[1]['name'])
+        logger.info('%s called randomly', chosen[1]['name'])
         return chosen[0]
 
 
@@ -262,7 +261,7 @@ def set_status(message):
 
 
 def clear_station(station):
-    for key in ('nickname', 'name', 'needHelp', 'done', 'haveAnswer'):
+    for key in ('name', 'needHelp', 'done', 'haveAnswer'):
         if key in station:
             del station[key]
 

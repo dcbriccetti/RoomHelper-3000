@@ -38,7 +38,7 @@ const sketch = new p5(p => {
                 const parts = station.name.split(', ');
                 p.textSize(20);
                 p.textAlign(p.CENTER, p.CENTER);
-                const name = station.nickname || parts[1];
+                const name = parts[1];
                 if (p.textWidth(name) > w) p.textSize(14);
                 p.text(name, startX + w / 2, startY + h / 3);
                 p.textSize(12);
