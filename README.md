@@ -7,9 +7,11 @@ A webapp to manage a class of students in a computer lab.
 - randomly chooses students from the entire class, or from just those who have indicated they have an answer
 - shows the students the current task, or other message from the teacher
 - gives realtime polls
+    - short text
     - multiple choice
     - from 0 to 10
 - allows the students to chat with each other (when the teacher permits it)
+- allows sharing by students of links to approved domains
 - provides a bell that rings on all the computers
 
 Feature ideas:
