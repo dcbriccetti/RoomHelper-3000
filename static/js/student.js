@@ -116,12 +116,16 @@ $(() => {
 
     function updateStatus() {
         const args = {name: firstLast(), seatIndex: getSeatIndex()};
-        status.keys.forEach((key) => args[key] = $('#' + key).is(':checked'));
+        status.keys.forEach(key => args[key] = $('#' + key).is(':checked'));
         socket.emit('set_status', args);
         return true;
     }
 
-    status.keys.forEach(id => {$(`#${id}`).click(updateStatus);});
+    settings.statuses.forEach(status => {
+        const id = status[0];
+        $('#statuses').append(`<input id='${id}' type="checkbox"> <label for="${id}" style="margin-right: 1em">${status[2]}</label> `);
+        $('#' + id).click(updateStatus);
+    });
 
     for (let r = 0; r < settings.rows; ++r) {
         const letter = String.fromCharCode('A'.charCodeAt(0) + r);

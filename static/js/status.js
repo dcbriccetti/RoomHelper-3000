@@ -2,9 +2,7 @@
 
 class Status {
     constructor() {
-        this.keys = ['needHelp', 'haveAnswer', 'done'];
-        this.shortCodes = ['?', 'A', 'D'];
-        this.tagColors = [[45, 98, 163], [228, 113, 39], [142, 145, 143]];
+        this.keys = settings.statuses.map(s => s[0]);
         this.orders = {};
         this.onHaveAnswerChangeCallbacks = []
     }

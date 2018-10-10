@@ -13,7 +13,6 @@ STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
 ALL_NS = (TEACHER_NS, STUDENT_NS)
 
-status_toggles = ('haveAnswer', 'needHelp', 'done')
 names = []
 stations = [{} for i in range(settings['columns'] * settings['rows'])]
 teacher_password = ''  # Change this
@@ -163,7 +162,7 @@ def enable_checks(enable):
 def clear_checks():
     if authenticated:
         for station in stations:
-            for st in status_toggles:
+            for st in settings['statuses']:
                 station[st] = None
 
     emit('clear_checks', broadcast=True, namespace=STUDENT_NS)
@@ -254,8 +253,9 @@ def set_status(message):
         if station:
             logger.info('set_status: %s', message)
             now = time()
-            for st in status_toggles:
-                station[st] = now if message.get(st, False) else None
+            for st in settings['statuses']:
+                id = st[0]
+                station[id] = now if message.get(id, False) else None
             ss_msg = {'seatIndex': si, 'station': station}
             emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
 

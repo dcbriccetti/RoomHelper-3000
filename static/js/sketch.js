@@ -54,14 +54,16 @@ const sketch = new p5(p => {
                 if (showAnswersInStations && answer) {
                     p.text(answer, startX + xMargin, y);
                 } else {
-                    status.keys.forEach((key, i) => {
-                        const code = status.shortCodes[i];
+                    const tagColors = [[45, 98, 163], [228, 113, 39], [142, 145, 143]];
+                    settings.statuses.forEach((s, i) => {
+                        const key = s[0];
+                        const code = s[1];
                         const x = startX + xMargin + xPerKey * i;
                         const keyOrder = status.orders[key];
                         if (keyOrder) {
                             const studentOrder = keyOrder[station.name];
                             if (studentOrder) {
-                                p.fill(status.tagColors[i]);
+                                p.fill(tagColors[i % tagColors.length]);
                                 p.rect(x - 2, startY + h - tagHeight - 3, xPerKey, tagHeight);
                                 p.fill(0);
                                 p.text(code + studentOrder.order, x, y);

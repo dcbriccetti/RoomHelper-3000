@@ -4,6 +4,11 @@ settingsTemplate = {
     'chatEnabled': False,
     'sharesEnabled': False,
     'checksEnabled': False,
+    'statuses': (
+        ('needHelp',   '?', 'Need Help'),
+        ('haveAnswer', 'A', 'Have Answer'),
+        ('done',       'D', 'Done')
+    ),
     'chatDelayMs': 5000,
     'allowedSharesDomains': ('repl.it', 'editor.p5js.org')
 }
