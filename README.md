@@ -28,5 +28,10 @@ chart instead of by row and column
 - Allow pre-loading poll questions
     - Paste them in, in some special format?
 - Show how much time remains in the period
+- Direct messages
+
+Bugs:
+
+- Can put arbitrary HTML in the chat
 
 ![Screen shot](screen1-large.png)

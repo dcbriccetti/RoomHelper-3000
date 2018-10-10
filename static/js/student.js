@@ -107,13 +107,14 @@ $(() => {
     });
 
     $('form#seat').submit(() => {
-        if (name().length > 0 && row().length > 0 && column().length > 0) {
+        if (name().length > 0 && row().length > 0 && column().length > 0 &&
+                ! settings.missingSeatIndexes.includes(getSeatIndex())) {
             submittedName = name();
             submittedNickname = nickname();
             socket.emit('seat', {nickname: nickname(), name: name(), seatIndex: getSeatIndex()});
             $('#comm').show();
             audioContext.resume();
-        }
+        } else $('#comm').hide();
         return false;
     });
 
