@@ -1,3 +1,12 @@
+import re
+
+
+def ms(text, code):  # Make status
+    s = re.sub(r'\W', '', text)
+    id = s[0].lower() + s[1:]
+    return [id, code, text]
+
+
 settingsTemplate = {
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
@@ -5,9 +14,9 @@ settingsTemplate = {
     'sharesEnabled': False,
     'checksEnabled': False,
     'statuses': [
-        ['needHelp',   '?', 'Need Help'],
-        ['haveAnswer', 'A', 'Have Answer'],
-        ['done',       'D', 'Done']
+        ms('Need Help',   '?'),
+        ms('Have Answer', 'A'),
+        ms('Done',        'D')
     ],
     'chatDelayMs': 5000,
     'allowedSharesDomains': ['repl.it', 'editor.p5js.org']
