@@ -218,6 +218,9 @@ def seat(message):
         if existing_different_index:
             stations[existing_different_index[0]] = {}
         station = {'ip': ip, 'sid': request.sid, 'name': name}
+        if len(stations[si]):
+            msg = 'Someone claiming to be %s has moved to seat %d, displacing %s' % (name, si, stations[si]['name'])
+            logger.warn(msg)
         stations[si] = station
         broadcast_seated(station, si)
 
