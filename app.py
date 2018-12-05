@@ -205,6 +205,12 @@ def set_names(message):
                     si = skip_missing(si + 1)
 
 
+def station_name(index):
+    rowFrom0 = int(index / settings['columns'])
+    colFrom0 = index % settings['columns']
+    return chr(ord('A') + rowFrom0) + str(colFrom0 + 1)
+
+
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message):
     if authenticated:
@@ -213,14 +219,20 @@ def seat(message):
         ip = request.remote_addr
         persister.seat_indexes_by_ip[ip] = si
         persister.save()
+
         logger.info('%s seat %s to %d', ip, name, si)
         existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
         if existing_different_index:
             stations[existing_different_index[0]] = {}
-        station = {'ip': ip, 'sid': request.sid, 'name': name}
         if len(stations[si]):
-            msg = 'Someone claiming to be %s has moved to seat %d, displacing %s' % (name, si, stations[si]['name'])
-            logger.warn(msg)
+            name_at_new_station = stations[si].get('name')
+            if name_at_new_station and name != name_at_new_station:
+                msg = 'Someone at %s claiming to be %s has moved to %s, displacing %s' % (
+                    ip, name, station_name(si), name_at_new_station)
+                logger.warn(msg)
+                relay_chat('RH3K', msg)
+
+        station = {'ip': ip, 'sid': request.sid, 'name': name}
         stations[si] = station
         broadcast_seated(station, si)
 
