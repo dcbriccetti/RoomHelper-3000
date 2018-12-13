@@ -30,7 +30,7 @@ def index():
     r = request
     seat_index = persister.seat_indexes_by_ip.get(r.remote_addr, -1)
     logger.info('Student page requested from %s (last seat index: %d), %s',
-        r.remote_addr, seat_index, r.user_agent)
+                r.remote_addr, seat_index, r.user_agent)
     return render_template('student.html', settings=json.dumps(settings), names=names, lastSeatIndex=seat_index)
 
 
@@ -51,7 +51,7 @@ def connect():
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
-def relay_chat(sender, msg):
+def relay_chat(sender: str, msg: str) -> None:
     r = request
     logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
     html = markdown(strftime('%H:%M:%S') + ' ' + sender + ': ' + msg)
@@ -60,7 +60,7 @@ def relay_chat(sender, msg):
             emit('chat_msg', html, namespace=ns, broadcast=True)
 
 
-def relay_teacher_msg(msg):
+def relay_teacher_msg(msg: str) -> None:
     r = request
     logger.info('Teacher message from %s: %s', r.remote_addr, msg)
     html = markdown(msg)
@@ -73,7 +73,7 @@ on_all_namespaces('chat_msg', relay_chat)
 on_all_namespaces('teacher_msg', relay_teacher_msg)
 
 
-def relay_shares(sender, possible_url, allow_any=False):
+def relay_shares(sender: str, possible_url: str, allow_any=False) -> None:
     r = request
     logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possible_url)
     parts = urlparse(possible_url)
@@ -86,17 +86,17 @@ def relay_shares(sender, possible_url, allow_any=False):
 
 
 @socketio.on('shares_msg', namespace=STUDENT_NS)
-def relay_student_share(sender, possible_url):
+def relay_student_share(sender: str, possible_url: str) -> None:
     relay_shares(sender, possible_url)
 
 
 @socketio.on('shares_msg', namespace=TEACHER_NS)
-def relay_student_share(sender, possible_url):
+def relay_teacher_share(sender: str, possible_url: str) -> None:
     relay_shares(sender, possible_url, allow_any=True)
 
 
 @socketio.on('auth', namespace=TEACHER_NS)
-def auth(password):
+def auth(password: str) -> bool:
     global authenticated
     if password == teacher_password:
         authenticated = True
@@ -104,7 +104,7 @@ def auth(password):
 
 
 @socketio.on('disconnect', namespace=STUDENT_NS)
-def disconnect_request():
+def disconnect_request() -> None:
     r = request
     logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
     matches = [item for item in enumerate(stations) if r.sid == item[1].get('sid')]
@@ -115,60 +115,61 @@ def disconnect_request():
 
 
 @socketio.on('ring_bell', namespace=TEACHER_NS)
-def ring_bell():
+def ring_bell() -> None:
     if authenticated:
         emit('ring_bell', broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('start_poll', namespace=TEACHER_NS)
-def start_poll(type, question, answers):
+def start_poll(type, question, answers) -> None:
     if authenticated:
-        emit('start_poll', {'type': type, 'question': question, 'answers': answers}, broadcast=True, namespace=STUDENT_NS)
+        emit('start_poll', {'type': type, 'question': question, 'answers': answers},
+             broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('stop_poll', namespace=TEACHER_NS)
-def stop_poll():
+def stop_poll() -> None:
     if authenticated:
         emit('stop_poll', broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('enable_chat', namespace=TEACHER_NS)
-def enable_chat(enable):
+def enable_chat(enable: bool) -> None:
     if authenticated:
         settings['chatEnabled'] = enable
         emit('enable_chat', enable, broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('enable_shares', namespace=TEACHER_NS)
-def enable_shares(enable):
+def enable_shares(enable: bool) -> None:
     if authenticated:
         settings['sharesEnabled'] = enable
         emit('enable_shares', enable, broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('clear_chat', namespace=TEACHER_NS)
-def clear_chat():
+def clear_chat() -> None:
     if authenticated:
         for ns in ALL_NS:
             emit('clear_chat', broadcast=True, namespace=ns)
 
 
 @socketio.on('clear_shares', namespace=TEACHER_NS)
-def clear_shares():
+def clear_shares() -> None:
     if authenticated:
         for ns in ALL_NS:
             emit('clear_shares', broadcast=True, namespace=ns)
 
 
 @socketio.on('enable_checks', namespace=TEACHER_NS)
-def enable_checks(enable):
+def enable_checks(enable: bool) -> None:
     if authenticated:
         settings['checksEnabled'] = enable
         emit('enable_checks', enable, broadcast=True, namespace=STUDENT_NS)
 
 
 @socketio.on('clear_checks', namespace=TEACHER_NS)
-def clear_checks():
+def clear_checks() -> None:
     if authenticated:
         for station in stations:
             for st in settings['statuses']:
@@ -178,7 +179,7 @@ def clear_checks():
 
 
 @socketio.on('set_names', namespace=TEACHER_NS)
-def set_names(message):
+def set_names(message: dict) -> None:
     if authenticated:
         r = request
         ip = r.remote_addr
@@ -186,9 +187,9 @@ def set_names(message):
         emit('set_names', message, broadcast=True, namespace=STUDENT_NS)
         global names
         names = []
-        assign_seats = message['assignSeats']
+        assign_seats: bool = message['assignSeats']
 
-        def skip_missing(start):
+        def skip_missing(start: int) -> int:
             while start in settings['missingSeatIndexes']:
                 start += 1
             return start
@@ -205,14 +206,14 @@ def set_names(message):
                     si = skip_missing(si + 1)
 
 
-def station_name(index):
-    rowFrom0 = int(index / settings['columns'])
-    colFrom0 = index % settings['columns']
-    return chr(ord('A') + rowFrom0) + str(colFrom0 + 1)
+def station_name(index: int) -> str:
+    row_from_0 = int(index / settings['columns'])
+    col_from_0 = index % settings['columns']
+    return chr(ord('A') + row_from_0) + str(col_from_0 + 1)
 
 
 @socketio.on('seat', namespace=STUDENT_NS)
-def seat(message):
+def seat(message: dict):
     if authenticated:
         name = message['name']
         si = message['seatIndex']
@@ -244,7 +245,7 @@ def yes_no_answer(answer):
 
 
 @socketio.on('random_set', namespace=TEACHER_NS)
-def random_set(random_calls_limit):
+def random_set(random_calls_limit: int) -> None:
     if authenticated:
         logger.info('Random calls limit set to %d', random_calls_limit)
         for station in stations:
@@ -253,10 +254,10 @@ def random_set(random_calls_limit):
 
 
 @socketio.on('random_call', namespace=TEACHER_NS)
-def random_call(any):
+def random_call(anyone: bool) -> int:
     if authenticated:
         eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
-                    and (True if any else v.get('haveAnswer', False))]
+                    and (anyone or v.get('haveAnswer', False))]
         if not eligible:
             return -1
         chosen = choice(eligible)
@@ -265,12 +266,12 @@ def random_call(any):
         return chosen[0]
 
 
-def broadcast_seated(station, seat_index):
+def broadcast_seated(station, seat_index: int) -> None:
     emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
 
 
 @socketio.on('set_status', namespace=STUDENT_NS)
-def set_status(message):
+def set_status(message: dict) -> None:
     if authenticated:
         si = message['seatIndex']
         station = stations[si]
@@ -284,7 +285,7 @@ def set_status(message):
             emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
 
 
-def clear_station(station):
+def clear_station(station) -> None:
     for key in ('name', 'needHelp', 'done', 'haveAnswer'):
         if key in station:
             del station[key]
