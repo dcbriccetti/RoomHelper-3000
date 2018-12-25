@@ -31,8 +31,9 @@ chart instead of by row and column
     - Paste them in, in some special format?
 - Show how much time remains in the period
 - Direct messages
-- Transmission of live coding session
-to students
+- Transmission of live coding session to students
+- Make the pre-seat feature work better
+    - When they choose their name, set the row, col?
 
 Bugs:
 
