@@ -1,3 +1,4 @@
+from typing import Any, List, Dict
 from random import choice
 from time import time, strftime
 from urllib.parse import urlparse
@@ -13,8 +14,8 @@ STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
 ALL_NS = (TEACHER_NS, STUDENT_NS)
 
-names = []
-stations = [{} for i in range(settings['columns'] * settings['rows'])]
+names: List[str] = []
+stations: List[Dict[str, Any]] = [{} for i in range(settings['columns'] * settings['rows'])]
 teacher_password = ''  # Change this
 authenticated = False
 
@@ -258,12 +259,12 @@ def random_call(anyone: bool) -> int:
     if authenticated:
         eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
                     and (anyone or v.get('haveAnswer', False))]
-        if not eligible:
-            return -1
-        chosen = choice(eligible)
-        chosen[1]['callsLeft'] -= 1
-        logger.info('%s called randomly', chosen[1]['name'])
-        return chosen[0]
+        if eligible:
+            chosen = choice(eligible)
+            chosen[1]['callsLeft'] -= 1
+            logger.info('%s called randomly', chosen[1]['name'])
+            return chosen[0]
+    return -1
 
 
 def broadcast_seated(station, seat_index: int) -> None:

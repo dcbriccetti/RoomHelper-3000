@@ -1,3 +1,4 @@
+from typing import Any, Dict
 import re
 
 
@@ -34,5 +35,5 @@ room2 = {
     'rows': 2,
 }
 
-settings = settingsTemplate
+settings: Dict[str, Any] = settingsTemplate
 settings.update(room1)
