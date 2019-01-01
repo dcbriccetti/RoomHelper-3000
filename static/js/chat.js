@@ -10,7 +10,9 @@ class Messenger {
         const entryField = $(entrySelector);
         let chatAfterTime = 0;
         entryField.keypress(e => {
-            if (e.which === 13 && entryField.val().length > 0 && new Date().getTime() > chatAfterTime) {
+            const msgLen = entryField.val().length;
+            if (e.which === 13 && msgLen > 0 && msgLen < settings.chatMessageMaxLen &&
+                new Date().getTime() > chatAfterTime) {
                 socket.emit(messageMessage, nameFn(), entryField.val());
                 entryField.val('');
                 if (controlFlood)

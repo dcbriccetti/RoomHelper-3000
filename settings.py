@@ -20,6 +20,7 @@ settingsTemplate = {
         ms('Done',        'D')
     ],
     'chatDelayMs': 5000,
+    'chatMessageMaxLen': 1000,
     'allowedSharesDomains': ['repl.it', 'editor.p5js.org']
 }
 
