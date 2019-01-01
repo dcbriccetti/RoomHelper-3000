@@ -25,5 +25,17 @@ room2 = {
     'rows': 2,
 }
 
+school1_config = {
+    'periods': [
+        (1, '18:20', '18:40'),
+        (2, '18:40', '19:00'),
+        (3, '19:00', '19:20'),
+        # (3, '09:50', '10:35'),
+        # (4, '11:00', '11:50'),
+        # (5, '11:50', '12:35'),
+    ]
+}
+
 settings = settingsTemplate
 settings.update(room1)
+settings.update(school1_config)

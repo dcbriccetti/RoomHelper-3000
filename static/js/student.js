@@ -17,6 +17,39 @@ $(() => {
     [Chat, Shares].forEach(fn => new fn(socket, firstLast, true));
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
+    settings.periods.forEach(p => {
+            const period = p.slice(1, 3);
+            const start = todayWithHourMin(period[0]);
+            const end = todayWithHourMin(period[1]);
+            const periodStartMs = start.getTime();
+            const periodEndMs = end.getTime();
+            const periodLengthMs = periodEndMs - periodStartMs;
+        }
+    );
+
+    function todayWithHourMin(hhmm) {
+        const parts = hhmm.split(':').map(n => Number(n));
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), parts[0], parts[1], 0);
+    }
+
+        }
+
+    console.log(periodStartMs, periodEndMs, periodLengthMs, settings.periods);
+
+    function updateTimeRemaining() {
+        const timeInPeriod = new Date().getTime() - periodStartMs;
+        const periodFractionSpent = timeInPeriod / periodLengthMs;
+        console.log(timeInPeriod, periodFractionSpent);
+        const percentLeftInPeriod = 100 - periodFractionSpent * 100;
+        $('#time-left').val(percentLeftInPeriod);
+        if (percentLeftInPeriod > 0) {
+            window.setTimeout(updateTimeRemaining, 5000);
+        }
+    }
+
+    updateTimeRemaining();
+
     function setUpPoll() {
         socket.on('start_poll', msg => {
             const scaleSlider = $('#scale');
