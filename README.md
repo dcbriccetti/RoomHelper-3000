@@ -16,6 +16,8 @@ A webapp to manage a class of students in a computer lab.
 
 Feature ideas:
 
+- Log in with Google
+    - Here’s a guide: https://fosstack.com/how-to-add-google-authentication-in-django/ . Is this a good way?
 - Chat:
     - Delete all messages from a person
     - Disable chat for a person
@@ -34,6 +36,7 @@ chart instead of by row and column
 - Transmission of live coding session to students
 - Make the pre-seat feature work better
     - When they choose their name, set the row, col?
+- Log poll questions and answers
 
 Bugs:
 
