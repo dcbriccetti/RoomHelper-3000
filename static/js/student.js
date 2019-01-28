@@ -23,39 +23,42 @@ $(() => {
         return new Date(now.getFullYear(), now.getMonth(), now.getDate(), parts[0], parts[1], 0);
     }
 
+    function formatTime(ms) {
+        const s = ms / 1000;
+        let hours   = Math.floor(s / 3600);
+        if (hours   < 10) hours   = "0" + hours;
+        let minutes = Math.floor((s - (hours * 3600)) / 60);
+        if (minutes < 10) minutes = "0" + minutes;
+        let seconds = Math.floor(s - hours * 3600 - minutes * 60);
+        if (seconds < 10) seconds = "0" + seconds;
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
     function updateTimeRemaining() {
-
         const now = new Date();
+        let start = 0;
+        let end = 0;
 
-        let periodStartMs;
-        let periodEndMs;
-        let periodLengthMs;
+        const periodFound = settings.periods.find(period => {
+            start = todayWithHourMin(period[1]);
+            end   = todayWithHourMin(period[2]);
+            return now >= start && now <= end;
+        });
 
-        settings.periods.forEach(p => {
-                const period = p.slice(1, 3);
-                const start = todayWithHourMin(period[0]);
-                const end = todayWithHourMin(period[1]);
-                periodStartMs = start.getTime();
-                periodEndMs = end.getTime();
-                if (now.getTime() >= periodStartMs && now.getTime() <= periodEndMs) {
-                    periodLengthMs = periodEndMs - periodStartMs;
-                    console.log(`pStartMs: ${periodStartMs}, pEndMs: ${periodEndMs}, pLengthMs: ${periodLengthMs}`);
-                }
-            }
-        );
-
-        let percentLeftInPeriod = 0;
-
-        if (periodLengthMs) {
-            const timeNow = now.getTime();
-            const timeInPeriod = timeNow - periodStartMs;
-            const periodFractionSpent = timeInPeriod / periodLengthMs;
-            console.log(`tInPeriod: ${timeInPeriod}, tNow: ${timeNow}, pFractionSpent: ${periodFractionSpent}`);
-            percentLeftInPeriod = 100 - periodFractionSpent * 100;
+        if (periodFound) {
+            const periodDuration = end - start;
+            const msLeft = periodDuration - (now - start);
+            const percentLeft = msLeft / periodDuration * 100;
+            $('#time-left').show();
+            $('#time-left-text').show();
+            $('#time-left').val(percentLeft);
+            $('#time-left-text').text(formatTime(msLeft));
+        } else {
+            $('#time-left').hide();
+            $('#time-left-text').hide();
         }
 
-        $('#time-left').val(percentLeftInPeriod);
-        window.setTimeout(updateTimeRemaining, 5000);
+        window.setTimeout(updateTimeRemaining, 1000);
     }
 
     updateTimeRemaining();
