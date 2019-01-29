@@ -17,6 +17,52 @@ $(() => {
     [Chat, Shares].forEach(fn => new fn(socket, firstLast, true));
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
+    function todayWithHourMin(hhmm) {
+        const parts = hhmm.split(':').map(n => Number(n));
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), parts[0], parts[1], 0);
+    }
+
+    function formatTime(ms) {
+        const s = ms / 1000;
+        let hours   = Math.floor(s / 3600);
+        if (hours   < 10) hours   = "0" + hours;
+        let minutes = Math.floor((s - (hours * 3600)) / 60);
+        if (minutes < 10) minutes = "0" + minutes;
+        let seconds = Math.floor(s - hours * 3600 - minutes * 60);
+        if (seconds < 10) seconds = "0" + seconds;
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
+    function updateTimeRemaining() {
+        const now = new Date();
+        let start = 0;
+        let end = 0;
+
+        const periodFound = settings.periods.find(period => {
+            start = todayWithHourMin(period[1]);
+            end   = todayWithHourMin(period[2]);
+            return now >= start && now <= end;
+        });
+
+        if (periodFound) {
+            const periodDuration = end - start;
+            const msLeft = periodDuration - (now - start);
+            const percentLeft = msLeft / periodDuration * 100;
+            $('#time-left').show();
+            $('#time-left-text').show();
+            $('#time-left').val(percentLeft);
+            $('#time-left-text').text(formatTime(msLeft));
+        } else {
+            $('#time-left').hide();
+            $('#time-left-text').hide();
+        }
+
+        window.setTimeout(updateTimeRemaining, 1000);
+    }
+
+    updateTimeRemaining();
+
     function setUpPoll() {
         socket.on('start_poll', msg => {
             const scaleSlider = $('#scale');

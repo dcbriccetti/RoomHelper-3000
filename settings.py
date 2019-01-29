@@ -36,5 +36,14 @@ room2 = {
     'rows': 2,
 }
 
-settings: Dict[str, Any] = settingsTemplate
+school1_config = {
+    'periods': [
+        (3, '09:50', '10:35'),
+        (4, '11:00', '11:50'),
+        (5, '11:50', '12:35'),
+    ]
+}
+
+settings = settingsTemplate
 settings.update(room1)
+settings.update(school1_config)
