@@ -23,23 +23,25 @@ class Polls {
         });
 
         socket.on('answer-poll', msg => {
-            const station = stations[msg.seatIndex];
-            station.answer = msg.answer;
-            sketch.loop();
-            $(`#answer-${msg.seatIndex}`).remove();
-            let insertBefore;
-            $('#answers table tbody').children().each((i, tr) => {
-                const tds = $(tr).children();
-                if (! insertBefore && tds[0].textContent > station.name) {
-                    insertBefore = $(tr);
-                }
-            });
-            const newRow = $(`<tr id="answer-${msg.seatIndex}"><td>${station.name}</td><td>${msg.answer}</td></tr>`);
-            if (insertBefore)
-                newRow.insertBefore(insertBefore);
-            else
-                newRow.appendTo($('#answers table tbody'));
-            this.setNumAnswers();
+            if (! $('#show-here').is(':checked') && ! $('#show-in-chart').is(':checked')) {
+                const station = stations[msg.seatIndex];
+                station.answer = msg.answer;
+                sketch.loop();
+                $(`#answer-${msg.seatIndex}`).remove();
+                let insertBefore;
+                $('#answers table tbody').children().each((i, tr) => {
+                    const tds = $(tr).children();
+                    if (!insertBefore && tds[0].textContent > station.name) {
+                        insertBefore = $(tr);
+                    }
+                });
+                const newRow = $(`<tr id="answer-${msg.seatIndex}"><td>${station.name}</td><td>${msg.answer}</td></tr>`);
+                if (insertBefore)
+                    newRow.insertBefore(insertBefore);
+                else
+                    newRow.appendTo($('#answers table tbody'));
+                this.setNumAnswers();
+            }
         });
     }
 
