@@ -29,7 +29,7 @@
                     <select class="form-control col-4" id="name">
                         <option value=''>Name</option>
                         {% for name in names %}
-                        <option value='{{ name }}'>{{ name }}</option>
+                        <option value='{{ loop.index }}'>{{ name }}</option>
                         {% endfor %}
                     </select>
                 </div>

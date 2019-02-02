@@ -216,7 +216,8 @@ def station_name(index: int) -> str:
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message: dict):
     if authenticated:
-        name = message['name']
+        name_index = int(message['name']) - 1
+        name = names[name_index]
         si = message['seatIndex']
         ip = request.remote_addr
         persister.seat_indexes_by_ip[ip] = si
