@@ -54,6 +54,7 @@ $(() => {
 
     $('#set-names').click(() => {
         socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
+        $('#names').val('');
     });
 
     $('#clear-checks').click(() => {
