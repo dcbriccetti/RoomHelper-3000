@@ -26,10 +26,10 @@
             <h4 class="card-title">Name and Location</h4>
             <form id="seat">
                 <div class="form-group row">
-                    <select class="form-control col-4" id="name">
-                        <option value=''>Name</option>
+                    <select class="form-control col-4" id="name-index">
+                        <option value='-1'>Name</option>
                         {% for name in names %}
-                        <option value='{{ loop.index }}'>{{ name }}</option>
+                        <option value='{{ loop.index - 1 }}'>{{ name }}</option>
                         {% endfor %}
                     </select>
                 </div>

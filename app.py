@@ -52,8 +52,9 @@ def connect():
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
-def relay_chat(sender: str, msg: str) -> None:
+def relay_chat(sender_id: int, msg: str) -> None:
     r = request
+    sender: str = settings['teacherName'] if sender_id == -1 else names[sender_id]
     logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
     html = markdown(strftime('%H:%M:%S') + ' ' + sender + ': ' + msg)
     for ns in ALL_NS:
@@ -216,8 +217,7 @@ def station_name(index: int) -> str:
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message: dict):
     if authenticated:
-        name_index = int(message['name']) - 1
-        name = names[name_index]
+        name = names[int(message['nameIndex'])]
         si = message['seatIndex']
         ip = request.remote_addr
         persister.seat_indexes_by_ip[ip] = si

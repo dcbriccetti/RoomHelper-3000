@@ -1,5 +1,5 @@
 class Messenger {
-    constructor(socket, nameFn, prefix, controlFlood) {
+    constructor(socket, nameIndexFn, prefix, controlFlood) {
         const messageMessage = prefix + '_msg';
         const clearMessage = 'clear_' + prefix;
         const entrySelector = `#${prefix}-msg`;
@@ -13,7 +13,7 @@ class Messenger {
             const msgLen = entryField.val().length;
             if (e.which === 13 && msgLen > 0 && msgLen < settings.chatMessageMaxLen &&
                 new Date().getTime() > chatAfterTime) {
-                socket.emit(messageMessage, nameFn(), entryField.val());
+                socket.emit(messageMessage, nameIndexFn(), entryField.val());
                 entryField.val('');
                 if (controlFlood)
                     chatAfterTime = new Date().getTime() + settings.chatDelayMs;
@@ -23,19 +23,19 @@ class Messenger {
 }
 
 class Chat extends Messenger {
-    constructor(socket, nameFn, controlFlood) {
-        super(socket, nameFn, 'chat', controlFlood);
+    constructor(socket, nameIndexFn, controlFlood) {
+        super(socket, nameIndexFn, 'chat', controlFlood);
     }
 }
 
 class TeacherChat extends Chat {
-    constructor(socket, nameFn) {
-        super(socket, nameFn, false);
+    constructor(socket, nameIndexFn) {
+        super(socket, nameIndexFn, false);
     }
 }
 
 class Shares extends Messenger {
-    constructor(socket, nameFn, controlFlood) {
-        super(socket, nameFn, 'shares', controlFlood);
+    constructor(socket, nameIndexFn, controlFlood) {
+        super(socket, nameIndexFn, 'shares', controlFlood);
     }
 }

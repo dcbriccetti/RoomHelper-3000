@@ -6,15 +6,10 @@ $(() => {
     const status = new Status();
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
-    let submittedName;
-    function name()         {return $('#name').val();}
+    function name_index()   {return Number($('#name-index').val());}
     function row()          {return $('#row').val();}
     function column()       {return $('#column').val();}
-    function firstLast()    {
-        const parts = submittedName.split(', ');
-        return parts[1] + ' ' + parts[0];
-    }
-    [Chat, Shares].forEach(fn => new fn(socket, firstLast, true));
+    [Chat, Shares].forEach(fn => new fn(socket, name_index, true));
     function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     function todayWithHourMin(hhmm) {
@@ -150,10 +145,9 @@ $(() => {
     });
 
     $('form#seat').submit(() => {
-        if (name().length > 0 && row().length > 0 && column().length > 0 &&
+        if (name_index() >= 0 && row().length > 0 && column().length > 0 &&
                 ! settings.missingSeatIndexes.includes(getSeatIndex())) {
-            submittedName = name();
-            socket.emit('seat', {name: name(), seatIndex: getSeatIndex()});
+            socket.emit('seat', {nameIndex: name_index(), seatIndex: getSeatIndex()});
             $('#comm').show();
             audioContext.resume();
         } else $('#comm').hide();

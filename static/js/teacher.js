@@ -12,7 +12,7 @@ $(() => {
     let authd = false;
     status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
-    [TeacherChat, Shares].forEach(fn => new fn(socket, () => settings.teacherName, false));
+    [TeacherChat, Shares].forEach(fn => new fn(socket, () => -1 /* teacher ID */, false));
     new Polls(socket);
 
     const tm = $('#teacher-msg');
