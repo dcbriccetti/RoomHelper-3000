@@ -118,8 +118,8 @@ $(() => {
 
     socket.on('ring_bell', () => soundFiles.play(0));
     socket.on('set_names', msg => {
-        $('#name option:gt(0)').remove();
-        const sel = $('#name');
+        $('#name-index option:gt(0)').remove();
+        const sel = $('#name-index');
         msg.names.split('\n').forEach(name =>
             sel.append(`<option value="${name}">${name}</option>`));
     });
