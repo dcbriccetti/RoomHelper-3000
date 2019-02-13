@@ -155,7 +155,7 @@ $(() => {
     });
 
     function updateStatus() {
-        const args = {name: firstLast(), seatIndex: getSeatIndex()};
+        const args = {seatIndex: getSeatIndex()};
         status.keys.forEach(key => args[key] = $('#' + key).is(':checked'));
         socket.emit('set_status', args);
         return true;
