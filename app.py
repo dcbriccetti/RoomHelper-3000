@@ -54,7 +54,7 @@ def connect():
 
 def relay_chat(sender_id: int, msg: str) -> None:
     r = request
-    sender: str = settings['teacherName'] if sender_id == -1 else names[sender_id]
+    sender: str = settings['teacherName'] if sender_id == -1 else 'RH3K' if sender_id == -2 else names[sender_id]
     logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
     html = markdown(strftime('%H:%M:%S') + ' ' + sender + ': ' + msg)
     for ns in ALL_NS:
@@ -197,15 +197,13 @@ def set_names(message: dict) -> None:
             return start
 
         si = skip_missing(0)
-        for line in message['names'].split('\n'):
-            name = line.strip()
-            if name:
-                names.append(name)
-                if assign_seats:
-                    station = {'ip': ip, 'name': name}
-                    stations[si] = station
-                    broadcast_seated(station, si)
-                    si = skip_missing(si + 1)
+        for name in message['names']:
+            names.append(name)
+            if assign_seats:
+                station = {'ip': ip, 'name': name}
+                stations[si] = station
+                broadcast_seated(station, si)
+                si = skip_missing(si + 1)
 
 
 def station_name(index: int) -> str:
@@ -230,10 +228,11 @@ def seat(message: dict):
         if len(stations[si]):
             name_at_new_station = stations[si].get('name')
             if name_at_new_station and name != name_at_new_station:
+                emit('clear_station', si, broadcast=True, namespace=TEACHER_NS)
                 msg = 'Someone at %s claiming to be %s has moved to %s, displacing %s' % (
                     ip, name, station_name(si), name_at_new_station)
                 logger.warn(msg)
-                relay_chat('RH3K', msg)
+                relay_chat(-2, msg)  # magic number for RoomHelper itself
 
         station = {'ip': ip, 'sid': request.sid, 'name': name}
         stations[si] = station

@@ -120,8 +120,7 @@ $(() => {
     socket.on('set_names', msg => {
         $('#name-index option:gt(0)').remove();
         const sel = $('#name-index');
-        msg.names.split('\n').forEach(name =>
-            sel.append(`<option value="${name}">${name}</option>`));
+        msg.names.forEach((name, i) => sel.append(`<option value="${i}">${name}</option>`));
     });
 
     socket.on('clear_checks', () => {

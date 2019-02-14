@@ -33,10 +33,19 @@ $(() => {
 
         clearNameElsewhere(msg.seatIndex, msg.station.name);
         stations[msg.seatIndex] = msg.station;
+        $('#names').val(getNamesArray().filter(name => name !== msg.station.name).join('\n'));
         sketch.loop();
     });
 
+    function getNamesArray() {
+        return $('#names').val().split('\n').filter(name => name.trim() !== '');
+    }
+
     socket.on('clear_station', seatIndex => {
+        const names = getNamesArray();
+        names.push(stations[seatIndex].name + '\n');
+        names.sort();
+        $('#names').val(names.join('\n'));
         stations[seatIndex] = {};
         sketch.loop();
     });
@@ -53,8 +62,7 @@ $(() => {
     });
 
     $('#set-names').click(() => {
-        socket.emit('set_names', {names: $('#names').val(), assignSeats: $('#assign-seats').is(':checked')});
-        $('#names').val('');
+        socket.emit('set_names', {names: getNamesArray(), assignSeats: $('#assign-seats').is(':checked')});
     });
 
     $('#clear-checks').click(() => {
