@@ -103,7 +103,7 @@ $(() => {
     if (!authd) $('#password').focus();
 
     setNumHaveButton(status.numWithAnswer(stations));
-    $('#front-view')        .click(() => sketch.loop());
+    $('#front-view')        .click(() => sketch.reconfigure());
     $('#choose')            .click(() => {requestRandomCall(true);});
     $('#choose-with-answer').click(() => {requestRandomCall(false);});
     $('#choose-reset')      .click(() => {
