@@ -43,7 +43,7 @@ $(() => {
 
     socket.on('clear_station', seatIndex => {
         const names = getNamesArray();
-        names.push(stations[seatIndex].name + '\n');
+        names.push(stations[seatIndex].name);
         names.sort();
         $('#names').val(names.join('\n'));
         stations[seatIndex] = {};
