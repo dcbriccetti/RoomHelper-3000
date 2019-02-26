@@ -1,5 +1,17 @@
 class Polls {
     constructor(socket) {
+        $('#multiple-question-text').change(() => {
+            $('#multiple-question-select option').remove();
+            const textval = $('#multiple-question-text').val();
+            textval.split('\n').forEach(line => {
+                $('#multiple-question-select').append(`<option value="${line}">${line}</option>`);
+            });
+        });
+
+        $('#multiple-question-select').change(() => {
+            const question = $('#multiple-question-select').val();
+            $('#question-text').val(question);
+        });
         const pollTabPrefix = 'poll-tab-';  // In tab IDs in teacher.html
         const enablePoll = $('#enable-poll');
         enablePoll.click(() => {
