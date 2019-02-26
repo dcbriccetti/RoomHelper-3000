@@ -13,6 +13,7 @@ A webapp to manage a class of students in a computer lab.
 - allows the students to chat with each other (when the teacher permits it)
 - allows sharing by students of links to approved domains
 - provides a bell that rings on all the computers
+- allows the teacher to pre-load poll questions
 
 Feature ideas:
 
@@ -29,8 +30,6 @@ push Set when they change checkbox settings
 - Let the students pick their location by clicking on the seating
 chart instead of by row and column
 - Show poll results graphically à la Google forms
-- Allow pre-loading poll questions
-    - Paste them in, in some special format?
 - Direct messages
 - Transmission of live coding session to students
 - Make the pre-seat feature work better
