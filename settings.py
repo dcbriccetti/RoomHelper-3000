@@ -1,11 +1,11 @@
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 import re
 
 
-def ms(text, code):  # Make status
+def ms(text: str, code: str):  # Make status
     s = re.sub(r'\W', '', text)
-    id = s[0].lower() + s[1:]
-    return [id, code, text]
+    key = s[0].lower() + s[1:]
+    return key, code, text
 
 
 settingsTemplate = {
