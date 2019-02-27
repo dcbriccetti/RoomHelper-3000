@@ -3,7 +3,7 @@
 $(() => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const soundFiles = new SoundFiles(audioContext, ['/static/audio/triangle.wav']);
-    const status = new Status();
+    const status = new Status(settings.statuses.map(s => s[0]));
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
     function name_index()   {return Number($('#name-index').val());}

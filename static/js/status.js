@@ -1,14 +1,14 @@
 'use strict';
 
 class Status {
-    constructor() {
-        this.keys = settings.statuses.map(s => s[0]);
+    constructor(keys) {
+        this.keys = keys;
         this.orders = {};
-        this.onHaveAnswerChangeCallbacks = []
+        this.onHaveAnswerChangeCallbacks = [];
     }
 
-    set(stations, msg) {
-        stations[msg.seatIndex] = msg.station;
+    set(stations, seatIndex, station) {
+        stations[seatIndex] = station;
         const numHave = this.numWithAnswer(stations);
         this.onHaveAnswerChangeCallbacks.forEach(cb => cb(numHave));
         this.recalculateStatusOrders(stations);

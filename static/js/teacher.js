@@ -1,7 +1,7 @@
 'use strict';
 
 let stations;
-const status = new Status();
+const status = new Status(settings.statuses.map(s => s[0]));
 
 let selectedSeatIndex = null;
 let showAnswersInStations = false;
@@ -57,7 +57,7 @@ $(() => {
     status.onHaveAnswerChange(numHave => setNumHaveButton(numHave));
 
     socket.on('status_set', msg => {
-        status.set(stations, msg);
+        status.set(stations, msg.seatIndex, msg.station);
         sketch.loop();
     });
 
