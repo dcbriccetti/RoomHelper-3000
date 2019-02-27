@@ -274,16 +274,12 @@ def broadcast_seated(station, seat_index: int) -> None:
 @socketio.on('set_status', namespace=STUDENT_NS)
 def set_status(message: dict) -> None:
     if authenticated:
-        si = message['seatIndex']
-        station = stations[si]
-        if station:
-            logger.info('set_status: %s', message)
-            now = time()
-            for st in settings['statuses']:
-                id = st[0]
-                station[id] = now if message.get(id, False) else None
-            ss_msg = {'seatIndex': si, 'station': station}
-            emit('status_set', ss_msg, broadcast=True, namespace=TEACHER_NS)
+        seat_index = message['seatIndex']
+        station: Dict[str, Any] = stations[seat_index]
+        logger.info('set_status: %s', message)
+        for key, code, text in settings['statuses']:
+            station[key] = time() if message.get(key, False) else None
+        emit('status_set', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
 
 
 def clear_station(station) -> None:
