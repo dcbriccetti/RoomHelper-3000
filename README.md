@@ -40,8 +40,6 @@ chart instead of by row and column
 Bugs:
 
 - Can put arbitrary HTML in the chat
-- The Russian translation of a student name can cause the
-sketch to fail at rendering the stations
 - Students joining late don’t get poll questions or shared links
 
 ![Screen shot](screen1-large.png)
