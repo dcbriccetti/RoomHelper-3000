@@ -285,8 +285,8 @@ def set_status(message: dict) -> any:
         logger.info(station['name'] + ' status: ' + enabled_statuses)
 
         # Temporarily log have answer toggles until reliability problem is solved
-        log_msg2 = station['name'] + ' ' + ('is' if message.get('haveAnswer', False) else 'is not') + ' ready'
-        relay_chat(ROOM_HELPER_CHAT_ID, log_msg2)
+        chat_log_msg = station['name'] + ' ' + ('is' if message.get('haveAnswer', False) else 'is not') + ' ready'
+        relay_chat(ROOM_HELPER_CHAT_ID, chat_log_msg)
 
         for key, code, text in settings['statuses']:
             station[key] = time() if message.get(key, False) else None
