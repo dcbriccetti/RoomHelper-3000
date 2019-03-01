@@ -10,6 +10,8 @@ from persister import Persister
 from settings import settings
 from applog import logger
 
+ROOM_HELPER_CHAT_ID = -2
+OK = 'OK'
 STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
 ALL_NS = (TEACHER_NS, STUDENT_NS)
@@ -232,17 +234,20 @@ def seat(message: dict):
                 msg = 'Someone at %s claiming to be %s has moved to %s, displacing %s' % (
                     ip, name, station_name(si), name_at_new_station)
                 logger.warn(msg)
-                relay_chat(-2, msg)  # magic number for RoomHelper itself
+                relay_chat(ROOM_HELPER_CHAT_ID, msg)
 
         station = {'ip': ip, 'sid': request.sid, 'name': name}
         stations[si] = station
         broadcast_seated(station, si)
+        return OK
 
 
 @socketio.on('answer-poll', namespace=STUDENT_NS)
-def yes_no_answer(answer):
+def answer_poll(message):
     if authenticated:
-        emit('answer-poll', answer, broadcast=True, namespace=TEACHER_NS)
+        logger.info('Poll answer: ' + str(message))
+        emit('answer-poll', message, broadcast=True, namespace=TEACHER_NS)
+        return OK
 
 
 @socketio.on('random_set', namespace=TEACHER_NS)
@@ -272,14 +277,21 @@ def broadcast_seated(station, seat_index: int) -> None:
 
 
 @socketio.on('set_status', namespace=STUDENT_NS)
-def set_status(message: dict) -> None:
+def set_status(message: dict) -> any:
     if authenticated:
         seat_index = message['seatIndex']
         station: Dict[str, Any] = stations[seat_index]
-        logger.info('set_status: %s', message)
+        enabled_statuses = ', '.join((text for key, code, text in settings['statuses'] if message.get(key, False)))
+        logger.info(station['name'] + ' status: ' + enabled_statuses)
+
+        # Temporarily log have answer toggles until reliability problem is solved
+        log_msg2 = station['name'] + ' ' + ('is' if message.get('haveAnswer', False) else 'is not') + ' ready'
+        relay_chat(ROOM_HELPER_CHAT_ID, log_msg2)
+
         for key, code, text in settings['statuses']:
             station[key] = time() if message.get(key, False) else None
         emit('status_set', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
+        return OK
 
 
 def clear_station(station) -> None:

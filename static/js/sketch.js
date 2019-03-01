@@ -1,41 +1,48 @@
 'use strict';
 
 const sketch = new p5(p => {
-    p.staLocs = [];
-    p.buildStaLocs = function() {
+
+    p.buildStationDrawingLocations = function() {
         const missingSeatIndexes = new Set(settings.missingSeatIndexes);
         const frontView = $('#front-view').is(':checked');
         const aisleWidth = 7;
         const w = (p.width - aisleWidth) / settings.columns;
         const h = p.height / settings.rows;
-        p.staLocs = [];
+
+        function adjustedX(r, c) {
+            const view_adjusted_col = frontView ? settings.columns - 1 - c : c;
+            const aisleXAdjustment = !settings.aisleAfterColumn ? 0 :
+                frontView ?
+                    view_adjusted_col > settings.columns - 1 - 1 - settings.aisleAfterColumn ? aisleWidth : 0 :
+                    view_adjusted_col > settings.aisleAfterColumn ? aisleWidth : 0;
+
+            return view_adjusted_col * w + aisleXAdjustment;
+        }
+
+        function adjustedY(r) {return (frontView ? settings.rows - 1 - r : r) * h;}
+
+        const stationDrawLocations = [];
 
         for (let r = 0; r < settings.rows; ++r) {
             for (let c = 0; c < settings.columns; ++c) {
                 const seatIndex = r * settings.columns + c;
                 if (!missingSeatIndexes.has(seatIndex)) {
-                    const ar = frontView ? settings.rows - 1 - r : r;
-                    const ac = frontView ? settings.columns - 1 - c : c;
-                    const aisleAdj = !settings.aisleAfterColumn ? 0 :
-                        frontView ?
-                            ac > settings.columns - 1 - 1 - settings.aisleAfterColumn ? aisleWidth : 0 :
-                            ac > settings.aisleAfterColumn ? aisleWidth : 0;
-
-                    const x = ac * w + aisleAdj;
-                    const y = ar * h;
-                    p.staLocs.push([x, y, seatIndex]);
+                    stationDrawLocations.push([adjustedX(r, c), adjustedY(r), seatIndex]);
                 }
             }
         }
-
+        return stationDrawLocations;
     };
+
+    p.stationDrawLocations = [];
+
     p.setup = function() {
         p.createCanvas(800, 400).parent('canvas');
         p.reconfigure();
     };
 
     p.reconfigure = function() {
-        p.buildStaLocs();
+        p.stationDrawLocations = p.buildStationDrawingLocations();
         p.loop();
     };
 
@@ -109,15 +116,13 @@ const sketch = new p5(p => {
 
         p.background(255);
 
-        const missingSeatIndexes = new Set(settings.missingSeatIndexes);
-
-        p.staLocs.forEach(loc => drawStation(loc[0], loc[1], loc[2]));
+        p.stationDrawLocations.forEach(loc => drawStation(loc[0], loc[1], loc[2]));
 
         p.noLoop();
     };
 
     p.mouseClicked = function() {
-       p.staLocs.forEach(loc => {
+       p.stationDrawLocations.forEach(loc => {
            console.log(loc, p.mouseX, p.mouseY);
        });
     };

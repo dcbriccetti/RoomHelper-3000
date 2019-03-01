@@ -21,7 +21,12 @@
 <body>
 <div class="container" id="container">
     <h3>RoomHelper 3000</h3>
-    <div class="card">
+    <div>
+        <label for="time-left">Time Left: </label>
+        <progress id="time-left" max="100"></progress>
+        <span id="time-left-text"></span>
+    </div>
+    <div id='name-loc-card' class="card">
         <div class="card-body">
             <h4 class="card-title">Name and Location</h4>
             <form id="seat">
@@ -42,14 +47,9 @@
                     </select>
                 </div>
                 <div class="form-group row">
-                    <button id="set-names" type="submit" class="btn btn-primary form-control col-2">Set</button>
+                    <button type="submit" class="btn btn-primary form-control col-2">Set</button>
                 </div>
             </form>
-            <div>
-                <label for="time-left">Time Left: </label>
-                <progress id="time-left" max="100"></progress>
-                <span id="time-left-text"></span>
-            </div>
         </div>
     </div>
 
@@ -73,8 +73,8 @@
                     <input type='range' id='scale' min="0" max="10" step="1"> <span id="scale-text"></span>
                 </div>
                 <div id="poll-text" class='pollType' style="display: none">
-                    <input type='text' class="form-control" id="text-answer"
-                           placeholder="Answer">
+                    <input type='text' class="form-control" id="text-answer" placeholder="Answer">
+                    <span id='answer-received' style='display: none'>Answer received</span>
                 </div>
             </div>
             {% include 'shares.html' %}

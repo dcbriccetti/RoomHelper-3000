@@ -6,11 +6,12 @@ $(() => {
     const status = new Status(settings.statuses.map(s => s[0]));
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/student');
 
-    function name_index()   {return Number($('#name-index').val());}
+    function nameIndex()    {return Number($('#name-index').val());}
     function row()          {return $('#row').val();}
     function column()       {return $('#column').val();}
-    [Chat, Shares].forEach(fn => new fn(socket, name_index, true));
-    function getSeatIndex() {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
+    function seatIndex()    {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
+
+    [Chat, Shares].forEach(fn => new fn(socket, nameIndex, true));
 
     function todayWithHourMin(hhmm) {
         const parts = hhmm.split(':').map(n => Number(n));
@@ -66,7 +67,9 @@ $(() => {
 
             const pollElem = $(`#poll-${msg.type}`);
 
-            function answerWith(answer) {socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: answer})}
+            function answerWith(answer, onDone) {
+                socket.emit('answer-poll', {seatIndex: seatIndex(), answer: answer}, result => onDone(result))
+            }
 
             switch(msg.type) {
                 case 'multi':
@@ -86,16 +89,19 @@ $(() => {
 
                     scaleSlider.change(() => {
                         $('#scale-text').text(scaleSlider.val());
-                        socket.emit('answer-poll', {seatIndex: getSeatIndex(), answer: scaleSlider.val()});
+                        answerWith(scaleSlider.val());
                     });
                     break;
 
                 case 'text':
+                    const answerReceived = $('#answer-received');
                     const elem = $('#text-answer');
                     elem.keypress(e => {
                         if (e.which === 13) {
-                            answerWith(elem.val());
-                        }
+                            answerWith(elem.val(), (result) => {
+                                if (result === 'OK') answerReceived.show()
+                            });
+                        } else answerReceived.hide();
                     });
             }
 
@@ -109,11 +115,12 @@ $(() => {
         });
     }
 
+    function showIf(jqObj, show) {if (show) jqObj.show(); else jqObj.hide();}
+
     function showOrHideNowAndFromMessage(selector, show, message) {
-        function sho(obj, show) {if (show) obj.show(); else obj.hide();}
         const jqObj = $(selector);
-        sho(jqObj, show);
-        socket.on(message, enabled => sho(jqObj, enabled));
+        showIf(jqObj, show);
+        socket.on(message, enabled => showIf(jqObj, enabled));
     }
 
     socket.on('ring_bell', () => soundFiles.play(0));
@@ -123,41 +130,39 @@ $(() => {
         msg.names.forEach((name, i) => sel.append(`<option value="${i}">${name}</option>`));
     });
 
-    socket.on('clear_checks', () => {
-        status.keys.forEach(key => {
-            const elem = $('#' + key);
-            console.log(elem);
-            elem.attr('checked', false)
-        });
-    });
+    socket.on('clear_checks', () => status.keys.forEach(key => $('#' + key).attr('checked', false)));
 
     showOrHideNowAndFromMessage('#status-checks', settings.checksEnabled, 'enable_checks');
     showOrHideNowAndFromMessage('#chat',          settings.chatEnabled,   'enable_chat');
     showOrHideNowAndFromMessage('#shares',        settings.sharesEnabled, 'enable_shares');
 
     socket.on('teacher_msg', msg => {
-        if (msg.trim().length)
-            $('#teacher-msg').show();
-        else
-            $('#teacher-msg').hide();
+        showIf($('#teacher-msg'), msg.trim().length);
         $('#teacher-msg-text').html(msg);
     });
 
+    function seatSettingsValid() {
+        return nameIndex() >= 0 && row().length > 0 && column().length > 0 &&
+            !settings.missingSeatIndexes.includes(seatIndex());
+    }
+
     $('form#seat').submit(() => {
-        if (name_index() >= 0 && row().length > 0 && column().length > 0 &&
-                ! settings.missingSeatIndexes.includes(getSeatIndex())) {
-            socket.emit('seat', {nameIndex: name_index(), seatIndex: getSeatIndex()});
-            $('#comm').show();
-            audioContext.resume();
+        if (seatSettingsValid()) {
+            socket.emit('seat', {nameIndex: nameIndex(), seatIndex: seatIndex()}, response => {
+                if (response === 'OK') {
+                    $('#name-loc-card').hide();
+                    $('#comm').show();
+                    audioContext.resume();
+                } else console.log(response);
+            });
         } else $('#comm').hide();
         return false;
     });
 
     function updateStatus() {
-        const args = {seatIndex: getSeatIndex()};
+        const args = {seatIndex: seatIndex()};
         status.keys.forEach(key => args[key] = $('#' + key).is(':checked'));
-        socket.emit('set_status', args);
-        return true;
+        socket.emit('set_status', args, response => {if (response !== 'OK') alert('Server confirmation was not received');});
     }
 
     settings.statuses.forEach(status => {
