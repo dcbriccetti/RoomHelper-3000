@@ -60,6 +60,26 @@ const sketch = new p5(p => {
         }
 
         function drawStation(startX, startY, seatIndex) {
+
+            function drawStatusTags(name, y, xMargin, xPerKey, tagHeight) {
+                const tagColors = [[45, 98, 163], [228, 113, 39], [142, 145, 143]];
+                settings.statuses.forEach((s, i) => {
+                    const key = s[0];
+                    const code = s[1];
+                    const x = startX + xMargin + xPerKey * i;
+                    const keyOrder = status.orders[key];
+                    if (keyOrder) {
+                        const studentOrder = keyOrder[name];
+                        if (studentOrder) {
+                            p.fill(tagColors[i % tagColors.length]);
+                            p.rect(x - 2, startY + h - tagHeight - 3, xPerKey, tagHeight);
+                            p.fill(0);
+                            p.text(code + studentOrder.order, x, y);
+                        }
+                    }
+                });
+            }
+
             p.textFont('Helvetica');
             p.noStroke();
             const station = stations[seatIndex];
@@ -73,6 +93,7 @@ const sketch = new p5(p => {
             p.text(stationName(seatIndex), startX + xMargin, startY + 3);
 
             if (station && station.name) {
+                p.fill(station.connected ? 0 : 128);
                 p.textAlign(p.RIGHT);
                 p.text(station.ip, startX + w - xMargin - 2 /* todo why this 2 */, startY + 3);
                 const parts = station.name.split(', ');
@@ -94,22 +115,7 @@ const sketch = new p5(p => {
                 if (showAnswersInStations && answer) {
                     p.text(answer, startX + xMargin, y);
                 } else {
-                    const tagColors = [[45, 98, 163], [228, 113, 39], [142, 145, 143]];
-                    settings.statuses.forEach((s, i) => {
-                        const key = s[0];
-                        const code = s[1];
-                        const x = startX + xMargin + xPerKey * i;
-                        const keyOrder = status.orders[key];
-                        if (keyOrder) {
-                            const studentOrder = keyOrder[station.name];
-                            if (studentOrder) {
-                                p.fill(tagColors[i % tagColors.length]);
-                                p.rect(x - 2, startY + h - tagHeight - 3, xPerKey, tagHeight);
-                                p.fill(0);
-                                p.text(code + studentOrder.order, x, y);
-                            }
-                        }
-                    });
+                    drawStatusTags(station.name, y, xMargin, xPerKey, tagHeight);
                 }
             }
         }
@@ -123,7 +129,7 @@ const sketch = new p5(p => {
 
     p.mouseClicked = function() {
        p.stationDrawLocations.forEach(loc => {
-           console.log(loc, p.mouseX, p.mouseY);
+           // TODO: console.log(loc, p.mouseX, p.mouseY);
        });
     };
  });
