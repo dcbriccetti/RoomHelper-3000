@@ -15,6 +15,9 @@ $(() => {
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
     [TeacherChat, Shares].forEach(fn => new fn(socket, () => -1 /* teacher ID */, false));
     new Polls(socket);
+    sketch.doubleClickListeners.push((index) => {
+        console.log(index);
+    });
 
     const tm = $('#teacher-msg');
     tm.keypress(e => {

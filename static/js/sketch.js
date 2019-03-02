@@ -12,19 +12,18 @@ const sketch = new p5(p => {
 
     const AISLE_WIDTH = 7;
 
-    p.getStationLocs = function() {
+    function getStationLocs() {
         const missingSeatIndexes = new Set(settings.missingSeatIndexes);
         const frontView = $('#front-view').is(':checked');
-        const aisleWidth = 7;
-        const w = (p.width - aisleWidth) / settings.columns;
+        const w = (p.width - AISLE_WIDTH) / settings.columns;
         const h = p.height / settings.rows;
 
         function adjustedX(r, c) {
             const view_adjusted_col = frontView ? settings.columns - 1 - c : c;
             const aisleXAdjustment = !settings.aisleAfterColumn ? 0 :
                 frontView ?
-                    view_adjusted_col > settings.columns - 1 - 1 - settings.aisleAfterColumn ? aisleWidth : 0 :
-                    view_adjusted_col > settings.aisleAfterColumn ? aisleWidth : 0;
+                    view_adjusted_col > settings.columns - 1 - 1 - settings.aisleAfterColumn ? AISLE_WIDTH : 0 :
+                    view_adjusted_col > settings.aisleAfterColumn ? AISLE_WIDTH : 0;
 
             return view_adjusted_col * w + aisleXAdjustment;
         }
@@ -42,9 +41,9 @@ const sketch = new p5(p => {
             }
         }
         return locs;
-    };
+    }
 
-    p.stationLocs = [];
+    let stationLocs = [];
 
     p.setup = function() {
         p.createCanvas(800, 400).parent('canvas-container');
@@ -52,7 +51,7 @@ const sketch = new p5(p => {
     };
 
     p.reconfigure = function() {
-        p.stationLocs = p.getStationLocs();
+        stationLocs = getStationLocs();
         p.loop();
     };
 
@@ -139,13 +138,23 @@ const sketch = new p5(p => {
 
         p.background(255);
 
-        p.stationLocs.forEach(loc => drawStation(loc));
+        stationLocs.forEach(loc => drawStation(loc));
 
         p.noLoop();
     };
 
     p.doubleClicked = function () {
-        p.stationLocs.forEach(loc => {
+        const w = stationWidth();
+        const h = stationHeight();
+        const x = p.mouseX;
+        const y = p.mouseY;
+
+        stationLocs.forEach(loc => {
+            if (x >= loc.x && y >= loc.y && x <= loc.x + w && y <= loc.y + h) {
+                p.doubleClickListeners.forEach(l => l(loc.index));
+            }
         });
     };
+
+    p.doubleClickListeners = [];
  });
