@@ -1,4 +1,4 @@
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Tuple, Union
 from random import choice
 from time import time, strftime
 from urllib.parse import urlparse
@@ -12,6 +12,7 @@ from applog import logger
 
 ROOM_HELPER_CHAT_ID = -2
 OK = 'OK'
+DISCONNECTED = 'disconnected'
 STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
 ALL_NS = (TEACHER_NS, STUDENT_NS)
@@ -25,7 +26,7 @@ persister = Persister()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+socketio = SocketIO(app, ping_interval=20)  # A bit more frequent than the default of 25, to try to avoid timeouts causing disconnections
 
 
 @app.route('/')
@@ -49,8 +50,45 @@ def on_all_namespaces(event, handler):
         socketio.on_event(event, handler, namespace=ns)
 
 
+def station_by_ip(ip: str) -> Union[None, Tuple[int, Dict[str, any]]]:
+    matches = [item for item in enumerate(stations) if ip == item[1].get('ip')]
+    if not matches: return None
+    if len(matches) > 1:
+        logger.warning('More than one station has IP %s. Using first one.', ip)
+    return matches[0]
+
+
+@socketio.on('connect', namespace=TEACHER_NS)
+def connect():
+    log_connection(request)
+
+
+@socketio.on('connect', namespace=STUDENT_NS)
 def connect():
     r = request
+    log_connection(r)
+    if connect_or_disconnect(True, r):
+        logger.warning('Reconnection')
+
+
+@socketio.on('disconnect', namespace=STUDENT_NS)
+def disconnect_request() -> None:
+    r = request
+    logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
+    connect_or_disconnect(False, r)
+
+
+def connect_or_disconnect(connected, r) -> bool:
+    match: Union[None, Tuple[int, Dict[str, any]]] = station_by_ip(r.remote_addr)
+    if match:
+        seat_index, station = match
+        station['connected'] = connected
+        emit('connect_station', {'seatIndex': seat_index, 'connected': connected}, broadcast=True, namespace=TEACHER_NS)
+        return True
+    return False
+
+
+def log_connection(r):
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
@@ -72,7 +110,6 @@ def relay_teacher_msg(msg: str) -> None:
         emit('teacher_msg', html, namespace=ns, broadcast=True)
 
 
-on_all_namespaces('connect', connect)
 on_all_namespaces('chat_msg', relay_chat)
 on_all_namespaces('teacher_msg', relay_teacher_msg)
 
@@ -105,17 +142,6 @@ def auth(password: str) -> bool:
     if password == teacher_password:
         authenticated = True
     return authenticated
-
-
-@socketio.on('disconnect', namespace=STUDENT_NS)
-def disconnect_request() -> None:
-    r = request
-    logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
-    matches = [item for item in enumerate(stations) if r.sid == item[1].get('sid')]
-    if matches:
-        station_index, station = matches[0]
-        clear_station(station)
-        emit('clear_station', station_index, broadcast=True, namespace=TEACHER_NS)
 
 
 @socketio.on('ring_bell', namespace=TEACHER_NS)
@@ -202,7 +228,7 @@ def set_names(message: dict) -> None:
         for name in message['names']:
             names.append(name)
             if assign_seats:
-                station = {'ip': ip, 'name': name}
+                station = {'ip': ip, 'name': name, 'connected': True}
                 stations[si] = station
                 broadcast_seated(station, si)
                 si = skip_missing(si + 1)
@@ -230,13 +256,13 @@ def seat(message: dict):
         if len(stations[si]):
             name_at_new_station = stations[si].get('name')
             if name_at_new_station and name != name_at_new_station:
-                emit('clear_station', si, broadcast=True, namespace=TEACHER_NS)
+                emit('disconnect_station', si, broadcast=True, namespace=TEACHER_NS)
                 msg = 'Someone at %s claiming to be %s has moved to %s, displacing %s' % (
                     ip, name, station_name(si), name_at_new_station)
-                logger.warn(msg)
+                logger.warning(msg)
                 relay_chat(ROOM_HELPER_CHAT_ID, msg)
 
-        station = {'ip': ip, 'sid': request.sid, 'name': name}
+        station = {'ip': ip, 'sid': request.sid, 'name': name, 'connected': True}
         stations[si] = station
         broadcast_seated(station, si)
         return OK
@@ -281,23 +307,23 @@ def set_status(message: dict) -> any:
     if authenticated:
         seat_index = message['seatIndex']
         station: Dict[str, Any] = stations[seat_index]
-        enabled_statuses = ', '.join((text for key, code, text in settings['statuses'] if message.get(key, False)))
-        logger.info(station['name'] + ' status: ' + enabled_statuses)
+        student_name = station.get('name')
+        if student_name:
+            key, value = message['status']
+            logger.info('%s status: %s: %s', student_name, key, value)
 
-        # Temporarily log have answer toggles until reliability problem is solved
-        chat_log_msg = station['name'] + ' ' + ('is' if message.get('haveAnswer', False) else 'is not') + ' ready'
-        relay_chat(ROOM_HELPER_CHAT_ID, chat_log_msg)
+            # Temporarily log haveAnswer toggles until reliability problem is solved
+            if key == 'haveAnswer':
+                chat_log_msg = student_name + ' ' + ('is' if value else 'is not') + ' ready'
+                relay_chat(ROOM_HELPER_CHAT_ID, chat_log_msg)
 
-        for key, code, text in settings['statuses']:
-            station[key] = time() if message.get(key, False) else None
-        emit('status_set', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
-        return OK
+            station[key] = time() if value else None
+            emit('status_set', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
+            return OK
 
-
-def clear_station(station) -> None:
-    for key in ('name', 'needHelp', 'done', 'haveAnswer'):
-        if key in station:
-            del station[key]
+        r = request
+        logger.warning('set_status from disconnected user %s, %d, %s', r.remote_addr, seat_index, r.sid)
+        return DISCONNECTED
 
 
 if __name__ == '__main__':

@@ -159,16 +159,21 @@ $(() => {
         return false;
     });
 
-    function updateStatus() {
-        const args = {seatIndex: seatIndex()};
-        status.keys.forEach(key => args[key] = $('#' + key).is(':checked'));
-        socket.emit('set_status', args, response => {if (response !== 'OK') alert('Server confirmation was not received');});
+    function updateStatus(id) {
+        const checkbox = $('#' + id);
+        checkbox.attr("disabled", true);  // Disable until server response arrives
+
+        const args = {seatIndex: seatIndex(), status: [id, checkbox.is(':checked')]};
+        socket.emit('set_status', args, response => {
+            if (response !== 'OK') alert('Server reply: ' + response);
+            setTimeout(() => checkbox.attr("disabled", false), settings['statusChangeEnableDelayMs']);
+        });
     }
 
     settings.statuses.forEach(status => {
         const id = status[0];
         $('#statuses').append(`<input id='${id}' type="checkbox"> <label for="${id}" style="margin-right: 1em">${status[2]}</label> `);
-        $('#' + id).click(updateStatus);
+        $('#' + id).click(() => updateStatus(id));
     });
 
     for (let r = 0; r < settings.rows; ++r) {

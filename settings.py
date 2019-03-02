@@ -20,6 +20,7 @@ settingsTemplate = {
         ms('Done',        'D')
     ],
     'chatDelayMs': 5000,
+    'statusChangeEnableDelayMs': 3000,
     'chatMessageMaxLen': 150,
     'allowedSharesDomains': ['repl.it', 'editor.p5js.org']
 }
@@ -42,6 +43,13 @@ school1_config = {
         (4, '11:00', '11:46'),
         (5, '11:50', '12:31'),
         (9, '15:30', '16:56'),
+    ]
+}
+
+school2_config = {
+    'periods': [
+        (1, '09:30', '10:29'),
+        (2, '11:15', '12:13'),
     ]
 }
 

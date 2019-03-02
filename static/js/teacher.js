@@ -1,6 +1,6 @@
 'use strict';
 
-let stations;
+let stations;  // Set from a script in teacher.html
 const status = new Status(settings.statuses.map(s => s[0]));
 
 let selectedSeatIndex = null;
@@ -10,6 +10,7 @@ $(() => {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const soundFiles = new SoundFiles(audioContext, ['/static/audio/triangle.wav']);
     let authd = false;
+    let unseatedNames = [];
     status.recalculateStatusOrders(stations);
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/teacher');
     [TeacherChat, Shares].forEach(fn => new fn(socket, () => -1 /* teacher ID */, false));
@@ -22,6 +23,14 @@ $(() => {
         }
     });
 
+    function copyNamesToTextArea() {
+        $('#names').val(unseatedNames.join('\n'));
+    }
+
+    function removeNameFromUnseated(removeName) {
+        unseatedNames = unseatedNames.filter(name => name !== removeName);
+    }
+
     socket.on('seated', msg => {
         function clearNameElsewhere(newSeatIndex, clearName) {
             stations.forEach((station, i) => {
@@ -32,8 +41,14 @@ $(() => {
         }
 
         clearNameElsewhere(msg.seatIndex, msg.station.name);
+        const nameAlreadyAtSeat = stations[msg.seatIndex].name;
+        if (nameAlreadyAtSeat) {
+            addUnseatedNameInOrder(nameAlreadyAtSeat);
+            copyNamesToTextArea();
+        }
         stations[msg.seatIndex] = msg.station;
-        $('#names').val(getNamesArray().filter(name => name !== msg.station.name).join('\n'));
+        removeNameFromUnseated(msg.station.name);
+        copyNamesToTextArea();
         sketch.loop();
     });
 
@@ -41,12 +56,23 @@ $(() => {
         return $('#names').val().split('\n').filter(name => name.trim() !== '');
     }
 
-    socket.on('clear_station', seatIndex => {
-        const names = getNamesArray();
-        names.push(stations[seatIndex].name);
-        names.sort();
-        $('#names').val(names.join('\n'));
-        stations[seatIndex] = {};
+    function addUnseatedNameInOrder(name) {
+        unseatedNames.push(name);
+        unseatedNames.sort();
+    }
+
+    socket.on('connect_station', msg => {
+        const station = stations[msg.seatIndex];
+        const name = station.name;
+        if (msg.connected) {
+            if (name) {
+                removeNameFromUnseated(name);
+            }
+        } else {
+            addUnseatedNameInOrder(name);
+            copyNamesToTextArea();
+        }
+        station.connected = msg.connected;
         sketch.loop();
     });
 
@@ -62,7 +88,8 @@ $(() => {
     });
 
     $('#set-names').click(() => {
-        socket.emit('set_names', {names: getNamesArray(), assignSeats: $('#assign-seats').is(':checked')});
+        unseatedNames = getNamesArray();
+        socket.emit('set_names', {names: unseatedNames, assignSeats: $('#assign-seats').is(':checked')});
     });
 
     $('#clear-checks').click(() => {
