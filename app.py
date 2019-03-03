@@ -94,7 +94,7 @@ def log_connection(r):
 
 def relay_chat(sender_id: int, msg: str) -> None:
     r = request
-    sender: str = settings['teacherName'] if sender_id == -1 else 'RH3K' if sender_id == -2 else names[sender_id]
+    sender: str = sender_from_id(sender_id)
     logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
     html = markdown(strftime('%H:%M:%S') + ' ' + sender + ': ' + msg)
     for ns in ALL_NS:
@@ -114,16 +114,22 @@ on_all_namespaces('chat_msg', relay_chat)
 on_all_namespaces('teacher_msg', relay_teacher_msg)
 
 
-def relay_shares(sender: str, possible_url: str, allow_any=False) -> None:
+def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
     r = request
+    sender: str = sender_from_id(sender_id)
     logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possible_url)
     parts = urlparse(possible_url)
     if allow_any or parts.hostname in settings['allowedSharesDomains']:
         html = '<p>%s %s: <a href="%s" target="_blank">%s</a></p>' % (
             strftime('%H:%M:%S'), sender, possible_url, possible_url)
+        settings['shares'].append(html)
         for ns in ALL_NS:
             if settings['sharesEnabled'] or ns == TEACHER_NS:
                 emit('shares_msg', html, namespace=ns, broadcast=True)
+
+
+def sender_from_id(sender_id):
+    return settings['teacherName'] if sender_id == -1 else 'RH3K' if sender_id == -2 else names[sender_id]
 
 
 @socketio.on('shares_msg', namespace=STUDENT_NS)
@@ -187,6 +193,7 @@ def clear_chat() -> None:
 @socketio.on('clear_shares', namespace=TEACHER_NS)
 def clear_shares() -> None:
     if authenticated:
+        settings['shares'] = []
         for ns in ALL_NS:
             emit('clear_shares', broadcast=True, namespace=ns)
 
@@ -220,9 +227,10 @@ def set_names(message: dict) -> None:
         assign_seats: bool = message['assignSeats']
 
         def skip_missing(start: int) -> int:
-            while start in settings['missingSeatIndexes']:
-                start += 1
-            return start
+            new_si = start
+            while new_si in settings['missingSeatIndexes']:
+                new_si += 1
+            return new_si
 
         si = skip_missing(0)
         for name in message['names']:

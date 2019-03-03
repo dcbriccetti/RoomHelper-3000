@@ -25,8 +25,6 @@ Feature ideas:
 - Make it easier to help students in order of them checking the box. Maybe a special marking for whoever is next. Perhaps this:
     - An assistant page that is like the teacher page, but with less
     power, and focused on helping kids in the order requested
-- Remove confusion where students think they have to
-push Set when they change checkbox settings
 - Let the students pick their location by clicking on the seating
 chart instead of by row and column
 - Show poll results graphically à la Google forms
@@ -40,6 +38,5 @@ chart instead of by row and column
 Bugs:
 
 - Can put arbitrary HTML in the chat
-- Students joining late don’t get poll questions or shared links
 
 ![Screen shot](screen1-large.png)

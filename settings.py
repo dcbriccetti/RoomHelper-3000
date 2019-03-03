@@ -12,8 +12,9 @@ settingsTemplate = {
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
     'chatEnabled': False,
-    'sharesEnabled': False,
+    'sharesEnabled': True,
     'checksEnabled': False,
+    'shares': [],
     'statuses': [
         ms('Need Help',   '?'),
         ms('Have Answer', 'A'),

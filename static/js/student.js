@@ -12,6 +12,7 @@ $(() => {
     function seatIndex()    {return (Number(row()) - 1) * settings.columns + Number(column()) - 1;}
 
     [Chat, Shares].forEach(fn => new fn(socket, nameIndex, true));
+    settings.shares.forEach(share => $('#shares-log').prepend(share));
 
     function todayWithHourMin(hhmm) {
         const parts = hhmm.split(':').map(n => Number(n));
