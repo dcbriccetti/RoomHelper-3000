@@ -2,28 +2,33 @@ class Polls {
     constructor(socket) {
         $('#multiple-question-text').change(() => {
             $('#multiple-question-select option').remove();
-            const textval = $('#multiple-question-text').val();
-            textval.split('\n').forEach(line => {
+            const questions = $('#multiple-question-text').val().split('\n');
+            questions.forEach(line => {
                 $('#multiple-question-select').append(`<option value="${line}">${line}</option>`);
             });
+            $('#multiple-question-select').change();
         });
 
         $('#multiple-question-select').change(() => {
-            const question = $('#multiple-question-select').val();
-            $('#question-text').val(question);
+            $('#question-text').val($('#multiple-question-select').val());
         });
         const pollTabPrefix = 'poll-tab-';  // In tab IDs in teacher.html
         const enablePoll = $('#enable-poll');
         enablePoll.click(() => {
             if (enablePoll.is(':checked')) {
+                this.updateNumAnswersDisplay();
                 const activePollTabId = $('#poll li a.active').attr('id');
                 socket.emit('start_poll', activePollTabId.substring(pollTabPrefix.length), $('#question-text').val(),
                     $('#multi-answers').val().split('\n').filter(line => line.trim().length > 0));
             } else {
+                ['#show-here', '#show-in-chart'].forEach(sel => {
+                    if ($(sel).is(':checked')) $(sel).trigger('click');
+                });
+                $('#num-answers').text($('#answers tbody tr').remove());
+                this.updateNumAnswersDisplay();
                 socket.emit('stop_poll');
                 stations.forEach(station => delete station.answer);
                 sketch.loop();
-                this.clearAnswers();
             }
         });
         function show(what, show) {show ? $(what).show() : $(what).hide();}
@@ -35,8 +40,8 @@ class Polls {
         });
 
         socket.on('answer-poll', msg => {
+            const station = stations[msg.seatIndex];
             if (! $('#show-here').is(':checked') && ! $('#show-in-chart').is(':checked')) {
-                const station = stations[msg.seatIndex];
                 station.answer = msg.answer;
                 sketch.loop();
                 $(`#answer-${msg.seatIndex}`).remove();
@@ -52,17 +57,18 @@ class Polls {
                     newRow.insertBefore(insertBefore);
                 else
                     newRow.appendTo($('#answers table tbody'));
-                this.setNumAnswers();
-            }
+                this.updateNumAnswersDisplay();
+            } else console.log(`Ignoring poll response from ${station.name}: ${msg.answer}`)
         });
+
+        this.updateNumAnswersDisplay();
     }
 
-    setNumAnswers() {
-        $('#num-answers').text($('#answers tbody tr').length);
-    }
-
-    clearAnswers() {
-        $('#num-answers').text($('#answers tbody tr').remove());
-        this.setNumAnswers();
+    updateNumAnswersDisplay() {
+        const numAnswers = $('#answers tbody tr').length;
+        $('#num-answers').text(numAnswers);
+        $('#num-answers-plural').text(numAnswers === 1 ? '' : 's');
+        const showAnswers = $('#show-answers');
+        if (numAnswers > 0) showAnswers.show(); else showAnswers.hide();
     }
 }

@@ -136,15 +136,12 @@ Don’t Know</textarea>
                     <span class="form-control">
                         <input id='enable-poll' type="checkbox">
                         <label for="enable-poll">Enable</label>
-                    </span>
-                </div>
-                <div id='show-answers' class="form-group row">
-                    Show answers:
-                    <span class="form-control">
-                        <input id='show-here' type="checkbox">
-                        <label for="show-here">Here</label>
-                        <input id='show-in-chart' type="checkbox">
-                        <label for="show-in-chart">In Chart</label>
+                        <span id='show-answers' style='margin-left: 2em'>Show <span id="num-answers"></span> answer<span id="num-answers-plural"></span>:
+                            <input id='show-here' type="checkbox">
+                            <label for="show-here">Here</label>
+                            <input id='show-in-chart' type="checkbox">
+                            <label for="show-in-chart">In Chart</label>
+                        </span>
                     </span>
                 </div>
                 <div id='answers' class="form-group row" style="display: none">
@@ -158,9 +155,6 @@ Don’t Know</textarea>
                         <tbody>
                         </tbody>
                     </table>
-                </div>
-                <div class="form-group row">
-                    <span>Answers:</span> <span id="num-answers"></span>
                 </div>
             </div>
         </div>

@@ -64,6 +64,7 @@ $(() => {
         socket.on('start_poll', msg => {
             const scaleSlider = $('#scale');
             $('#question-text').text(msg.question);
+            $('#answer-received').hide();
             $('#poll').show();
 
             const pollElem = $(`#poll-${msg.type}`);
@@ -97,7 +98,7 @@ $(() => {
                 case 'text':
                     const answerReceived = $('#answer-received');
                     const elem = $('#text-answer');
-                    elem.keypress(e => {
+                    elem.keyup(e => {
                         if (e.which === 13) {
                             answerWith(elem.val(), (result) => {
                                 if (result === 'OK') answerReceived.show()
