@@ -2,6 +2,7 @@ from typing import Any, List, Dict, Tuple, Union
 from random import choice
 from time import time, strftime
 from urllib.parse import urlparse
+from html import escape
 
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
@@ -10,7 +11,8 @@ from persister import Persister
 from settings import settings
 from applog import logger
 
-ROOM_HELPER_CHAT_ID = -2
+TEACHER_ID = -1
+RH3K_ID = -2
 OK = 'OK'
 DISCONNECTED = 'disconnected'
 STUDENT_NS = '/student'
@@ -92,11 +94,14 @@ def log_connection(r):
     logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
 
 
-def relay_chat(sender_id: int, msg: str) -> None:
+def relay_chat(sender_id: int, raw_msg: str) -> None:
+    'Relay chat message, escaping student messages and processing teacher messages with Markdown'
     r = request
     sender: str = sender_from_id(sender_id)
-    logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, msg)
-    html = markdown(strftime('%H:%M:%S') + ' ' + sender + ': ' + msg)
+    logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, raw_msg)
+    msg = raw_msg if sender_id == TEACHER_ID else escape(raw_msg) + '<br/>'
+    prefixed_msg = strftime('%H:%M:%S') + ' ' + sender + ': ' + msg
+    html = markdown(prefixed_msg) if sender_id == TEACHER_ID else prefixed_msg
     for ns in ALL_NS:
         if settings['chatEnabled'] or ns == TEACHER_NS:
             emit('chat_msg', html, namespace=ns, broadcast=True)
@@ -129,7 +134,7 @@ def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
 
 
 def sender_from_id(sender_id):
-    return settings['teacherName'] if sender_id == -1 else 'RH3K' if sender_id == -2 else names[sender_id]
+    return settings['teacherName'] if sender_id == TEACHER_ID else 'RH3K' if sender_id == RH3K_ID else names[sender_id]
 
 
 @socketio.on('shares_msg', namespace=STUDENT_NS)
@@ -268,7 +273,7 @@ def seat(message: dict):
                 msg = 'Someone at %s claiming to be %s has moved to %s, displacing %s' % (
                     ip, name, station_name(si), name_at_new_station)
                 logger.warning(msg)
-                relay_chat(ROOM_HELPER_CHAT_ID, msg)
+                relay_chat(RH3K_ID, msg)
 
         station = {'ip': ip, 'sid': request.sid, 'name': name, 'connected': True}
         stations[si] = station
@@ -323,7 +328,7 @@ def set_status(message: dict) -> any:
             # Temporarily log haveAnswer toggles until reliability problem is solved
             if key == 'haveAnswer':
                 chat_log_msg = student_name + ' ' + ('is' if value else 'is not') + ' ready'
-                relay_chat(ROOM_HELPER_CHAT_ID, chat_log_msg)
+                relay_chat(RH3K_ID, chat_log_msg)
 
             station[key] = time() if value else None
             emit('status_set', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)

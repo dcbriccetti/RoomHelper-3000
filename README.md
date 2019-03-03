@@ -35,8 +35,4 @@ chart instead of by row and column
 - Log poll questions and answers
 - Color code the station boxes to reflect the degree of misbehavior of the student
 
-Bugs:
-
-- Can put arbitrary HTML in the chat
-
 ![Screen shot](screen1-large.png)
