@@ -56,14 +56,12 @@
     <div class="card" id="comm" style="display: none">
         <div class="card-body">
             <h4 class="card-title">Communication</h4>
+
             <div id="teacher-msg" style="display: none">
                 <h5>Instructions from Teacher</h5>
                 <p id="teacher-msg-text"></p>
             </div>
-            <div id="status-checks" style="display: none">
-                <h5>Your Status</h5>
-                <span id="statuses"></span>
-            </div>
+
             <div id="poll" style="display: none">
                 <h5>Question</h5>
                 <p id="question-text"></p>
@@ -76,6 +74,11 @@
                     <input type='text' class="form-control" id="text-answer" placeholder="Answer">
                     <span id='answer-received' style='display: none'>Answer received</span>
                 </div>
+            </div>
+
+            <div id="status-checks" style="display: none">
+                <h5>Your Status</h5>
+                <span id="statuses"></span>
             </div>
             {% include 'shares.html' %}
             {% include 'chat.html' %}

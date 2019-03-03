@@ -52,68 +52,64 @@
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="seating" role="tabpanel" aria-labelledby="seating-tab">
+            <div class="tab-pane show active" id="seating" role="tabpanel" aria-labelledby="seating-tab">
                 <input id='front-view' type="checkbox" checked>
                 <label for="front-view">Front View</label>
                 <textarea id="names" rows="8" placeholder="Names"></textarea>
                 <label>
                     <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
                 </label>
-                <button id="set-names" type="button" class="btn btn-primary">Set</button>
+                <button id="set-names" type="button" class="btn btn-outline-primary btn-sm">Set</button>
             </div>
-            <div class="tab-pane fade" id="calling" role="tabpanel" aria-labelledby="calling-tab">
-                <button class="btn btn-primary" id="random-set">Set</button>
+            <div class="tab-pane" id="calling" role="tabpanel" aria-labelledby="calling-tab">
+                <button class="btn btn-outline-primary btn-sm" id="random-set">Set</button>
                 <input type="number" value='2' style="width: 2em" id="random-set-number">
                 Call:
-                <button class="btn btn-primary" id="choose">Any</button>
-                <button class="btn btn-primary" id="choose-with-answer">With Answer</button>
-                <button class="btn btn-secondary" id="choose-reset">Reset</button>
+                <button class="btn btn-outline-primary btn-sm" id="choose">Any</button>
+                <button class="btn btn-outline-primary btn-sm" id="choose-with-answer">With Answer</button>
+                <button class="btn btn-outline-secondary btn-sm" id="choose-reset">Reset</button>
             </div>
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                <button id="ring-bell" type="button" class="btn btn-primary">Bell</button>
+            <div class="tab-pane" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <button id="ring-bell" type="button" class="btn btn-outline-primary btn-sm">Bell</button>
                 <textarea id="teacher-msg" style='margin-left: 1em' rows="2" cols="40"
                           placeholder="Message from Teacher"></textarea>
             </div>
-            <div class="tab-pane fade" id="control" role="tabpanel" aria-labelledby="control-tab">
-                <input id='enable-chat' type="checkbox" style="margin-left: .6em;">
-                <label for="enable-chat">Chat</label>
-                <button id="clear-chat" type="button" class="btn btn-primary">Clear</button>
-                <input id='enable-shares' type="checkbox" style="margin-left: .6em;">
-                <label for="enable-shares">Shares</label>
-                <button id="clear-shares" type="button" class="btn btn-primary">Clear</button>
-                <input id='enable-checks' type="checkbox" style="margin-left: .6em;">
+            <div class="tab-pane" id="control" role="tabpanel" aria-labelledby="control-tab">
+                <input id='enable-checks' type="checkbox">
                 <label for="enable-checks">Statuses</label>
-                <button id="clear-checks" type="button" class="btn btn-primary">Clear</button>
+                <button id="clear-checks" type="button" class="btn btn-outline-primary btn-sm">Clear</button>
+
+                <input id='enable-shares' type="checkbox" style="margin-left: 3em;">
+                <label for="enable-shares">Shares</label>
+                <button id="clear-shares" type="button" class="btn btn-outline-primary btn-sm">Clear</button>
+
+                <input id='enable-chat' type="checkbox" style="margin-left: 3em;">
+                <label for="enable-chat">Chat</label>
+                <button id="clear-chat" type="button" class="btn btn-outline-primary btn-sm">Clear</button>
             </div>
-            <div class="tab-pane fade" id="poll" role="tabpanel" aria-labelledby="poll-tab">
+            <div class="tab-pane" id="poll" role="tabpanel" aria-labelledby="poll-tab">
                 <div class="form-group row">
                     <textarea class="form-control" id="question-text" rows="2"
                               placeholder="Question"></textarea>
                 </div>
-                <div class="form-group row">
-                    <textarea class="form-control" id="multiple-question-text" rows="5"
-                              placeholder="Paste multiple questions here"></textarea>
-                </div>
-                <div class="form-group row">
-                    <select class="form-control" id="multiple-question-select"></select>
-                </div>
 
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                        <a id="poll-tab-multi" class="nav-link active" data-toggle="tab" href="#multi" role="tab"
+                        <a id="poll-tab-text" class="nav-link active" data-toggle="tab" href="#text" role="tab"
+                           aria-controls="text" aria-selected="true">Text</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="poll-tab-multi" class="nav-link" data-toggle="tab" href="#multi" role="tab"
                            aria-controls="multi" aria-selected="true">Multi</a>
                     </li>
                     <li class="nav-item">
                         <a id="poll-tab-scale" class="nav-link" data-toggle="tab" href="#scale" role="tab"
                            aria-controls="scale" aria-selected="true">Scale</a>
                     </li>
-                    <li class="nav-item">
-                        <a id="poll-tab-text" class="nav-link" data-toggle="tab" href="#text" role="tab"
-                           aria-controls="text" aria-selected="true">Text</a>
-                    </li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane fade show active" id="multi" role="tabpanel" aria-labelledby="poll-tab-multi">
+                    <div class="tab-pane show active" id="text" role="tabpanel" aria-labelledby="poll-tab-text"></div>
+                    <div class="tab-pane" id="multi" role="tabpanel" aria-labelledby="poll-tab-multi">
                         <div class="form-group row">
                             <textarea class="form-control" id="multi-answers" rows="4"
                                       placeholder="Answers">
@@ -122,13 +118,20 @@ No
 Don’t Know</textarea>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="scale" role="tabpanel" aria-labelledby="poll-tab-scale">
+                    <div class="tab-pane" id="scale" role="tabpanel" aria-labelledby="poll-tab-scale">
                         <div class="form-group row">
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="text" role="tabpanel" aria-labelledby="poll-tab-text">
-                    </div>
                 </div>
+
+                <div class="form-group row">
+                    <textarea class="form-control" id="multiple-question-text" rows="5"
+                              placeholder="Paste multiple questions here"></textarea>
+                </div>
+                <div class="form-group row">
+                    <select class="form-control" id="multiple-question-select"></select>
+                </div>
+
                 <div class="form-group row">
                     <span class="form-control">
                         <input id='enable-poll' type="checkbox">
@@ -157,7 +160,7 @@ Don’t Know</textarea>
                     </table>
                 </div>
                 <div class="form-group row">
-                    <span>Answers: </span><span id="num-answers"></span>
+                    <span>Answers:</span> <span id="num-answers"></span>
                 </div>
             </div>
         </div>
