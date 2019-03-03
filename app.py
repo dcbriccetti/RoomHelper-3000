@@ -35,15 +35,14 @@ socketio = SocketIO(app, ping_interval=20)  # A bit more frequent than the defau
 def index():
     r = request
     seat_index = persister.seat_indexes_by_ip.get(r.remote_addr, -1)
-    logger.info('Student page requested from %s (last seat index: %d), %s',
-                r.remote_addr, seat_index, r.user_agent)
+    logger.info(f'Student page requested from {r.remote_addr} (last seat index: {seat_index})')
     return render_template('student.html', settings=json.dumps(settings), names=names, lastSeatIndex=seat_index)
 
 
 @app.route('/teacher')
 def teacher():
     r = request
-    logger.info('Teacher page requested from %s, %s', r.remote_addr, r.user_agent)
+    logger.info(f'Teacher page requested from {r.remote_addr}, {r.user_agent}')
     return render_template('teacher.html', settings=json.dumps(settings), stationJson=json.dumps(stations))
 
 
@@ -56,7 +55,7 @@ def station_by_ip(ip: str) -> Union[None, Tuple[int, Dict[str, any]]]:
     matches = [item for item in enumerate(stations) if ip == item[1].get('ip')]
     if not matches: return None
     if len(matches) > 1:
-        logger.warning('More than one station has IP %s. Using first one.', ip)
+        logger.warning(f'More than one station has IP {ip}. Using first one.')
     return matches[0]
 
 
@@ -76,7 +75,7 @@ def connect():
 @socketio.on('disconnect', namespace=STUDENT_NS)
 def disconnect_request() -> None:
     r = request
-    logger.info('Disconnected: %s, %s', r.remote_addr, r.sid)
+    logger.info(f'Disconnected: {r.remote_addr}, {r.sid}')
     connect_or_disconnect(False, r)
 
 
@@ -91,16 +90,16 @@ def connect_or_disconnect(connected, r) -> bool:
 
 
 def log_connection(r):
-    logger.info('Connection from %s, %s, %s', r.remote_addr, r.sid, r.user_agent)
+    logger.info(f'Connection from {r.remote_addr}, {r.sid}, {r.user_agent}')
 
 
 def relay_chat(sender_id: int, raw_msg: str) -> None:
     'Relay chat message, escaping student messages and processing teacher messages with Markdown'
     r = request
     sender: str = sender_from_id(sender_id)
-    logger.info('Chat message from %s at %s: %s', sender, r.remote_addr, raw_msg)
+    logger.info(f'Chat message from {sender} at {r.remote_addr}: {raw_msg}')
     msg = raw_msg if sender_id == TEACHER_ID else escape(raw_msg) + '<br/>'
-    prefixed_msg = strftime('%H:%M:%S') + ' ' + sender + ': ' + msg
+    prefixed_msg = strftime('%H:%M:%S') + f' {sender} : {msg}'
     html = markdown(prefixed_msg) if sender_id == TEACHER_ID else prefixed_msg
     for ns in ALL_NS:
         if settings['chatEnabled'] or ns == TEACHER_NS:
@@ -109,7 +108,7 @@ def relay_chat(sender_id: int, raw_msg: str) -> None:
 
 def relay_teacher_msg(msg: str) -> None:
     r = request
-    logger.info('Teacher message from %s: %s', r.remote_addr, msg)
+    logger.info(f'Teacher message from {r.remote_addr}: {msg}')
     html = markdown(msg)
     for ns in ALL_NS:
         emit('teacher_msg', html, namespace=ns, broadcast=True)
@@ -122,11 +121,10 @@ on_all_namespaces('teacher_msg', relay_teacher_msg)
 def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
     r = request
     sender: str = sender_from_id(sender_id)
-    logger.info('Shares message from %s at %s: %s', sender, r.remote_addr, possible_url)
+    logger.info(f'Shares message from {sender} at {r.remote_addr}: {possible_url}')
     parts = urlparse(possible_url)
     if allow_any or parts.hostname in settings['allowedSharesDomains']:
-        html = '<p>%s %s: <a href="%s" target="_blank">%s</a></p>' % (
-            strftime('%H:%M:%S'), sender, possible_url, possible_url)
+        html = f'<p>{strftime("%H:%M:%S")} {sender}: <a href="{possible_url}" target="_blank">{possible_url}</a></p>'
         settings['shares'].append(html)
         for ns in ALL_NS:
             if settings['sharesEnabled'] or ns == TEACHER_NS:
@@ -225,7 +223,7 @@ def set_names(message: dict) -> None:
     if authenticated:
         r = request
         ip = r.remote_addr
-        logger.info('set_names from %s, %s', ip, r.sid)
+        logger.info(f'set_names from {ip}, {r.sid}')
         emit('set_names', message, broadcast=True, namespace=STUDENT_NS)
         global names
         names = []
@@ -262,7 +260,7 @@ def seat(message: dict):
         persister.seat_indexes_by_ip[ip] = si
         persister.save()
 
-        logger.info('%s seat %s to %d', ip, name, si)
+        logger.info(f'{ip} seat {name} to {si}')
         existing_different_index = [i for i, station in enumerate(stations) if station.get('name') == name and i != si]
         if existing_different_index:
             stations[existing_different_index[0]] = {}
@@ -270,8 +268,8 @@ def seat(message: dict):
             name_at_new_station = stations[si].get('name')
             if name_at_new_station and name != name_at_new_station:
                 emit('disconnect_station', si, broadcast=True, namespace=TEACHER_NS)
-                msg = 'Someone at %s claiming to be %s has moved to %s, displacing %s' % (
-                    ip, name, station_name(si), name_at_new_station)
+                msg = f'Someone at {ip} claiming to be {name} has moved to {station_name(si)}, ' \
+                    f'displacing {name_at_new_station}'
                 logger.warning(msg)
                 relay_chat(RH3K_ID, msg)
 
@@ -306,7 +304,7 @@ def random_call(anyone: bool) -> int:
         if eligible:
             chosen = choice(eligible)
             chosen[1]['callsLeft'] -= 1
-            logger.info('%s called randomly', chosen[1]['name'])
+            logger.info(f'{chosen[1]["name"]} called randomly')
             return chosen[0]
     return -1
 
@@ -323,7 +321,7 @@ def set_status(message: dict) -> any:
         student_name = station.get('name')
         if student_name:
             key, value = message['status']
-            logger.info('%s status: %s: %s', student_name, key, value)
+            logger.info(f'{student_name} status: {key}: {value}')
 
             # Temporarily log haveAnswer toggles until reliability problem is solved
             if key == 'haveAnswer':
@@ -335,7 +333,7 @@ def set_status(message: dict) -> any:
             return OK
 
         r = request
-        logger.warning('set_status from disconnected user %s, %d, %s', r.remote_addr, seat_index, r.sid)
+        logger.warning(f'set_status from disconnected user {r.remote_addr}, {seat_index}, {r.sid}')
         return DISCONNECTED
 
 
