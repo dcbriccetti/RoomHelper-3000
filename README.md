@@ -28,10 +28,6 @@ Feature ideas:
 - Let the students pick their location by clicking on the seating
 chart instead of by row and column
 - Show poll results graphically à la Google forms
-- Direct messages
-- Transmission of live coding session to students
-- Make the pre-seat feature work better
-    - When they choose their name, set the row, col?
 - Log poll questions and answers
 - Color code the station boxes to reflect the degree of misbehavior of the student
 
