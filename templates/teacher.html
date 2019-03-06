@@ -53,8 +53,10 @@
 
         <div class="tab-content">
             <div class="tab-pane show active" id="seating" role="tabpanel" aria-labelledby="seating-tab">
-                <input id='front-view' type="checkbox" checked>
-                <label for="front-view">Front View</label>
+                <span>
+                    <input id='front-view' type="checkbox" checked>
+                    <label for="front-view">Front View</label>
+                </span>
                 <textarea id="names" rows="8" placeholder="Names"></textarea>
                 <label>
                     <input id='assign-seats' type="checkbox" autocomplete="off"> Assign Seats
@@ -125,6 +127,7 @@ Don’t Know</textarea>
                 </div>
 
                 <div class="form-group row">
+                    <button id='show-multi-text' class='btn btn-outline-secondary btn-sm'>Paste...</button>
                     <textarea class="form-control" id="multiple-question-text" rows="5"
                               placeholder="Paste multiple questions here"></textarea>
                 </div>

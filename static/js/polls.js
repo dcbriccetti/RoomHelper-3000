@@ -1,6 +1,13 @@
 class Polls {
     constructor(socket) {
+        $('#show-multi-text').hide();
+        $('#show-multi-text').click(() => {
+            $('#show-multi-text').hide();
+            $('#multiple-question-text').show();
+        });
         $('#multiple-question-text').change(() => {
+            $('#multiple-question-text').hide();
+            $('#show-multi-text').show();
             $('#multiple-question-select option').remove();
             const questions = $('#multiple-question-text').val().split('\n');
             questions.forEach(line => {
