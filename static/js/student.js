@@ -63,6 +63,7 @@ $(() => {
     function setUpPoll() {
         socket.on('start_poll', msg => {
             const scaleSlider = $('#scale');
+            $('#text-answer').val('');
             $('#question-text').text(msg.question);
             $('#answer-received').hide();
             $('#poll').fadeIn(500);
