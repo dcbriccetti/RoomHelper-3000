@@ -65,7 +65,7 @@ $(() => {
             const scaleSlider = $('#scale');
             $('#question-text').text(msg.question);
             $('#answer-received').hide();
-            $('#poll').show();
+            $('#poll').fadeIn(500);
 
             const pollElem = $(`#poll-${msg.type}`);
 
@@ -111,9 +111,10 @@ $(() => {
         });
 
         socket.on('stop_poll', () => {
-            $('#question-text').text('');
-            $('.pollType').hide();
-            $('#poll').hide();
+            $('#poll').fadeOut(500, () => {
+                $('#question-text').text('');
+                $('.pollType').hide();
+            });
         });
     }
 
