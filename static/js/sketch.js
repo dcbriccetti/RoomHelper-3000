@@ -68,6 +68,7 @@ const sketch = new p5(p => {
         const h = stationHeight();
         const normalColor   = [168, 196, 219];
         const selectedColor = [230, 230, 230];
+        const pollAnswerSubmittedColor = [200, 230, 200];
 
         function stationName(index) {
             const rowFrom0 = Math.floor(index / settings.columns);
@@ -99,7 +100,7 @@ const sketch = new p5(p => {
             p.textFont('Helvetica');
             p.noStroke();
             const station = stations[loc.index];
-            p.fill(loc.index === selectedSeatIndex ? selectedColor : normalColor);
+            p.fill(loc.index === selectedSeatIndex ? selectedColor : station.answer ? pollAnswerSubmittedColor : normalColor);
             p.rect(loc.x, loc.y, w - 3, h - 3);
 
             p.fill(0);
