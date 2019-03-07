@@ -1,5 +1,6 @@
 from typing import Any, List, Dict, Tuple, Union
 from random import choice
+import datetime
 from time import time, strftime
 from urllib.parse import urlparse
 from html import escape
@@ -159,11 +160,28 @@ def ring_bell() -> None:
         emit('ring_bell', broadcast=True, namespace=STUDENT_NS)
 
 
+def log_poll(*args):
+    with open('polllog.txt', 'a') as poll_log:
+        poll_log.write(datetime.datetime.now().isoformat() + '\t' + '\t'.join(args) + '\n')
+
+
 @socketio.on('start_poll', namespace=TEACHER_NS)
 def start_poll(type, question, answers) -> None:
     if authenticated:
+        log_poll('q', type, question, ';'.join(answers))
         emit('start_poll', {'type': type, 'question': question, 'answers': answers},
              broadcast=True, namespace=STUDENT_NS)
+
+
+@socketio.on('answer_poll', namespace=STUDENT_NS)
+def answer_poll(message):
+    if authenticated:
+        seat_index = message['seatIndex']
+        station: Dict[str, Any] = stations[seat_index]
+        student_name = station.get('name')
+        log_poll('a', student_name, message['answer'])
+        emit('answer_poll', message, broadcast=True, namespace=TEACHER_NS)
+        return OK
 
 
 @socketio.on('stop_poll', namespace=TEACHER_NS)
@@ -276,14 +294,6 @@ def seat(message: dict):
         station = {'ip': ip, 'sid': request.sid, 'name': name, 'connected': True}
         stations[si] = station
         broadcast_seated(station, si)
-        return OK
-
-
-@socketio.on('answer-poll', namespace=STUDENT_NS)
-def answer_poll(message):
-    if authenticated:
-        logger.info('Poll answer: ' + str(message))
-        emit('answer-poll', message, broadcast=True, namespace=TEACHER_NS)
         return OK
 
 

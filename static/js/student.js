@@ -71,7 +71,7 @@ $(() => {
             const pollElem = $(`#poll-${msg.type}`);
 
             function answerWith(answer, onDone) {
-                socket.emit('answer-poll', {seatIndex: seatIndex(), answer: answer}, result => onDone(result))
+                socket.emit('answer_poll', {seatIndex: seatIndex(), answer: answer}, result => onDone(result))
             }
 
             switch(msg.type) {

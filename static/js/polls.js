@@ -46,7 +46,7 @@ class Polls {
             sketch.loop();
         });
 
-        socket.on('answer-poll', msg => {
+        socket.on('answer_poll', msg => {
             const station = stations[msg.seatIndex];
             if (! $('#show-here').is(':checked') && ! $('#show-in-chart').is(':checked')) {
                 station.answer = msg.answer;
