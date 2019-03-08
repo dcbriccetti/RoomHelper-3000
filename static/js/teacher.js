@@ -86,7 +86,7 @@ $(() => {
     status.onHaveAnswerChange(numHave => setNumHaveButton(numHave));
 
     socket.on('status_set', msg => {
-        status.set(stations, msg.seatIndex, msg.station);
+        status.set(stations, msg.seatIndex, msg.key, msg.value);
         sketch.loop();
     });
 

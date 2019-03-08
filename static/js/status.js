@@ -7,8 +7,8 @@ class Status {
         this.onHaveAnswerChangeCallbacks = [];
     }
 
-    set(stations, seatIndex, station) {
-        stations[seatIndex] = station;
+    set(stations, seatIndex, key, value) {
+        stations[seatIndex][key] = value;
         const numHave = this.numWithAnswer(stations);
         this.onHaveAnswerChangeCallbacks.forEach(cb => cb(numHave));
         this.recalculateStatusOrders(stations);
