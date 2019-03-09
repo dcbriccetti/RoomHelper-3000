@@ -28,7 +28,6 @@ Feature ideas:
 - Let the students pick their location by clicking on the seating
 chart instead of by row and column
 - Show poll results graphically à la Google forms
-- Log poll questions and answers
-- Color code the station boxes to reflect the degree of misbehavior of the student
+- Color code the station boxes to praise or warn students
 
 ![Screen shot](screen1-large.png)
