@@ -339,7 +339,7 @@ def set_status(message: dict) -> any:
                 relay_chat(RH3K_ID, chat_log_msg)
 
             station[key] = time() if value else None
-            emit('status_set', {'seatIndex': seat_index, 'key': key, 'value': value}, broadcast=True, namespace=TEACHER_NS)
+            emit('status_set', {'seatIndex': seat_index, 'key': key, 'value': station[key]}, broadcast=True, namespace=TEACHER_NS)
             return OK
 
         r = request
