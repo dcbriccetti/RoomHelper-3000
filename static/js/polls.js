@@ -9,9 +9,13 @@ class Polls {
             $('#multiple-question-text').hide();
             $('#show-multi-text').show();
             $('#multiple-question-select option').remove();
-            const questions = $('#multiple-question-text').val().split('\n');
-            questions.forEach(line => {
-                $('#multiple-question-select').append(`<option value="${line}">${line}</option>`);
+            const qas = $('#multiple-question-text').val().split('\n');
+            this.savedQas = [];
+            qas.forEach(qa => {
+                const qaArray = qa.split("|");
+                const q = qaArray[0];
+                this.savedQas.push(qaArray);
+                $('#multiple-question-select').append(`<option value="${q}">${q}</option>`);
             });
             $('#multiple-question-select').change();
         });
@@ -59,7 +63,8 @@ class Polls {
                         insertBefore = $(tr);
                     }
                 });
-                const newRow = $(`<tr id="answer-${msg.seatIndex}"><td>${station.name}</td><td>${msg.answer}</td></tr>`);
+                const answerClass = this.getAnswerClass(msg.answer);
+                const newRow = $(`<tr id="answer-${msg.seatIndex}"><td>${station.name}</td><td class="${answerClass}">${msg.answer}</td></tr>`);
                 if (insertBefore)
                     newRow.insertBefore(insertBefore);
                 else
@@ -69,6 +74,12 @@ class Polls {
         });
 
         this.updateNumAnswersDisplay();
+    }
+
+    getAnswerClass(studentAnswer) {
+        const currentQuestion = $('#question-text').val();
+        const answerRegEx = this.savedQas.find(e => e[0] === currentQuestion)[1];
+        return answerRegEx && new RegExp(answerRegEx).exec(studentAnswer) ? 'right-answer' : 'unknown-answer';
     }
 
     updateNumAnswersDisplay() {

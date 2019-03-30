@@ -17,3 +17,7 @@
 .tab-content {
     padding: 1em;
 }
+
+.right-answer {
+    color:  green;
+}
