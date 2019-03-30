@@ -77,10 +77,9 @@ class Polls {
     }
 
     getAnswerClass(studentAnswer) {
-        const currentQuestion = $('#question-text').text();
-        console.log(this.savedQas, currentQuestion);
+        const currentQuestion = $('#question-text').val();
         const answerRegEx = this.savedQas.find(e => e[0] === currentQuestion)[1];
-        return new RegExp(answerRegEx).exec(studentAnswer) ? 'right-answer' : 'wrong-answer';
+        return answerRegEx && new RegExp(answerRegEx).exec(studentAnswer) ? 'right-answer' : 'unknown-answer';
     }
 
     updateNumAnswersDisplay() {
