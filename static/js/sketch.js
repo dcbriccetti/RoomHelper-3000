@@ -113,7 +113,7 @@ const sketch = new p5(p => {
                 p.fill(station.connected ? 0 : 128);
                 p.textAlign(p.RIGHT);
                 p.text(station.ip, loc.x + w - xMargin - 2 /* todo why this 2 */, loc.y + 3);
-                const parts = station.name.split(', ');
+                const parts = station.name.split(/,\s*/);
                 p.textSize(20);
                 p.textAlign(p.CENTER, p.CENTER);
                 const name = parts[1];
