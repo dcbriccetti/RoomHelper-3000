@@ -77,9 +77,13 @@ class Polls {
     }
 
     getAnswerClass(studentAnswer) {
-        const currentQuestion = $('#question-text').val();
-        const answerRegEx = this.savedQas.find(e => e[0] === currentQuestion)[1];
-        return answerRegEx && new RegExp(answerRegEx).exec(studentAnswer) ? 'right-answer' : 'unknown-answer';
+        if (this.savedQas) {
+            const currentQuestion = $('#question-text').val();
+            const answerRegEx = this.savedQas.find(e => e[0] === currentQuestion)[1];
+            if (answerRegEx && new RegExp(answerRegEx).exec(studentAnswer))
+                return 'right-answer';
+        }
+        return 'unknown-answer';
     }
 
     updateNumAnswersDisplay() {
