@@ -79,9 +79,12 @@ class Polls {
     getAnswerClass(studentAnswer) {
         if (this.savedQas) {
             const currentQuestion = $('#question-text').val();
-            const answerRegEx = this.savedQas.find(e => e[0] === currentQuestion)[1];
-            if (answerRegEx && new RegExp(answerRegEx).exec(studentAnswer))
-                return 'right-answer';
+            const foundQa = this.savedQas.find(e => e[0] === currentQuestion);
+            if (foundQa) {
+                const answerRegEx = foundQa[1];
+                if (answerRegEx && new RegExp(answerRegEx).exec(studentAnswer))
+                    return 'right-answer';
+            }
         }
         return 'unknown-answer';
     }
