@@ -125,7 +125,8 @@ def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
     logger.info(f'Shares message from {sender} at {r.remote_addr}: {possible_url}')
     parts = urlparse(possible_url)
     if allow_any or parts.hostname in settings['allowedSharesDomains']:
-        html = f'<p>{strftime("%H:%M:%S")} {sender}: <a href="{possible_url}" target="_blank">{possible_url}</a></p>'
+        escaped_url = escape(possible_url)
+        html = f'<p>{strftime("%H:%M:%S")} {sender}: <a href="{escaped_url}" target="_blank">{escaped_url}</a></p>'
         settings['shares'].append(html)
         for ns in ALL_NS:
             if settings['sharesEnabled'] or ns == TEACHER_NS:
