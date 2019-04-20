@@ -23,7 +23,7 @@ settingsTemplate = {
     'chatDelayMs': 5000,
     'statusChangeEnableDelayMs': 3000,
     'chatMessageMaxLen': 150,
-    'allowedSharesDomains': ['repl.it', 'editor.p5js.org']
+    'allowedSharesDomains': ['repl.it', 'editor.p5js.org', 'scalafiddle.io']
 }
 
 room1 = {
