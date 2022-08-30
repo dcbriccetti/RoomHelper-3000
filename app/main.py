@@ -8,9 +8,9 @@ from html import escape
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
 from markdown import markdown
-from persister import Persister
-from settings import settings
-from applog import logger
+from app.persister import Persister
+from app.settings import settings
+from app.applog import logger
 
 TEACHER_ID = -1
 RH3K_ID = -2
