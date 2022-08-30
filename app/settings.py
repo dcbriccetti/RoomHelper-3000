@@ -34,10 +34,9 @@ school1_config = {
 }
 
 room1 = {
-    'columns': 9,
-    'rows': 4,
-    'missingSeatIndexes': [8, 35],
-    'aisleAfterColumn': 3,
+    'columns': 8,
+    'rows': 6,
+    'missingSeatIndexes': [0, 3, 4, 8, 11, 12, 16, 19, 20, 25, 30, 33, 38],
 }
 
 settings = settingsTemplate
