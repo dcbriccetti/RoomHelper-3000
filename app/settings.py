@@ -11,8 +11,8 @@ settingsTemplate = {
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
     'chatEnabled': False,
-    'sharesEnabled': True,
-    'checksEnabled': False,
+    'sharesEnabled': False,
+    'checksEnabled': True,
     'shares': [],
     'statuses': [
         ms('Need Help',   '?'),
@@ -22,7 +22,8 @@ settingsTemplate = {
     'chatDelayMs': 5000,
     'statusChangeEnableDelayMs': 3000,
     'chatMessageMaxLen': 150,
-    'allowedSharesDomains': ['repl.it', 'editor.p5js.org', 'scalafiddle.io']
+    'allowedSharesDomains': ['repl.it', 'editor.p5js.org', 'scalafiddle.io'],
+    'normalColor': (168, 196, 219)
 }
 
 school1_config = {
@@ -34,9 +35,10 @@ school1_config = {
 }
 
 room1 = {
-    'columns': 8,
-    'rows': 6,
-    'missingSeatIndexes': [0, 3, 4, 8, 11, 12, 16, 19, 20, 25, 30, 33, 38],
+    'columns': 9,
+    'rows': 4,
+    'missingSeatIndexes': [num for num in range(8, 32, 9)],
+    'aisleAfterColumn': 3,
 }
 
 settings = settingsTemplate

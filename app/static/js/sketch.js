@@ -66,7 +66,7 @@ const sketch = new p5(p => {
     p.draw = function() {
         const w = stationWidth();
         const h = stationHeight();
-        const normalColor   = [168, 196, 219];
+        const normalColor   = settings.normalColor;
         const selectedColor = [230, 230, 230];
         const pollAnswerSubmittedColor = [200, 230, 200];
 
