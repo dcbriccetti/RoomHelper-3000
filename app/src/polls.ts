@@ -1,5 +1,12 @@
-class Polls {
-    constructor(socket) {
+import {Sketch} from "./sketch"
+import {Socket} from "socket.io-client"
+
+export class Polls {
+    private sketch: Sketch
+    private savedQas: any[]
+
+    constructor(stations: any, socket: Socket, sketch: Sketch) {
+        this.sketch = sketch
         $('#show-multi-text').hide();
         $('#show-multi-text').click(() => {
             $('#show-multi-text').hide();
@@ -9,7 +16,7 @@ class Polls {
             $('#multiple-question-text').hide();
             $('#show-multi-text').show();
             $('#multiple-question-select option').remove();
-            const qas = $('#multiple-question-text').val().split('\n');
+            const qas = (document.getElementById('multiple-question-text') as HTMLInputElement).value.split('\n');
             this.savedQas = [];
             qas.forEach(qa => {
                 const qaArray = qa.split("|");
@@ -29,13 +36,16 @@ class Polls {
             if (enablePoll.is(':checked')) {
                 this.updateNumAnswersDisplay();
                 const activePollTabId = $('#poll li a.active').attr('id');
+                const multiAnswers = (document.querySelector<HTMLInputElement>('#multi-answers')).value.split('\n').filter(line => line.trim().length > 0);
                 socket.emit('start_poll', activePollTabId.substring(pollTabPrefix.length), $('#question-text').val(),
-                    $('#multi-answers').val().split('\n').filter(line => line.trim().length > 0));
+                    multiAnswers);
             } else {
                 ['#show-here', '#show-in-chart'].forEach(sel => {
                     if ($(sel).is(':checked')) $(sel).trigger('click');
                 });
-                $('#num-answers').text($('#answers tbody tr').remove());
+                const answerRows = document.querySelectorAll('#answers tbody tr');
+                document.querySelector('#num-answers').textContent = answerRows.length.toString();
+                answerRows.forEach(row => row.remove());
                 this.updateNumAnswersDisplay();
                 socket.emit('stop_poll');
                 stations.forEach(station => delete station.answer);
@@ -46,7 +56,7 @@ class Polls {
 
         $('#show-here').change(() => show('#answers', $('#show-here').is(':checked')));
         $('#show-in-chart').change(() => {
-            showAnswersInStations = $('#show-in-chart').is(':checked');
+            sketch.setShowAnswersInStations($('#show-in-chart').is(':checked'))
             sketch.loop();
         });
 

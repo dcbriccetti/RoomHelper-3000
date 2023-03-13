@@ -1,13 +1,15 @@
-'use strict';
+export class Status {
+    keys: string[];
+    orders: any;
+    onHaveAnswerChangeCallbacks: any[];
 
-class Status {
     constructor(keys) {
         this.keys = keys;
         this.orders = {};
         this.onHaveAnswerChangeCallbacks = [];
     }
 
-    set(stations, seatIndex, key, value) {
+    set(stations, seatIndex: number, key, value) {
         stations[seatIndex][key] = value;
         const numHave = this.numWithAnswer(stations);
         this.onHaveAnswerChangeCallbacks.forEach(cb => cb(numHave));

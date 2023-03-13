@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en-US">
 <head>
     <title>RoomHelper 3000—Student</title>
     <meta charset="utf-8">
@@ -8,14 +8,12 @@
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-    <script>
+    <script type="module">
         const settings = {{settings | safe}};
         const lastSeatIndex = {{lastSeatIndex}};
+        import {Student} from "./static/js/student.js"
+        new Student(settings, lastSeatIndex).run();
     </script>
-    <script type="text/javascript" charset="utf-8" src="static/js/status.js"></script>
-    <script type="text/javascript" charset="utf-8" src="static/js/sound.js"></script>
-    <script type="text/javascript" charset="utf-8" src="static/js/student.js"></script>
-    <script type="text/javascript" charset="utf-8" src="static/js/chat.js"></script>
     <link rel="stylesheet" href="static/css/main.css">
 </head>
 <body>

@@ -1,2 +1,8 @@
 /.idea/
 /room-helper-3000.iml
+/app/node_modules/
+/app/static/js/
+/app/package-lock.json
+/log.txt
+/polllog.txt
+/stationloc.txt

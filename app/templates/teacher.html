@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="en:US">
 <head>
     <title>RoomHelper 3000</title>
     <meta charset="utf-8">
@@ -10,13 +10,11 @@
             crossorigin="anonymous"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
     <script>const settings = {{settings | safe}};</script>
-    <script src="static/js/status.js"></script>
-    <script src="static/js/sound.js"></script>
-    <script src="static/js/polls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
-    <script src="static/js/sketch.js"></script>
-    <script src="static/js/teacher.js"></script>
-    <script src="static/js/chat.js"></script>
+    <script type="module">
+        import {Teacher} from "./static/js/teacher.js"
+        new Teacher({{settings | safe}}, {{stationJson | safe}}).run();
+    </script>
     <link rel="stylesheet" href="static/css/main.css">
     </head>
 <body>
@@ -164,9 +162,6 @@
     </div>
     <p/><p style="font-size: 70%"><a href="https://davebsoft.com">Dave Briccetti Software LLC</a></p>
 </div>
-<script>
-stations = {{stationJson | safe}};
-</script>
 {% include 'bootstrap.html' %}
 </body>
 </html>

@@ -1,0 +1,4 @@
+GET /socket
+POST /socket
+get /static
+(_internal
