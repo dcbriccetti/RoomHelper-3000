@@ -6,12 +6,7 @@ import {q, qi} from "./dom-util.js"
 import {newSocket} from "./io-util.js"
 
 export class Student {
-    private readonly settings: any
-    private readonly lastSeatIndex
-
-    constructor(settings, lastSeatIndex) {
-        this.settings = settings
-        this.lastSeatIndex = lastSeatIndex
+    constructor(private settings: any, private lastSeatIndex: any) {
     }
 
     run() {

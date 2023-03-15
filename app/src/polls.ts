@@ -2,11 +2,9 @@ import {Sketch} from "./sketch"
 import {Socket} from "socket.io-client"
 
 export class Polls {
-    private sketch: Sketch
     private savedQas: any[]
 
-    constructor(stations: any, socket: Socket, sketch: Sketch) {
-        this.sketch = sketch
+    constructor(stations: any, socket: Socket, private sketch: Sketch) {
         $('#show-multi-text').hide();
         $('#show-multi-text').click(() => {
             $('#show-multi-text').hide();

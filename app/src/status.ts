@@ -1,10 +1,8 @@
 export class Status {
-    keys: string[];
     orders: any;
     onHaveAnswerChangeCallbacks: any[];
 
-    constructor(keys) {
-        this.keys = keys;
+    constructor(public keys: string[]) {
         this.orders = {};
         this.onHaveAnswerChangeCallbacks = [];
     }

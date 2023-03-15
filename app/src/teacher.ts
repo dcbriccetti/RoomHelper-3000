@@ -8,12 +8,7 @@ import {Sketch} from "./sketch.js"
 import {q, qi} from "./dom-util.js"
 
 export class Teacher {
-    private readonly settings
-    private readonly stations
-
-    constructor(settings, stations) {
-        this.settings = settings
-        this.stations = stations
+    constructor(private settings: any, private stations: any) {
     }
 
     run() {

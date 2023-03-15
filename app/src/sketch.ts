@@ -3,13 +3,8 @@ import {Status} from "./status"
 declare const p5;
 
 class StationLoc {
-    private index: number
-    private x: number
-    private y: number
-    constructor(index, x, y) {
-        this.index = index;
+    constructor(private index: number, private x: number, private y: number) {
         this.x = Math.round(x);
-        this.y = y;
     }
 }
 
