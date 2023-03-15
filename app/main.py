@@ -320,6 +320,13 @@ def random_call(anyone: bool) -> int:
     return -1
 
 
+@socketio.on('warn', namespace=TEACHER_NS)
+def warn_student(seat_index: int) -> None:
+    if authenticated:
+        station: Dict[str, Any] = stations[seat_index]
+        logger.info(f'Student {station.get("name")} warned')
+
+
 def broadcast_seated(station, seat_index: int) -> None:
     emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
 

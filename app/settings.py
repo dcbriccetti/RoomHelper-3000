@@ -23,7 +23,8 @@ settingsTemplate = {
     'statusChangeEnableDelayMs': 3000,
     'chatMessageMaxLen': 150,
     'allowedSharesDomains': ['repl.it', 'editor.p5js.org', 'scalafiddle.io'],
-    'normalColor': (168, 196, 219)
+    'normalColor': (168, 196, 219),
+    'warningColor': (255, 204, 0),
 }
 
 school1_config = {

@@ -85,7 +85,6 @@ export class Sketch {
             p.draw = function() {
                 const w = stationWidth();
                 const h = stationHeight();
-                const normalColor   = settings.normalColor;
                 const selectedColor = [230, 230, 230];
                 const pollAnswerSubmittedColor = [200, 230, 200];
 
@@ -119,7 +118,10 @@ export class Sketch {
                     p.textFont('Helvetica');
                     p.noStroke();
                     const station = objThis.stations[loc.index];
-                    p.fill(loc.index === objThis.selectedSeatIndex ? selectedColor : station.answer ? pollAnswerSubmittedColor : normalColor);
+                    p.fill(loc.index === objThis.selectedSeatIndex ?
+                        selectedColor : station.answer ?
+                            pollAnswerSubmittedColor : 'warn' in station ?
+                                settings.warningColor : settings.normalColor);
                     p.rect(loc.x, loc.y, w - 3, h - 3);
 
                     p.fill(0);
@@ -195,6 +197,10 @@ export class Sketch {
 
     setShowAnswersInStations(show: boolean) {
         this.showAnswersInStations = show
+    }
+
+    addDoubleClickListener(listener: (index: number) => void) {
+        this.p.doubleClickListeners.push(listener)
     }
 }
 

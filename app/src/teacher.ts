@@ -24,6 +24,17 @@ export class Teacher {
         [TeacherChat, Shares].forEach(fn => new fn(objThis.settings, socket, () => -1 /* teacher ID */, false))
         const sketch = new Sketch(appStatus, this.settings, this.stations)
         sketch.run()
+        sketch.addDoubleClickListener((index: number) => {
+            const station = this.stations[index]
+            if ('name' in station) { // Ignore clicks on empty stations
+                if ('warn' in station) delete station.warn
+                else {
+                    station.warn = true
+                    socket.emit('warn', index)
+                }
+                sketch.loop()
+            }
+        })
         new Polls(this.stations, socket, sketch);
         const tm = qi('#teacher-msg');
         tm.addEventListener('keydown', e => {
