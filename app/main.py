@@ -313,7 +313,7 @@ def random_call(anyone: bool) -> int:
         eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
                     and (anyone or v.get('haveAnswer', False))]
         if eligible:
-            chosen = choice(eligible)
+            chosen: tuple[int, dict[str, Any]] = choice(eligible)
             chosen[1]['callsLeft'] -= 1
             logger.info(f'{chosen[1]["name"]} called randomly')
             return chosen[0]
@@ -340,14 +340,12 @@ def set_status(message: dict) -> any:
         if student_name:
             key, value = message['status']
             logger.info(f'{student_name} status: {key}: {value}')
-
-            # Temporarily log haveAnswer toggles until reliability problem is solved
-            if key == 'haveAnswer':
-                chat_log_msg = student_name + ' ' + ('is' if value else 'is not') + ' ready'
-                relay_chat(RH3K_ID, chat_log_msg)
-
             station[key] = time() if value else None
-            emit('status_set', {'seatIndex': seat_index, 'key': key, 'value': station[key]}, broadcast=True, namespace=TEACHER_NS)
+            emit('status_set', {
+                'seatIndex': seat_index,
+                'key': key,
+                'value': station[key]
+                }, broadcast=True, namespace=TEACHER_NS)
             return OK
 
         r = request
