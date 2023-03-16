@@ -151,11 +151,6 @@ export class Teacher {
         if (!authd) {
           q('#password').focus();
         }
-        q('#shares').style.display = 'block';
-        q('#chat').style.display = 'block';
-        if (!authd) {
-          q('#password').focus();
-        }
 
         setNumHaveButton(appStatus.numWithAnswer(objThis.stations));
         q('#front-view').addEventListener('click', () => sketch.reconfigure());
