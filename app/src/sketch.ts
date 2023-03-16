@@ -1,25 +1,20 @@
-import {Status} from "./status"
+import {Status} from "./status.js"
+import {qi} from "./dom-util.js"
 
 declare const p5;
 
 class StationLoc {
-    constructor(private index: number, private x: number, private y: number) {
+    constructor(public index: number, public x: number, public y: number) {
         this.x = Math.round(x);
     }
 }
 
 export class Sketch {
-    private appStatus: Status
-    private settings: any
-    private stations: any
     private p: any
-    private selectedSeatIndex: number | null
+    private selectedSeatIndex?: number
     private showAnswersInStations: boolean
 
-    constructor(appStatus, settings, stations) {
-        this.appStatus = appStatus
-        this.settings = settings
-        this.stations = stations
+    constructor(private appStatus: Status, private settings: any, private stations: any) {
         this.selectedSeatIndex = null
         this.showAnswersInStations = false
     }
@@ -31,38 +26,37 @@ export class Sketch {
             const settings = objThis.settings
             const AISLE_WIDTH = 7;
 
-            function getStationLocs() {
-                const missingSeatIndexes = new Set(objThis.settings.missingSeatIndexes);
-                const frontView = $('#front-view').is(':checked');
-                const w = (p.width - AISLE_WIDTH) / objThis.settings.columns;
-                const h = p.height / settings.rows;
+            function getStationLocs(): StationLoc[] {
+                const { columns, rows, aisleAfterColumn } = settings;
+                const missingSeatIndexes = new Set(settings.missingSeatIndexes);
+                const frontView = qi('#front-view').checked;
+                const stationWidth = (p.width - AISLE_WIDTH) / columns;
+                const stationHeight = p.height / rows;
 
-                function adjustedX(r, c) {
-                    const view_adjusted_col = frontView ? settings.columns - 1 - c : c;
+                function adjustedX(row: number, col: number): number {
+                    const view_adjusted_col = frontView ? columns - 1 - col : col;
                     const aisleXAdjustment = !settings.aisleAfterColumn ? 0 :
                         frontView ?
-                            view_adjusted_col > settings.columns - 1 - 1 - settings.aisleAfterColumn ? AISLE_WIDTH : 0 :
-                            view_adjusted_col > settings.aisleAfterColumn ? AISLE_WIDTH : 0;
+                            view_adjusted_col > columns - 1 - 1 - aisleAfterColumn ? AISLE_WIDTH : 0 :
+                            view_adjusted_col > aisleAfterColumn ? AISLE_WIDTH : 0;
 
-                    return view_adjusted_col * w + aisleXAdjustment;
+                    return view_adjusted_col * stationWidth + aisleXAdjustment;
                 }
 
-                function adjustedY(r) {return (frontView ? settings.rows - 1 - r : r) * h;}
-
-                const locs = [];
-
-                for (let r = 0; r < settings.rows; ++r) {
-                    for (let c = 0; c < settings.columns; ++c) {
-                        const seatIndex = r * settings.columns + c;
-                        if (!missingSeatIndexes.has(seatIndex)) {
-                            locs.push(new StationLoc(seatIndex, adjustedX(r, c), adjustedY(r)));
-                        }
-                    }
+                function adjustedY(r) {
+                    return (frontView ? rows - 1 - r : r) * stationHeight;
                 }
-                return locs;
+
+                return Array.from({ length: rows }, (_, rowIndex) =>
+                  Array.from({ length: columns }, (_, colIndex) => {
+                    const seatIndex = rowIndex * columns + colIndex;
+                    return missingSeatIndexes.has(seatIndex) ?
+                        [] : new StationLoc(seatIndex, adjustedX(rowIndex, colIndex), adjustedY(rowIndex));
+                  }).flat()  // remove empty arrays for missing seats
+                ).flat();    // flatten array of arrays to an array
             }
 
-            let stationLocs = [];
+            let stationLocs: StationLoc[] = [];
 
             p.setup = function() {
                 p.createCanvas(800, 400).parent('canvas-container');
@@ -94,20 +88,20 @@ export class Sketch {
                     return String.fromCharCode('A'.charCodeAt(0) + rowFrom0) + (colFrom0 + 1);
                 }
 
-                function drawStation(loc) {
+                function drawStation(stationLoc: StationLoc) {
 
-                    function drawStatusTags(name, y, xMargin, xPerKey, tagHeight) {
+                    function drawStatusTags(tagName: string, y: number, xMargin: number, xPerKey: number, tagHeight: number) {
                         const tagColors = [[45, 98, 163], [228, 113, 39], [142, 145, 143]];
-                        settings.statuses.forEach((s, i) => {
-                            const key = s[0];
-                            const code = s[1];
-                            const x = loc.x + xMargin + xPerKey * i;
+                        settings.statuses.forEach((status: string[], index: number) => {
+                            const key = status[0];
+                            const code = status[1];
+                            const x = stationLoc.x + xMargin + xPerKey * index;
                             const keyOrder = objThis.appStatus.orders[key];
                             if (keyOrder) {
-                                const studentOrder = keyOrder[name];
+                                const studentOrder = keyOrder[tagName];
                                 if (studentOrder) {
-                                    p.fill(tagColors[i % tagColors.length]);
-                                    p.rect(x - 2, loc.y + h - tagHeight - 3, xPerKey, tagHeight);
+                                    p.fill(tagColors[index % tagColors.length]);
+                                    p.rect(x - 2, stationLoc.y + h - tagHeight - 3, xPerKey, tagHeight);
                                     p.fill(0);
                                     p.text(code + studentOrder.order, x, y);
                                 }
@@ -117,41 +111,41 @@ export class Sketch {
 
                     p.textFont('Helvetica');
                     p.noStroke();
-                    const station = objThis.stations[loc.index];
-                    p.fill(loc.index === objThis.selectedSeatIndex ?
+                    const station = objThis.stations[stationLoc.index];
+                    p.fill(stationLoc.index === objThis.selectedSeatIndex ?
                         selectedColor : station.answer ?
                             pollAnswerSubmittedColor : 'warn' in station ?
                                 settings.warningColor : settings.normalColor);
-                    p.rect(loc.x, loc.y, w - 3, h - 3);
+                    p.rect(stationLoc.x, stationLoc.y, w - 3, h - 3);
 
                     p.fill(0);
                     const xMargin = 2;
                     p.textSize(10);
                     p.textAlign(p.LEFT, p.TOP);
-                    p.text(stationName(loc.index), loc.x + xMargin, loc.y + 3);
+                    p.text(stationName(stationLoc.index), stationLoc.x + xMargin, stationLoc.y + 3);
 
                     if (station && station.name) {
                         p.fill(station.connected ? 0 : 128);
                         p.textAlign(p.RIGHT);
-                        p.text(station.ip, loc.x + w - xMargin - 2 /* todo why this 2 */, loc.y + 3);
+                        p.text(station.ip, stationLoc.x + w - xMargin - 2 /* todo why this 2 */, stationLoc.y + 3);
                         const parts = station.name.split(/,\s*/);
                         p.textSize(20);
                         p.textAlign(p.CENTER, p.CENTER);
                         const name = parts[1];
                         if (p.textWidth(name) > w) p.textSize(14);
-                        p.text(name, loc.x + w / 2, loc.y + h / 3);
+                        p.text(name, stationLoc.x + w / 2, stationLoc.y + h / 3);
                         p.textSize(12);
-                        p.text(parts[0], loc.x + w / 2, loc.y + h / 3 + 20);
+                        p.text(parts[0], stationLoc.x + w / 2, stationLoc.y + h / 3 + 20);
 
                         p.textSize(14);
                         p.textAlign(p.LEFT, p.BOTTOM);
                         const xPerKey = (w - 2 * xMargin) / objThis.appStatus.keys.length;
                         const tagHeight = 1 / 3 * h;
 
-                        const y = loc.y + h - 4;
+                        const y = stationLoc.y + h - 4;
                         const answer = station.answer;
                         if (objThis.showAnswersInStations && answer) {
-                            p.text(answer, loc.x + xMargin, y);
+                            p.text(answer, stationLoc.x + xMargin, y);
                         } else {
                             drawStatusTags(station.name, y, xMargin, xPerKey, tagHeight);
                         }
@@ -160,23 +154,24 @@ export class Sketch {
 
                 p.background(255);
 
-                stationLocs.forEach(loc => drawStation(loc));
+                stationLocs.forEach(drawStation);
 
                 p.noLoop();
             };
 
-            p.doubleClicked = function () {
-                const w = stationWidth();
-                const h = stationHeight();
-                const x = p.mouseX;
-                const y = p.mouseY;
+            p.doubleClicked = () => {
+                const w = stationWidth()
+                const h = stationHeight()
+                const x = p.mouseX
+                const y = p.mouseY
 
-                stationLocs.forEach(loc => {
-                    if (x >= loc.x && y >= loc.y && x <= loc.x + w && y <= loc.y + h) {
-                        p.doubleClickListeners.forEach(l => l(loc.index));
-                    }
-                });
-            };
+                const clickedStation: StationLoc = stationLocs.find(loc =>
+                    x >= loc.x && y >= loc.y && x <= loc.x + w && y <= loc.y + h)
+
+                if (clickedStation) {
+                    p.doubleClickListeners.forEach(l => l(clickedStation.index))
+                }
+            }
 
             p.doubleClickListeners = [];
          });

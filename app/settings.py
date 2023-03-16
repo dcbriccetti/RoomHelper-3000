@@ -1,13 +1,11 @@
 import re
 
-
-def ms(text: str, code: str):  # Make status
-    s = re.sub(r'\W', '', text)
-    key = s[0].lower() + s[1:]
+def ms(text: str, code: str) -> tuple[str, str, str]:  # Make status
+    cleaned_text = re.sub(r'\W', '', text)
+    key = cleaned_text[0].lower() + cleaned_text[1:]
     return key, code, text
 
-
-settingsTemplate = {
+settingsTemplate: dict[str, any] = {
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
     'chatEnabled': False,
