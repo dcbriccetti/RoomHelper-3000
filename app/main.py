@@ -1,4 +1,3 @@
-from typing import Optional
 from random import choice
 import datetime
 from time import time, strftime
@@ -8,19 +7,12 @@ from html import escape
 from flask import Flask, render_template, request, json
 from flask_socketio import SocketIO, emit
 from markdown import markdown
+
+from app.io_helper import IoHelper
 from app.persister import Persister
 from app.settings import settings
 from app.applog import logger
-
-TEACHER_ID = -1
-RH3K_ID = -2
-OK = 'OK'
-DISCONNECTED = 'disconnected'
-STUDENT_NS = '/student'
-TEACHER_NS = '/teacher'
-ALL_NS = (TEACHER_NS, STUDENT_NS)
-station_dict = dict[str, any]
-indexed_station = tuple[int, station_dict]
+from app.types import *
 
 names: list[str] = []
 stations: list[station_dict] = [{}] * settings['columns'] * settings['rows']
@@ -31,8 +23,8 @@ persister = Persister()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, ping_interval=20)  # A bit more frequent than the default of 25, to try to avoid timeouts causing disconnections
-
+socketio: SocketIO = SocketIO(app, ping_interval=20)  # A bit more frequent than the default of 25, to try to avoid timeouts causing disconnections
+ioh = IoHelper(socketio, stations)
 
 @app.route('/')
 def index():
@@ -49,29 +41,16 @@ def teacher():
     return render_template('teacher.html', settings=json.dumps(settings), stationJson=json.dumps(stations))
 
 
-def on_all_namespaces(event, handler):
-    for ns in ALL_NS:
-        socketio.on_event(event, handler, namespace=ns)
-
-
-def station_by_ip(ip: str) -> Optional[indexed_station]:
-    matches: list[indexed_station] = [item for item in enumerate(stations) if ip == item[1].get('ip')]
-    if not matches: return None
-    if len(matches) > 1:
-        logger.warning(f'More than one station has IP {ip}. Using first one.')
-    return matches[0]
-
-
 @socketio.on('connect', namespace=TEACHER_NS)
 def connect():
-    log_connection(request)
+    ioh.log_connection(request)
 
 
 @socketio.on('connect', namespace=STUDENT_NS)
 def connect():
     r = request
-    log_connection(r)
-    if connect_or_disconnect(True, r):
+    ioh.log_connection(r)
+    if ioh.connect_or_disconnect(True, r):
         logger.warning('Reconnection')
 
 
@@ -79,64 +58,7 @@ def connect():
 def disconnect_request() -> None:
     r = request
     logger.info(f'Disconnected: {r.remote_addr}, {r.sid}')
-    connect_or_disconnect(False, r)
-
-
-def connect_or_disconnect(connected: bool, r) -> bool:
-    match: Optional[indexed_station] = station_by_ip(r.remote_addr)
-    if match:
-        seat_index, station = match
-        station['connected'] = connected
-        emit('connect_station', {'seatIndex': seat_index, 'connected': connected}, broadcast=True, namespace=TEACHER_NS)
-        return True
-    return False
-
-
-def log_connection(r):
-    logger.info(f'Connection from {r.remote_addr}, {r.sid}, {r.user_agent}')
-
-
-def relay_chat(sender_id: int, raw_msg: str) -> None:
-    'Relay chat message, escaping student messages and processing teacher messages with Markdown'
-    r = request
-    sender: str = sender_from_id(sender_id)
-    logger.info(f'Chat message from {sender} at {r.remote_addr}: {raw_msg}')
-    msg = raw_msg if sender_id == TEACHER_ID else escape(raw_msg) + '<br/>'
-    prefixed_msg = strftime('%H:%M:%S') + f' {sender} : {msg}'
-    html = markdown(prefixed_msg) if sender_id == TEACHER_ID else prefixed_msg
-    for ns in ALL_NS:
-        if settings['chatEnabled'] or ns == TEACHER_NS:
-            emit('chat_msg', html, namespace=ns, broadcast=True)
-
-
-def relay_teacher_msg(msg: str) -> None:
-    r = request
-    logger.info(f'Teacher message from {r.remote_addr}: {msg}')
-    html = markdown(msg)
-    for ns in ALL_NS:
-        emit('teacher_msg', html, namespace=ns, broadcast=True)
-
-
-on_all_namespaces('chat_msg', relay_chat)
-on_all_namespaces('teacher_msg', relay_teacher_msg)
-
-
-def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
-    r = request
-    sender: str = sender_from_id(sender_id)
-    logger.info(f'Shares message from {sender} at {r.remote_addr}: {possible_url}')
-    parts = urlparse(possible_url)
-    if allow_any or parts.hostname in settings['allowedSharesDomains']:
-        escaped_url = escape(possible_url)
-        html = f'<p>{strftime("%H:%M:%S")} {sender}: <a href="{escaped_url}" target="_blank">{escaped_url}</a></p>'
-        settings['shares'].append(html)
-        for ns in ALL_NS:
-            if settings['sharesEnabled'] or ns == TEACHER_NS:
-                emit('shares_msg', html, namespace=ns, broadcast=True)
-
-
-def sender_from_id(sender_id):
-    return settings['teacherName'] if sender_id == TEACHER_ID else 'RH3K' if sender_id == RH3K_ID else names[sender_id]
+    ioh.connect_or_disconnect(False, r)
 
 
 @socketio.on('shares_msg', namespace=STUDENT_NS)
@@ -267,14 +189,14 @@ def set_names(message: dict) -> None:
                 si = skip_missing(si + 1)
 
 
-def station_name(index: int) -> str:
-    row_from_0 = int(index / settings['columns'])
-    col_from_0 = index % settings['columns']
-    return chr(ord('A') + row_from_0) + str(col_from_0 + 1)
-
-
 @socketio.on('seat', namespace=STUDENT_NS)
 def seat(message: dict):
+    def station_name(index: int) -> str:
+        row_from_0 = int(index / settings['columns'])
+        col_from_1 = index % settings['columns'] + 1
+        row_letter = chr(ord('A') + row_from_0)
+        return f'{row_letter}{col_from_1}'
+
     if authenticated:
         name = names[int(message['nameIndex'])]
         si = message['seatIndex']
@@ -330,10 +252,6 @@ def warn_student(seat_index: int) -> None:
         logger.info(f'Student {station.get("name")} warned')
 
 
-def broadcast_seated(station, seat_index: int) -> None:
-    emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
-
-
 @socketio.on('set_status', namespace=STUDENT_NS)
 def set_status(message: dict) -> any:
     if authenticated:
@@ -354,6 +272,52 @@ def set_status(message: dict) -> any:
         r = request
         logger.warning(f'set_status from disconnected user {r.remote_addr}, {seat_index}, {r.sid}')
         return DISCONNECTED
+
+
+def broadcast_seated(station, seat_index: int) -> None:
+    emit('seated', {'seatIndex': seat_index, 'station': station}, broadcast=True, namespace=TEACHER_NS)
+
+
+def relay_chat(sender_id: int, raw_msg: str) -> None:
+    'Relay chat message, escaping student messages and processing teacher messages with Markdown'
+    sender: str = sender_from_id(sender_id)
+    logger.info(f'Chat message from {sender} at {request.remote_addr}: {raw_msg}')
+    msg = raw_msg if sender_id == TEACHER_ID else escape(raw_msg) + '<br/>'
+    prefixed_msg = strftime('%H:%M:%S') + f' {sender} : {msg}'
+    html = markdown(prefixed_msg) if sender_id == TEACHER_ID else prefixed_msg
+    for ns in ALL_NS:
+        if settings['chatEnabled'] or ns == TEACHER_NS:
+            emit('chat_msg', html, namespace=ns, broadcast=True)
+
+
+ioh.on_all_namespaces('chat_msg', relay_chat)
+
+
+def relay_teacher_msg(msg: str) -> None:
+    logger.info(f'Teacher message from {request.remote_addr}: {msg}')
+    html = markdown(msg)
+    for ns in ALL_NS:
+        emit('teacher_msg', html, namespace=ns, broadcast=True)
+
+
+ioh.on_all_namespaces('teacher_msg', relay_teacher_msg)
+
+
+def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
+    sender: str = sender_from_id(sender_id)
+    logger.info(f'Shares message from {sender} at {request.remote_addr}: {possible_url}')
+    parts = urlparse(possible_url)
+    if allow_any or parts.hostname in settings['allowedSharesDomains']:
+        escaped_url = escape(possible_url)
+        html = f'<p>{strftime("%H:%M:%S")} {sender}: <a href="{escaped_url}" target="_blank">{escaped_url}</a></p>'
+        settings['shares'].append(html)
+        for ns in ALL_NS:
+            if settings['sharesEnabled'] or ns == TEACHER_NS:
+                emit('shares_msg', html, namespace=ns, broadcast=True)
+
+
+def sender_from_id(sender_id):
+    return settings['teacherName'] if sender_id == TEACHER_ID else 'RH3K' if sender_id == RH3K_ID else names[sender_id]
 
 
 if __name__ == '__main__':
