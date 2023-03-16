@@ -202,6 +202,9 @@ export class Student {
             if (seatSettingsValid()) {
                 socket.emit('seat', {nameIndex: nameIndex(), seatIndex: seatIndex()}, response => {
                     if (response === 'OK') {
+                        q('#dash').style.display = 'inline'
+                        const selectedOption = (q("#name-index") as HTMLSelectElement).selectedOptions[0];
+                        q("#student-name").textContent = selectedOption ? selectedOption.textContent : null
                         $('#name-loc-card').hide();
                         $('#comm').show();
                         audioContext.resume();
