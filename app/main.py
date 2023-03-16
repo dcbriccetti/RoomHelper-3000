@@ -1,4 +1,4 @@
-from typing import Any, List, Dict, Tuple, Union
+from typing import Optional
 from random import choice
 import datetime
 from time import time, strftime
@@ -19,9 +19,11 @@ DISCONNECTED = 'disconnected'
 STUDENT_NS = '/student'
 TEACHER_NS = '/teacher'
 ALL_NS = (TEACHER_NS, STUDENT_NS)
+station_dict = dict[str, any]
+indexed_station = tuple[int, station_dict]
 
-names: List[str] = []
-stations: List[Dict[str, Any]] = [{} for i in range(settings['columns'] * settings['rows'])]
+names: list[str] = []
+stations: list[station_dict] = [{}] * settings['columns'] * settings['rows']
 teacher_password = ''  # Change this
 authenticated = False
 
@@ -52,8 +54,8 @@ def on_all_namespaces(event, handler):
         socketio.on_event(event, handler, namespace=ns)
 
 
-def station_by_ip(ip: str) -> Union[None, Tuple[int, Dict[str, any]]]:
-    matches = [item for item in enumerate(stations) if ip == item[1].get('ip')]
+def station_by_ip(ip: str) -> Optional[indexed_station]:
+    matches: list[indexed_station] = [item for item in enumerate(stations) if ip == item[1].get('ip')]
     if not matches: return None
     if len(matches) > 1:
         logger.warning(f'More than one station has IP {ip}. Using first one.')
@@ -80,8 +82,8 @@ def disconnect_request() -> None:
     connect_or_disconnect(False, r)
 
 
-def connect_or_disconnect(connected, r) -> bool:
-    match: Union[None, Tuple[int, Dict[str, any]]] = station_by_ip(r.remote_addr)
+def connect_or_disconnect(connected: bool, r) -> bool:
+    match: Optional[indexed_station] = station_by_ip(r.remote_addr)
     if match:
         seat_index, station = match
         station['connected'] = connected
@@ -179,7 +181,7 @@ def start_poll(type, question, answers) -> None:
 def answer_poll(message):
     if authenticated:
         seat_index = message['seatIndex']
-        station: Dict[str, Any] = stations[seat_index]
+        station: station_dict = stations[seat_index]
         student_name = station.get('name')
         log_poll('a', student_name, message['answer'])
         emit('answer_poll', message, broadcast=True, namespace=TEACHER_NS)
@@ -314,7 +316,7 @@ def random_call(anyone: bool) -> int:
         eligible = [(k, v) for k, v in enumerate(stations) if v.get('callsLeft', 0) > 0
                     and (anyone or v.get('haveAnswer', False))]
         if eligible:
-            chosen: tuple[int, dict[str, Any]] = choice(eligible)
+            chosen: tuple[int, station_dict] = choice(eligible)
             chosen[1]['callsLeft'] -= 1
             logger.info(f'{chosen[1]["name"]} called randomly')
             return chosen[0]
@@ -324,7 +326,7 @@ def random_call(anyone: bool) -> int:
 @socketio.on('warn', namespace=TEACHER_NS)
 def warn_student(seat_index: int) -> None:
     if authenticated:
-        station: Dict[str, Any] = stations[seat_index]
+        station: station_dict = stations[seat_index]
         logger.info(f'Student {station.get("name")} warned')
 
 
@@ -336,7 +338,7 @@ def broadcast_seated(station, seat_index: int) -> None:
 def set_status(message: dict) -> any:
     if authenticated:
         seat_index = message['seatIndex']
-        station: Dict[str, Any] = stations[seat_index]
+        station: station_dict = stations[seat_index]
         student_name = station.get('name')
         if student_name:
             key, value = message['status']
