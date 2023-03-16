@@ -152,7 +152,8 @@ def auth(password: str) -> bool:
     global authenticated
     if password == teacher_password:
         authenticated = True
-    return authenticated
+        return True
+    return False
 
 
 @socketio.on('ring_bell', namespace=TEACHER_NS)
