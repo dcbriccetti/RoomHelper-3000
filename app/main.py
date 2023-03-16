@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from html import escape
 
 from flask import Flask, render_template, request, json
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, send
 from markdown import markdown
 
 from app.io_helper import IoHelper
@@ -39,6 +39,11 @@ def teacher():
     r = request
     logger.info(f'Teacher page requested from {r.remote_addr}, {r.user_agent}')
     return render_template('teacher.html', settings=json.dumps(settings), stationJson=json.dumps(stations))
+
+
+@socketio.on_error()
+def handle_error(e):
+    print('An error occurred:', e)
 
 
 @socketio.on('connect', namespace=TEACHER_NS)
@@ -250,6 +255,7 @@ def warn_student(seat_index: int) -> None:
     if authenticated:
         station: station_dict = stations[seat_index]
         logger.info(f'Student {station.get("name")} warned')
+        emit('ring_bell', namespace=STUDENT_NS, to=station.get('sid'))
 
 
 @socketio.on('set_status', namespace=STUDENT_NS)
