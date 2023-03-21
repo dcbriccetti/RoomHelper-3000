@@ -5,7 +5,7 @@ def ms(text: str, code: str) -> tuple[str, str, str]:  # Make status
     key = cleaned_text[0].lower() + cleaned_text[1:]
     return key, code, text
 
-settingsTemplate: dict[str, any] = {
+settingsTemplate: dict[str, any] = {  # When changing, also change settings.ts
     'teacherName': 'Dave Briccetti',  # Change this
     'missingSeatIndexes': [],
     'chatEnabled': False,
@@ -18,7 +18,6 @@ settingsTemplate: dict[str, any] = {
         ms('Done',        'D')
     ],
     'chatDelayMs': 5000,
-    'statusChangeEnableDelayMs': 3000,
     'chatMessageMaxLen': 150,
     'allowedSharesDomains': ['repl.it', 'editor.p5js.org', 'scalafiddle.io'],
     'normalColor': (168, 196, 219),

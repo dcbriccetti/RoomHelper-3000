@@ -1,14 +1,15 @@
 import {Socket} from "socket.io-client"
-import {newSocket} from "./io-util"
 import {Status} from "./status"
+import {Settings} from "./settings"
 import {SoundFiles} from "./sound"
 import {TeacherChat, Shares} from "./chat"
 import {Polls} from "./polls"
 import {Sketch} from "./sketch"
+import {newSocket} from "./io-util"
 import {q, qi} from "./dom-util"
 
 export class Teacher {
-    constructor(private settings: any, private stations: any) {
+    constructor(private settings: Settings, private stations: any) {
     }
 
     run() {
