@@ -9,11 +9,11 @@
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
             crossorigin="anonymous"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-    <script>const settings = {{settings | safe}};</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
-    <script type="module">
-        import {Teacher} from "./static/js/teacher.js"
-        new Teacher({{settings | safe}}, {{stationJson | safe}}).run();
+    <script src="./static/js/teacher_bundle.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () =>
+        RoomHelper3000.createTeacher({{ settings | safe }}, {{ stationJson | safe }}));
     </script>
     <link rel="stylesheet" href="static/css/main.css">
     </head>

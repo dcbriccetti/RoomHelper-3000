@@ -1,9 +1,9 @@
 import {Socket} from "socket.io-client"
-import {Chat, Shares} from "./chat.js"
-import {SoundFiles} from "./sound.js"
-import {Status} from "./status.js"
-import {q, qi} from "./dom-util.js"
-import {newSocket} from "./io-util.js"
+import {Chat, Shares} from "./chat"
+import {SoundFiles} from "./sound"
+import {Status} from "./status"
+import {q, qi} from "./dom-util"
+import {newSocket} from "./io-util"
 
 export class Student {
     constructor(private settings: any, private lastSeatIndex: any) {

@@ -8,11 +8,10 @@
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
-    <script type="module">
-        const settings = {{settings | safe}};
-        const lastSeatIndex = {{lastSeatIndex}};
-        import {Student} from "./static/js/student.js"
-        new Student(settings, lastSeatIndex).run();
+    <script src="./static/js/student_bundle.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () =>
+        RoomHelper3000.createStudent({{ settings | safe }}, {{ lastSeatIndex }}));
     </script>
     <link rel="stylesheet" href="static/css/main.css">
 </head>

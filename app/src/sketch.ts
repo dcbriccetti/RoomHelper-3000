@@ -1,5 +1,5 @@
 import {Status} from "./status.js"
-import {qi} from "./dom-util.js"
+import {qi} from "./dom-util"
 
 declare const p5;
 

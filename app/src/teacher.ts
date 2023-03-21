@@ -1,11 +1,11 @@
 import {Socket} from "socket.io-client"
-import {newSocket} from "./io-util.js"
-import {Status} from "./status.js"
-import {SoundFiles} from "./sound.js"
-import {TeacherChat, Shares} from "./chat.js"
-import {Polls} from "./polls.js"
-import {Sketch} from "./sketch.js"
-import {q, qi} from "./dom-util.js"
+import {newSocket} from "./io-util"
+import {Status} from "./status"
+import {SoundFiles} from "./sound"
+import {TeacherChat, Shares} from "./chat"
+import {Polls} from "./polls"
+import {Sketch} from "./sketch"
+import {q, qi} from "./dom-util"
 
 export class Teacher {
     constructor(private settings: any, private stations: any) {
