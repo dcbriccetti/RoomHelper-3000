@@ -7,44 +7,51 @@ export class Polls {
     private savedQas: any[]
 
     constructor(stations: Station[], socket: Socket, private sketch: Sketch) {
-        $('#show-multi-text').hide();
-        $('#show-multi-text').click(() => {
-            $('#show-multi-text').hide();
-            $('#multiple-question-text').show();
-        });
-        $('#multiple-question-text').change(() => {
-            $('#multiple-question-text').hide();
-            $('#show-multi-text').show();
-            $('#multiple-question-select option').remove();
-            const qas = qi('#multiple-question-text').value.split('\n');
-            this.savedQas = [];
-            qas.forEach(qa => {
-                const qaArray = qa.split("|");
-                const q = qaArray[0];
-                this.savedQas.push(qaArray);
-                $('#multiple-question-select').append(`<option value="${q}">${q}</option>`);
-            });
-            $('#multiple-question-select').change();
-        });
+        const showMultiText         = qi('#show-multi-text');
+        const multiQuestionSelect   = qi('#multiple-question-select');
+        const multiQuestionText     = qi('#multiple-question-text');
+        const questionText          = qi('#question-text');
 
-        $('#multiple-question-select').change(() => {
-            $('#question-text').val($('#multiple-question-select').val());
-        });
+        showMultiText.style.display = 'none'
+        showMultiText.addEventListener('click', () => {
+            showMultiText.style.display = 'none'
+            multiQuestionText.style.display = 'block'
+        })
+        multiQuestionText.addEventListener('change', () => {
+            multiQuestionText.style.display = 'none'
+            showMultiText.style.display = 'block'
+            multiQuestionSelect.innerHTML = ''
+            this.savedQas = []
+            for (const qa of multiQuestionText.value.split('\n')) {
+                const qaParts = qa.split("|")
+                this.savedQas.push(qaParts)
+                const question = qaParts[0]
+                const option = document.createElement('option')
+                option.value = question
+                option.text = question
+                multiQuestionSelect.appendChild(option)
+            }
+            multiQuestionSelect.dispatchEvent(new Event('change'))
+        })
+        multiQuestionSelect.addEventListener('change', () => {
+            questionText.value = multiQuestionSelect.value
+        })
+
         const pollTabPrefix = 'poll-tab-';  // In tab IDs in teacher.html
         const enablePoll = $('#enable-poll');
         enablePoll.click(() => {
             if (enablePoll.is(':checked')) {
                 this.updateNumAnswersDisplay();
                 const activePollTabId = $('#poll li a.active').attr('id');
-                const multiAnswers = (document.querySelector<HTMLInputElement>('#multi-answers')).value.split('\n').filter(line => line.trim().length > 0);
-                socket.emit('start_poll', activePollTabId.substring(pollTabPrefix.length), $('#question-text').val(),
-                    multiAnswers);
+                const questionType: string = activePollTabId.substring(pollTabPrefix.length)
+                const multiAnswers: string[] = qi('#multi-answers').value.split('\n').filter(line => line.trim().length > 0);
+                socket.emit('start_poll', questionType, qi('#question-text').value, multiAnswers);
             } else {
                 ['#show-here', '#show-in-chart'].forEach(sel => {
                     if ($(sel).is(':checked')) $(sel).trigger('click');
                 });
                 const answerRows = document.querySelectorAll('#answers tbody tr');
-                document.querySelector('#num-answers').textContent = answerRows.length.toString();
+                qi('#num-answers').textContent = answerRows.length.toString();
                 answerRows.forEach(row => row.remove());
                 this.updateNumAnswersDisplay();
                 socket.emit('stop_poll');
@@ -104,6 +111,7 @@ export class Polls {
         $('#num-answers').text(numAnswers);
         $('#num-answers-plural').text(numAnswers === 1 ? '' : 's');
         const showAnswers = $('#show-answers');
-        if (numAnswers > 0) showAnswers.show(); else showAnswers.hide();
+        if (numAnswers > 0) showAnswers.show();
+        else showAnswers.hide();
     }
 }

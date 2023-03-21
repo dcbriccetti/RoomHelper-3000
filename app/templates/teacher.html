@@ -89,6 +89,7 @@
             </div>
             <div class="tab-pane" id="poll" role="tabpanel" aria-labelledby="poll-tab">
                 <div class="form-group row">
+                    <h5>Question</h5>
                     <textarea class="form-control" id="question-text" rows="2"
                               placeholder="Question"></textarea>
                 </div>
@@ -99,8 +100,8 @@
                            aria-controls="text" aria-selected="true">Text</a>
                     </li>
                     <li class="nav-item">
-                        <a id="poll-tab-multi" class="nav-link" data-toggle="tab" href="#multi" role="tab"
-                           aria-controls="multi" aria-selected="true">Multi</a>
+                        <a id="poll-tab-multi" class="nav-link" data-toggle="tab" href="#multiple-choice" role="tab"
+                           aria-controls="multiple-choice" aria-selected="true">Multiple Choice</a>
                     </li>
                     <li class="nav-item">
                         <a id="poll-tab-scale" class="nav-link" data-toggle="tab" href="#scale" role="tab"
@@ -108,9 +109,11 @@
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane show active" id="text" role="tabpanel" aria-labelledby="poll-tab-text"></div>
-                    <div class="tab-pane" id="multi" role="tabpanel" aria-labelledby="poll-tab-multi">
+                    <div class="tab-pane show active" id="text" role="tabpanel" aria-labelledby="poll-tab-text">
+                    </div>
+                    <div class="tab-pane" id="multiple-choice" role="tabpanel" aria-labelledby="poll-tab-multi">
                         <div class="form-group row">
+                            <h5>Responses</h5>
                             <textarea class="form-control" id="multi-answers" rows="4"
                                       placeholder="Answers"></textarea>
                         </div>
@@ -122,18 +125,20 @@
                 </div>
 
                 <div class="form-group row">
+                    <h5>Multiple Questions</h5>
                     <button id='show-multi-text' class='btn btn-outline-secondary btn-sm'>Paste...</button>
                     <textarea class="form-control" id="multiple-question-text" rows="5"
                               placeholder="Paste multiple questions here"></textarea>
                 </div>
                 <div class="form-group row">
+                    <h5>Select from Multiple Questions</h5>
                     <select class="form-control" id="multiple-question-select"></select>
                 </div>
 
                 <div class="form-group row">
                     <span class="form-control">
                         <input id='enable-poll' type="checkbox">
-                        <label for="enable-poll">Enable</label>
+                        <label for="enable-poll">Show Question</label>
                         <span id='show-answers' style='margin-left: 2em'>Show <span id="num-answers"></span> answer<span id="num-answers-plural"></span>:
                             <input id='show-here' type="checkbox">
                             <label for="show-here">Here</label>

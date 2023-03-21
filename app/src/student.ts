@@ -6,7 +6,7 @@ import {Settings} from "./settings"
 import {updateTimeRemaining} from "./time-util"
 import {q, qi, showIf} from "./dom-util"
 import {newSocket} from "./io-util"
-import {startPoll} from "./poll-client"
+import {StartPollMessage, startPoll} from "./poll-client"
 
 export class Student {
     constructor(private settings: Settings, private lastSeatIndex: number) {
@@ -115,7 +115,7 @@ export class Student {
             columnSelect.selectedIndex = c;
         }
 
-        socket.on('start_poll', msg => startPoll(msg, socket, seatIndex));
+        socket.on('start_poll', (msg: StartPollMessage) => startPoll(msg, socket, seatIndex));
 
         socket.on('stop_poll', () =>
             $('#poll').fadeOut(500, () => {

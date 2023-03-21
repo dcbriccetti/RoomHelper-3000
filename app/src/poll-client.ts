@@ -1,52 +1,62 @@
 import {q, qi} from "./dom-util"
 import {Socket} from "socket.io-client"
 
-interface Message {
+export interface StartPollMessage {
     type: string
     question: string
     answers: string[]
 }
 
-export function startPoll(msg: Message, socket: Socket, seatIndex: () => number) {
-    qi('#text-answer').value = '';
-    q('#question-text').textContent = msg.question;
-    q('#answer-received').style.display = 'none';
-    const pollElement = qi('#poll')
-    pollElement.style.opacity = '0';
-    pollElement.style.transition = 'opacity 500ms ease-in-out';
-    pollElement.style.display = 'block';
-    setTimeout(() => {
-        pollElement.style.opacity = '1';
-    }, 0);
+export function startPoll(msg: StartPollMessage, socket: Socket, seatIndex: () => number) {
+    const textAnswerElem        = qi('#text-answer')
+    const answerReceivedElem    = q ('#answer-received')
+    const questionTextElem      = q ('#question-text')
+    const pollElem              = qi('#poll')
+    const pollOfTypeElem        = q (`#poll-${msg.type}`);
 
-    const pollElem = q(`#poll-${msg.type}`);
+    textAnswerElem.value = '';
+    questionTextElem.textContent = msg.question;
+    answerReceivedElem.style.display = 'none';
+    pollElem.style.display = 'block';
+    pollOfTypeElem.style.display = 'block'
 
-    function answerWith(answer: any, onDone?: (result: any) => void): void {
+    function answerWith(answer: string, onDone?: (result: string) => void): void {
         socket.emit('answer_poll', {
             seatIndex: seatIndex(),
             answer: answer
-        }, (result: any) => {
+        }, (result: string) => {
             if (onDone)
                 onDone(result)
         })
     }
 
     switch (msg.type) {
+        case 'text':
+            textAnswerElem.addEventListener('keypress', e => {
+                if (e.key === 'Enter') {
+                    answerWith(textAnswerElem.value, (result: string) => {
+                        if (result === 'OK')
+                            answerReceivedElem.style.display = 'block';
+                    });
+                } else answerReceivedElem.style.display = 'none'
+            });
+            break
+
         case 'multi':
-            while (pollElem.firstChild) {
-                pollElem.removeChild(pollElem.firstChild);
+            while (pollOfTypeElem.firstChild) {
+                pollOfTypeElem.removeChild(pollOfTypeElem.firstChild);
             }
-            msg.answers.forEach((answer, i) => {
+            msg.answers.forEach((answer: string, i: number) => {
                 const radioId = `ans-${i}`;
                 const newRadio = $(`<input name='multi-answer' id='${radioId}' type="radio">`);
                 newRadio.click(() => answerWith(answer));
-                newRadio.appendTo(pollElem);
-                $(`<span> </span><label for="${radioId}">${answer}</label><br/>`).appendTo(pollElem);
+                newRadio.appendTo(pollOfTypeElem);
+                $(`<span> </span><label for="${radioId}">${answer}</label><br/>`).appendTo(pollOfTypeElem);
             });
             break;
 
         case 'scale':
-            const scaleSlider = qi('#scaleSlider');
+            const scaleSlider = qi('#scale');
             scaleSlider.value = '0';
             const scaleText = qi('#scale-text');
             scaleText.textContent = '0';
@@ -56,18 +66,6 @@ export function startPoll(msg: Message, socket: Socket, seatIndex: () => number)
                 answerWith(scaleSlider.value);
             });
             break;
-
-        case 'text':
-            const answerReceived = q('#answer-received');
-            const elem = qi('#text-answer');
-
-            elem.addEventListener('keyup', e => {
-                if (e.key === 'Enter') {
-                    answerWith(elem.value, result => {
-                        if (result === 'OK') answerReceived.style.display = 'block';
-                    });
-                } else answerReceived.style.display = 'none'
-            });
     }
-    pollElem.style.display = 'block'
+    pollOfTypeElem.style.display = 'block'
 }
