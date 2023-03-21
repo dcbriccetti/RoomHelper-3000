@@ -1,4 +1,5 @@
-type Station = any
+import {Station} from "./station"
+
 type OnHaveAnswerChangeCallback = (numHave: number) => void;
 
 export class Status {

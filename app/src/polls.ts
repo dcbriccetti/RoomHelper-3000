@@ -1,10 +1,12 @@
-import {Sketch} from "./sketch"
 import {Socket} from "socket.io-client"
+import {Sketch} from "./sketch"
+import {Station} from "./station"
+import {qi} from "./dom-util"
 
 export class Polls {
     private savedQas: any[]
 
-    constructor(stations: any, socket: Socket, private sketch: Sketch) {
+    constructor(stations: Station[], socket: Socket, private sketch: Sketch) {
         $('#show-multi-text').hide();
         $('#show-multi-text').click(() => {
             $('#show-multi-text').hide();
@@ -14,7 +16,7 @@ export class Polls {
             $('#multiple-question-text').hide();
             $('#show-multi-text').show();
             $('#multiple-question-select option').remove();
-            const qas = (document.getElementById('multiple-question-text') as HTMLInputElement).value.split('\n');
+            const qas = qi('#multiple-question-text').value.split('\n');
             this.savedQas = [];
             qas.forEach(qa => {
                 const qaArray = qa.split("|");
