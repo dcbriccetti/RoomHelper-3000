@@ -1,5 +1,7 @@
 import {Status} from "./status.js"
 import {qi} from "./dom-util"
+import {Settings} from "./settings"
+import {Station} from "./station"
 
 declare const p5;
 
@@ -14,7 +16,7 @@ export class Sketch {
     private selectedSeatIndex?: number
     private showAnswersInStations: boolean
 
-    constructor(private appStatus: Status, private settings: any, private stations: any) {
+    constructor(private appStatus: Status, private settings: Settings, private stations: Station[]) {
         this.selectedSeatIndex = null
         this.showAnswersInStations = false
     }
@@ -92,7 +94,7 @@ export class Sketch {
 
                     function drawStatusTags(tagName: string, y: number, xMargin: number, xPerKey: number, tagHeight: number) {
                         const tagColors = [[45, 98, 163], [228, 113, 39], [142, 145, 143]];
-                        settings.statuses.forEach((status: string[], index: number) => {
+                        settings.statuses.forEach((status, index: number) => {
                             const key = status[0];
                             const code = status[1];
                             const x = stationLoc.x + xMargin + xPerKey * index;
