@@ -34,6 +34,11 @@ export class Teacher {
                     socket.emit('warn', index)
                 }
                 sketch.loop()
+            } else {
+                // Toggle teacher view
+                const tv = qi('#teacher-view')
+                tv.checked = !tv.checked
+                sketch.reconfigure()
             }
         })
         new Polls(this.stations, socket, sketch);
@@ -154,7 +159,7 @@ export class Teacher {
         }
 
         setNumHaveButton(appStatus.numWithAnswer(objThis.stations));
-        q('#front-view').addEventListener('click', () => sketch.reconfigure());
+        q('#teacher-view').addEventListener('click', () => sketch.reconfigure());
         q('#choose').addEventListener('click', () => {requestRandomCall(true);});
         q('#choose-with-answer').addEventListener('click', () => {requestRandomCall(false);});
         q('#choose-reset').addEventListener('click', () => {

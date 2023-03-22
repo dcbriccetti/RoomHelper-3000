@@ -31,7 +31,7 @@ export class Sketch {
             function getStationLocs(): StationLoc[] {
                 const { columns, rows, aisleAfterColumn } = settings;
                 const missingSeatIndexes = new Set(settings.missingSeatIndexes);
-                const frontView = qi('#front-view').checked;
+                const frontView = qi('#teacher-view').checked;
                 const stationWidth = (p.width - AISLE_WIDTH) / columns;
                 const stationHeight = p.height / rows;
 
