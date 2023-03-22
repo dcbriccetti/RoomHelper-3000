@@ -313,7 +313,7 @@ def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
     sender: str = sender_from_id(sender_id)
     logger.info(f'Shares message from {sender} at {request.remote_addr}: {possible_url}')
     parts = urlparse(possible_url)
-    if allow_any or parts.hostname in settings['allowedSharesDomains']:
+    if allow_any or is_host_approved(parts.hostname):
         escaped_url = escape(possible_url)
         html = f'<p>{strftime("%H:%M:%S")} {sender}: <a href="{escaped_url}" target="_blank">{escaped_url}</a></p>'
         settings['shares'].append(html)
@@ -321,6 +321,11 @@ def relay_shares(sender_id: str, possible_url: str, allow_any=False) -> None:
             if settings['sharesEnabled'] or ns == TEACHER_NS:
                 emit('shares_msg', html, namespace=ns, broadcast=True)
 
+def is_host_approved(hostname: str) -> bool:
+    if not hostname:
+        return False
+    domains = settings['allowedSharesDomains']
+    return bool([host for host in domains if hostname.endswith(host)])
 
 def sender_from_id(sender_id):
     return settings['teacherName'] if sender_id == TEACHER_ID else 'RH3K' if sender_id == RH3K_ID else names[sender_id]

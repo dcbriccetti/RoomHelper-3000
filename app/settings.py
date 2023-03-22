@@ -19,7 +19,7 @@ settingsTemplate: dict[str, any] = {  # When changing, also change settings.ts
     ],
     'chatDelayMs': 5000,
     'chatMessageMaxLen': 150,
-    'allowedSharesDomains': ['repl.it', 'editor.p5js.org', 'scalafiddle.io'],
+    'allowedSharesDomains': 'repl.it replit.com repl.co editor.p5js.org scalafiddle.io'.split(),
     'normalColor': (168, 196, 219),
     'warningColor': (255, 204, 0),
 }
