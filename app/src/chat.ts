@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io-client';
+import {q} from "./dom-util"
 
 export class Messenger {
   constructor(
@@ -12,14 +13,14 @@ export class Messenger {
     const entrySelector = `#${prefix}-msg`;
     const contentsSelector = `#${prefix}-log`;
 
-    const contents = document.querySelector(contentsSelector);
+    const contents = q(contentsSelector);
 
     socket.on(messageMessage, (msg: string) =>
       contents?.insertAdjacentHTML('afterbegin', msg)
     );
     socket.on(clearMessage, () => contents!.innerHTML = '');
 
-    const entryField = document.querySelector(entrySelector) as HTMLInputElement;
+    const entryField = q(entrySelector) as HTMLInputElement;
     let chatAfterTime = 0;
 
     entryField.addEventListener('keypress', (e) => {
