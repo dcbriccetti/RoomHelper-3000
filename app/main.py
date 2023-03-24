@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from html import escape
 
 from flask import Flask, render_template, request, json
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO, emit
 from markdown import markdown
 
 from app.io_helper import IoHelper
@@ -16,7 +16,7 @@ from app.types import *
 
 names: list[str] = []
 stations: list[station_dict] = [{}] * settings['columns'] * settings['rows']
-teacher_password = ''  # Change this
+teacher_password = 'ddd'  # Change this
 authenticated = False
 
 persister = Persister()

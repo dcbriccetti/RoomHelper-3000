@@ -26,7 +26,7 @@ settingsTemplate: dict[str, any] = {  # When changing, also change settings.ts
 
 school1_config = {
     'periods': [
-        (5, '11:50', '12:28'),
+        (5, '11:50', '12:30'),
         (6, '13:10', '13:58'),
         (7, '14:00', '14:50'),
     ]
