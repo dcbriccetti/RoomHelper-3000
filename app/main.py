@@ -1,6 +1,7 @@
 from random import choice
 import datetime
 from time import time, strftime
+from typing import Any
 from urllib.parse import urlparse
 from html import escape
 
@@ -105,7 +106,7 @@ def start_poll(type, question, answers) -> None:
 
 
 @socketio.on('answer_poll', namespace=STUDENT_NS)
-def answer_poll(message):
+def answer_poll(message: dict[str, str | int]):
     if authenticated:
         seat_index = message['seatIndex']
         station: station_dict = stations[seat_index]

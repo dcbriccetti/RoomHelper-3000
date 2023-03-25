@@ -1,25 +1,26 @@
 import {Socket} from "socket.io-client"
 import {Sketch} from "./sketch"
 import {Station} from "./station"
-import {qi} from "./dom-util"
+import {q, qi, Hider} from "./dom-util"
 
-export class Polls {
-    private savedQas: any[]
+export class PollTeacher {
+    private savedQas: string[][]
 
-    constructor(stations: Station[], socket: Socket, private sketch: Sketch) {
-        const showMultiText         = qi('#show-multi-text');
-        const multiQuestionSelect   = qi('#multiple-question-select');
-        const multiQuestionText     = qi('#multiple-question-text');
-        const questionText          = qi('#question-text');
+    constructor(private stations: Station[], socket: Socket, private sketch: Sketch) {
+        const showMultiText             = qi('#show-multi-text');
+        const multiQuestionSelect       = qi('#multiple-question-select');
+        const multiQuestionText         = qi('#multiple-question-text');
+        const questionText              = qi('#question-text');
+        const hider                     = new Hider();
 
-        showMultiText.style.display = 'none'
+        hider.hide(showMultiText)
         showMultiText.addEventListener('click', () => {
-            showMultiText.style.display = 'none'
-            multiQuestionText.style.display = 'block'
+            hider.hide(showMultiText)
+            hider.show(multiQuestionText)
         })
         multiQuestionText.addEventListener('change', () => {
-            multiQuestionText.style.display = 'none'
-            showMultiText.style.display = 'block'
+            hider.hide(multiQuestionText)
+            hider.show(showMultiText)
             multiQuestionSelect.innerHTML = ''
             this.savedQas = []
             for (const qa of multiQuestionText.value.split('\n')) {
@@ -67,43 +68,9 @@ export class Polls {
             sketch.loop();
         });
 
-        socket.on('answer_poll', msg => {
-            const station = stations[msg.seatIndex];
-            if (! $('#show-here').is(':checked') && ! $('#show-in-chart').is(':checked')) {
-                station.answer = msg.answer;
-                sketch.loop();
-                $(`#answer-${msg.seatIndex}`).remove();
-                let insertBefore;
-                $('#answers table tbody').children().each((i, tr) => {
-                    const tds = $(tr).children();
-                    if (!insertBefore && tds[0].textContent > station.name) {
-                        insertBefore = $(tr);
-                    }
-                });
-                const answerClass = this.getAnswerClass(msg.answer);
-                const newRow = $(`<tr id="answer-${msg.seatIndex}"><td>${station.name}</td><td class="${answerClass}">${msg.answer}</td></tr>`);
-                if (insertBefore)
-                    newRow.insertBefore(insertBefore);
-                else
-                    newRow.appendTo($('#answers table tbody'));
-                this.updateNumAnswersDisplay();
-            } else console.log(`Ignoring poll response from ${station.name}: ${msg.answer}`)
-        });
+        socket.on('answer_poll', this.answerPoll);
 
         this.updateNumAnswersDisplay();
-    }
-
-    getAnswerClass(studentAnswer) {
-        if (this.savedQas) {
-            const currentQuestion = $('#question-text').val();
-            const foundQa = this.savedQas.find(e => e[0] === currentQuestion);
-            if (foundQa) {
-                const answerRegEx = foundQa[1];
-                if (answerRegEx && new RegExp(answerRegEx).exec(studentAnswer))
-                    return 'right-answer';
-            }
-        }
-        return 'unknown-answer';
     }
 
     updateNumAnswersDisplay() {
@@ -113,5 +80,54 @@ export class Polls {
         const showAnswers = $('#show-answers');
         if (numAnswers > 0) showAnswers.show();
         else showAnswers.hide();
+    }
+
+    answerPoll(msg) {
+        const station = this.stations[msg.seatIndex]
+
+        const showHereCheckbox = qi('#show-here')
+        const showInChartCheckbox = qi('#show-in-chart')
+
+        if (!showHereCheckbox.checked && !showInChartCheckbox.checked) {
+            station.answer = msg.answer
+            this.sketch.loop()
+
+            const answerRow = q(`#answer-${msg.seatIndex}`)
+            if (answerRow) {
+                answerRow.remove()
+            }
+
+            let insertBefore
+            const tableRows = document.querySelectorAll('#answers table tbody tr')
+            for (const tr of tableRows) {
+                const tds = tr.children
+                if (!insertBefore && tds[0].textContent > station.name) {
+                    insertBefore = tr
+                }
+            }
+
+            const newRow = document.createElement('tr')
+            newRow.id = `answer-${msg.seatIndex}`
+
+            const stationNameCell = document.createElement('td')
+            stationNameCell.textContent = station.name
+            newRow.appendChild(stationNameCell)
+
+            const answerCell = document.createElement('td')
+            answerCell.textContent = msg.answer
+            newRow.appendChild(answerCell)
+
+            const tableBody = q('#answers table tbody')
+
+            if (insertBefore) {
+                tableBody.insertBefore(newRow, insertBefore)
+            } else {
+                tableBody.appendChild(newRow)
+            }
+
+            this.updateNumAnswersDisplay()
+        } else {
+            console.log(`Ignoring poll response from ${station.name}: ${msg.answer}`)
+        }
     }
 }

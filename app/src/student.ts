@@ -6,7 +6,7 @@ import {Settings} from "./settings"
 import {updateTimeRemaining} from "./time-util"
 import {q, qi, showIf} from "./dom-util"
 import {newSocket} from "./io-util"
-import {StartPollMessage, startPoll} from "./poll-client"
+import {StartPollMessage, startPoll} from "./poll-student"
 
 export class Student {
     constructor(private settings: Settings, private lastSeatIndex: number) {

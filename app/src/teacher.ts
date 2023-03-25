@@ -3,7 +3,7 @@ import {Status} from "./status"
 import {Settings} from "./settings"
 import {SoundFiles} from "./sound"
 import {TeacherChat, Shares} from "./chat"
-import {Polls} from "./polls"
+import {PollTeacher} from "./poll-teacher"
 import {Sketch} from "./sketch"
 import {newSocket} from "./io-util"
 import {q, qi} from "./dom-util"
@@ -41,7 +41,7 @@ export class Teacher {
                 sketch.reconfigure()
             }
         })
-        new Polls(this.stations, socket, sketch);
+        new PollTeacher(this.stations, socket, sketch);
         const tm = qi('#teacher-msg');
         tm.addEventListener('keydown', e => {
           if (e.key === 'Enter') {
