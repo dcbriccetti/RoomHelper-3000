@@ -37,9 +37,21 @@ export class Student {
 
         socket.on('ring_bell', () => soundFiles.play(0));
         socket.on('set_names', msg => {
-            $('#name-index option:gt(0)').remove();
-            const sel = $('#name-index');
-            msg.names.forEach((name, i) => sel.append(`<option value="${i}">${name}</option>`));
+            // Get the select dropdown element by its ID
+            const sel = q('#name-index') as HTMLSelectElement
+
+            // Remove all options except the first one
+            Array.from(sel.options).slice(1).forEach(option => {
+                sel.removeChild(option);
+            });
+
+            // Add new options from the received names
+            msg.names.forEach((name, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = name;
+                sel.appendChild(option);
+            });
         });
 
         socket.on('clear_checks',
