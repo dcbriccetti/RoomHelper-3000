@@ -26,17 +26,13 @@ settingsTemplate: dict[str, any] = {  # When changing, also change settings.ts
 
 school1_config = {
     'periods': [
-        (5, '11:50', '12:30'),
-        (6, '13:10', '13:58'),
-        (7, '14:00', '14:50'),
+        (7, '14:05', '14:53'),
     ]
 }
 
 room1 = {
-    'columns': 9,
-    'rows': 4,
-    'missingSeatIndexes': [num for num in range(8, 32, 9)],
-    'aisleAfterColumn': 3,
+    'columns': 7,
+    'rows': 3,
 }
 
 settings = settingsTemplate
