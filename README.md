@@ -15,7 +15,7 @@ A webapp to manage a class of students in a computer lab.
 - provides a bell that rings on all the computers
 - allows the teacher to pre-load poll questions
 
-Improvement ideas:
+## Improvement ideas
 
 - Log in with Google
     - Here’s a guide: https://fosstack.com/how-to-add-google-authentication-in-django/ . Is this a good way?
@@ -35,3 +35,9 @@ chart instead of by row and column
   - Class periods 
 
 ![Screen shot](screen1-large.png)
+
+## Running
+`flask run --host='0.0.0.0'`
+
+## Creating the js files
+use build from the run menu in IntelliJ IDEA
