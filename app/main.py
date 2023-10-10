@@ -1,7 +1,6 @@
 from random import choice
 import datetime
 from time import time, strftime
-from typing import Any
 from urllib.parse import urlparse
 from html import escape
 
