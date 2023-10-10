@@ -68,7 +68,7 @@ export class PollTeacher {
             sketch.loop();
         });
 
-        socket.on('answer_poll', this.answerPoll);
+        socket.on('answer_poll', (msg) => {this.answerPoll(msg, this)});
 
         this.updateNumAnswersDisplay();
     }
@@ -82,8 +82,8 @@ export class PollTeacher {
         else showAnswers.hide();
     }
 
-    answerPoll(msg) {
-        const station = this.stations[msg.seatIndex]
+    answerPoll(msg, objectInstance) {
+        const station = objectInstance.stations[msg.seatIndex]
 
         const showHereCheckbox = qi('#show-here')
         const showInChartCheckbox = qi('#show-in-chart')
