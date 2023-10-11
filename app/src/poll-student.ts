@@ -33,7 +33,8 @@ export function startPoll(msg: StartPollMessage, socket: Socket, seatIndex: () =
     switch (msg.type) {
         case 'text':
             textAnswerElem.addEventListener('keypress', e => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && ! e.shiftKey) {
+                    e.preventDefault()
                     answerWith(textAnswerElem.value, (result: string) => {
                         if (result === 'OK')
                             answerReceivedElem.style.display = 'block';

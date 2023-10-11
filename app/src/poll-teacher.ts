@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import {Socket} from "socket.io-client"
 import {Sketch} from "./sketch"
 import {Station} from "./station"
@@ -114,7 +115,7 @@ export class PollTeacher {
             newRow.appendChild(stationNameCell)
 
             const answerCell = document.createElement('td')
-            answerCell.textContent = msg.answer
+            answerCell.innerHTML = DOMPurify.sanitize(msg.answer).replace(/\n/g, '<br/>').replace(/ /g, '&nbsp;')
             newRow.appendChild(answerCell)
 
             const tableBody = q('#answers table tbody')
